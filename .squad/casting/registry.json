@@ -1,0 +1,53 @@
+{
+  "agents": {
+    "lead": {
+      "persistent_name": "Leela",
+      "universe": "Futurama",
+      "created_at": "2026-04-15T12:04:45Z",
+      "legacy_named": false,
+      "status": "active"
+    },
+    "frontend-dev": {
+      "persistent_name": "Fry",
+      "universe": "Futurama",
+      "created_at": "2026-04-15T12:04:45Z",
+      "legacy_named": false,
+      "status": "active"
+    },
+    "backend-dev": {
+      "persistent_name": "Bender",
+      "universe": "Futurama",
+      "created_at": "2026-04-15T12:04:45Z",
+      "legacy_named": false,
+      "status": "active"
+    },
+    "devops": {
+      "persistent_name": "Hermes",
+      "universe": "Futurama",
+      "created_at": "2026-04-15T12:04:45Z",
+      "legacy_named": false,
+      "status": "active"
+    },
+    "tester": {
+      "persistent_name": "Amy",
+      "universe": "Futurama",
+      "created_at": "2026-04-15T12:04:45Z",
+      "legacy_named": false,
+      "status": "active"
+    },
+    "scribe": {
+      "persistent_name": "Scribe",
+      "universe": "N/A",
+      "created_at": "2026-04-15T12:04:45Z",
+      "legacy_named": false,
+      "status": "active"
+    },
+    "work-monitor": {
+      "persistent_name": "Ralph",
+      "universe": "N/A",
+      "created_at": "2026-04-15T12:04:45Z",
+      "legacy_named": false,
+      "status": "active"
+    }
+  }
+}
