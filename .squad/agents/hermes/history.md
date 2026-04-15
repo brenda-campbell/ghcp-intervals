@@ -8,3 +8,22 @@
 ## Learnings
 
 <!-- Append new learnings below. Each entry is something lasting about the project. -->
+
+### 2026-04-15 — Bicep Infrastructure Created (infra-bicep)
+- **What:** Created `infra/` directory with `main.bicep` orchestrator + 3 modules: `staticWebApp.bicep`, `cosmosDb.bicep`, `signalr.bicep`. Added `main.bicepparam` for dev environment.
+- **Naming convention:** `${appName}-${environmentName}-{resource}` (e.g., `fastestfinger-dev-cosmos`). All resources tagged with `environment` and `app`.
+- **Cosmos DB:** Serverless capacity mode. Database `fastestfinger` with `users` (partition key `/userId`) and `questions` (partition key `/category`). Composite index on `users` for `totalScore DESC` + `userId ASC` to support leaderboard queries.
+- **SignalR:** Serverless mode via `ServiceMode` feature flag — matches ADR-002 (Azure Functions bindings, not standalone hub).
+- **Static Web App:** Free tier, configured with `appLocation: /client`, `apiLocation: /api`, `outputLocation: dist` for React + managed Functions.
+- **Secrets in outputs:** Bicep linter warns about connection strings in module outputs. Acceptable for CI/CD pipeline consumption. Future improvement: route through Key Vault.
+- **Parameter file:** Uses `.bicepparam` format (Bicep-native) rather than JSON parameters.
+
+### 2026-04-15 — GitHub Actions CI/CD Pipeline Created (cicd-pipeline)
+- **What:** Created `.github/workflows/deploy.yml` — single workflow per ADR-005 with two jobs: `infrastructure` (Bicep deploy) → `build-and-deploy` (Node 20, build, test, SWA deploy).
+- **Auth:** OIDC federated credentials via `azure/login@v2`. Requires secrets: `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`, `AZURE_RG`.
+- **SWA deploy token:** Extracted from Bicep output (`staticWebAppDeploymentToken`) and masked in logs. Falls back to `AZURE_STATIC_WEB_APPS_API_TOKEN` secret if set directly.
+- **Tests:** Uses `npm test --if-present` with `continue-on-error: true` so the pipeline doesn't fail while test suites are still being written.
+- **Concurrency:** `deploy-${{ github.ref }}` group with `cancel-in-progress: true` to avoid redundant deployments.
+- **SWA action paths:** `app_location: src/frontend`, `api_location: src/api`, `output_location: dist` — matches actual project directory structure.
+- **npm cache:** `actions/setup-node@v4` caches both `src/frontend/package-lock.json` and `src/api/package-lock.json` for faster CI.
+- **Prod note:** Workflow comments document that production deployments should use GitHub Environment protection rules with required reviewers.

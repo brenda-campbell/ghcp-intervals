@@ -8,3 +8,95 @@
 ## Learnings
 
 <!-- Append new learnings below. Each entry is something lasting about the project. -->
+
+### fe-scaffold (2026-04-15)
+- **Project location:** `src/frontend/` — Vite 8 + React 19 + TypeScript 6
+- **Key packages:** `@tailwindcss/vite` (Tailwind v4), `tw-animate-css`, `@phosphor-icons/react`, shadcn/ui (new-york style), `class-variance-authority`, `clsx`, `tailwind-merge`
+- **Design system:** Tailwind v4 `@theme` block in `src/index.css` — no `tailwind.config.js`. Colors: primary (#4A90E2), background (#2A2D3A), accent (#C5F542), card (#353849), github-black (#1B1D23)
+- **Fonts:** Space Grotesk (sans, headings) + JetBrains Mono (mono, answers/leaderboard) loaded via Google Fonts in `index.html`
+- **Typography classes:** `.h1`, `.h2`, `.body-mono`, `.ui-label`, `.leaderboard-text`, `.caption` — defined in `index.css`
+- **shadcn/ui components:** Card, Button, Badge, Progress, Separator, Table, Skeleton, Alert in `src/components/ui/`
+- **Path alias:** `@/` → `src/` configured in both `tsconfig.app.json` and `vite.config.ts`
+- **SWA config:** `staticwebapp.config.json` at repo root with SPA fallback and `/api/*` routing
+- **shadcn quirk:** With TS6, `paths` works without `baseUrl` (deprecated). shadcn CLI may create a literal `@/` directory — files need manual move to `src/`.
+
+### fe-question-ui (2026-04-15)
+- **QuestionCard** (`src/components/QuestionCard.tsx`): Displays question text (h2 class), category Badge, difficulty Badge (color-coded easy/medium/hard), progress "N / M" indicator. Uses shadcn Card as container. Accepts children for composing AnswerGrid + Timer inside.
+- **AnswerGrid** (`src/components/AnswerGrid.tsx`): 2×2 grid (sm:grid-cols-2) → single-column on mobile. Options labeled A–D, JetBrains Mono via `body-mono` class. Selected state: scale 1.03 + primary bg + shadow. Unselected fade to 60% opacity. Disabled after selection prevents double-tap. Min height 56px per PRD.
+- **QuestionPage** (`src/components/QuestionPage.tsx`): Orchestrator with loading/playing/feedback/done/error phases. Fetches 3 questions from `/api/questions?count=3` on mount. Tracks elapsed time with 100ms interval. Submits answers via POST `/api/answer` with `userId` from UserContext. Shows inline correct/incorrect feedback + points. Advances through questions, then shows "Round Complete" card with Play Again.
+- **API service** (`src/services/api.ts`): Already had `fetchQuestions`, `submitAnswer`, User/Leaderboard types from prior work. Used as-is — no changes needed.
+- **App.tsx wiring:** Default view changed from "leaderboard" to "quiz". Quiz placeholder text replaced with `<QuestionPage />`. Mobile padding adjusted to p-4.
+- **Build:** Compiles clean (`npm run build` — 0 errors, 0 warnings).
+
+### fe-session (2026-04-15)
+- **User identity:** Anonymous — no login. `userId` stored in localStorage under key `ff_userId`. On mount, context checks localStorage → GET to refresh or POST to create.
+- **API service:** `src/services/api.ts` — typed client with `createUser()`, `getUser()`, `fetchQuestions()`, `submitAnswer()`. Uses shared `ApiError` class with `.status`.
+- **User context:** `src/contexts/UserContext.tsx` — `UserProvider` wraps the app in `main.tsx`. Exposes `{ user, isLoading, error, refreshUser }` via `useUser()` hook.
+- **UserBadge:** `src/components/UserBadge.tsx` — shows display name + score in header, skeleton while loading, "Offline" badge on error.
+- **TS6 gotcha:** `erasableSyntaxOnly` prevents `public` parameter properties in constructors. Must declare field separately and assign in body.
+- **Wiring:** `UserProvider` wraps `<App />` in `main.tsx`. App shows loading skeletons until user is resolved.
+
+### fe-timer (2026-04-15)
+- **Timer hook:** `src/hooks/useTimer.ts` — returns `{ elapsedMs, elapsedDisplay, start, stop, reset, isRunning, colorState }`. Uses `performance.now()` + `requestAnimationFrame` for precision timing. `colorState` is `'fast' | 'warning' | 'danger'` based on thresholds (0-5s, 5-10s, 10s+).
+- **Timer component:** `src/components/Timer.tsx` — accepts props from hook, renders time in JetBrains Mono (`font-mono`) at `text-5xl`. Shows Phosphor `Clock` icon + shadcn `Progress` bar underneath.
+- **Color states:** fast = Electric Lime (#C5F542), warning = amber-400, danger = red-500. All use CSS `transition-all duration-500` for smooth shifts. Glow effects via `drop-shadow`.
+- **Animations:** `timer-pulse` (1s loop, scale 1.02x while running), `timer-freeze` (300ms scale+brightness flash on stop). Keyframes in `index.css`.
+- **Props-driven design:** Timer component is stateless — parent owns the hook and passes data as props. This keeps Timer reusable and testable.
+- **Pre-existing build errors:** `api.ts` (TS1294 erasableSyntaxOnly) and `UserContext.tsx` (TS2305/TS18046) fail `tsc`. Vite build succeeds. Timer code is clean.
+
+### fe-leaderboard (2026-04-15)
+- **Leaderboard API:** `getLeaderboard(userId?)` in `src/services/api.ts`. Returns `LeaderboardResponse` with `leaderboard` array + optional `userRank` (when user is outside top 10).
+- **RankBadge:** `src/components/RankBadge.tsx` — gold/silver/bronze badges for top 3 using Phosphor Trophy (1st) and Medal (2nd/3rd) icons. Gradient backgrounds. Falls back to `#N` for ranks >3.
+- **Leaderboard table:** `src/components/Leaderboard.tsx` — shadcn Table with columns: Rank, Player, Score, Games, Fastest. Current user row highlighted with Electric Lime accent + left border. Alternating row colors via `bg-muted/20`. If user is outside top 10, separator + user row appended below.
+- **LeaderboardPage:** `src/components/LeaderboardPage.tsx` — fetches on mount, auto-refreshes every 30s. Skeleton loading (8 rows), error alert with retry button, "last updated" timestamp.
+- **Navigation:** Tab bar in `App.tsx` — "Quiz" and "Leaderboard" tabs with icon toggle (fill/regular weight). Tab state managed with `useState<View>`.
+- **Fonts:** Space Grotesk for player names (font-sans), JetBrains Mono for scores/numbers (font-mono), matching PRD spec.
+- **Fix:** Added `ApiRequestError` export alias for `ApiError` in api.ts — UserContext was importing a name that didn't exist. Build now succeeds cleanly with `tsc -b && vite build`.
+
+### fe-animations (2026-04-15)
+- **Page transitions:** `animate-page-enter` (fade+slide-up, 300ms) applied via `key={view}` in App.tsx. Remounts content on tab switch, triggering enter animation.
+- **Tab indicator:** Sliding `<div>` with `transition-all duration-300` using `useRef` + `useEffect` to track active tab position. Buttons are `relative z-10` above the indicator.
+- **Question transitions:** Horizontal slide-out/slide-in using `animate-question-slide-out` (200ms, translateX -30px) and `animate-question-slide-in` (300ms, translateX 30px). Managed via `transitioning` state + `questionAnimKey` for React remount.
+- **Answer stagger:** Each option gets `animate-[option-stagger-in_300ms_ease-out_backwards]` with `animationDelay: i * 75ms` (A→B→C→D). Uses `backwards` fill-mode so transitions still work after animation completes.
+- **Leaderboard row enter:** Inline `style.animation` with `row-enter 350ms ease-out ${i*50}ms backwards` for staggered entrance. #1 position gets additional `shimmer-glow 3s 500ms ease-in-out infinite`.
+- **Score tick-up:** `AnimatedScore` component in Leaderboard.tsx uses `requestAnimationFrame` + ease-out cubic curve over 800ms. Preserves `prevRef` across re-renders for delta animation on 30s refresh.
+- **UserBadge score delta:** Tracks `prevScoreRef` vs `user.totalScore`. Shows floating `+N` with `score-float-up` animation (1.2s) using TrendUp icon. Auto-clears after 1.4s.
+- **Micro-interactions:** `hover:scale-[1.03] active:scale-[0.97]` on all action buttons (Retry, Play Again, Next, View Leaderboard). `transition-transform duration-150` for smoothness.
+- **Skeleton pulse:** `animate-skeleton-shimmer` (opacity 0.4↔0.7, 1.5s infinite) on loading states.
+- **Accessibility:** `@media (prefers-reduced-motion: reduce)` disables all animations/transitions globally.
+- **Performance:** `will-change-[opacity,transform]` on animated wrappers. All animations use `transform` + `opacity` only (GPU composited, no layout thrash).
+- **CSS-only approach:** Zero new dependencies. All animations are CSS keyframes + transitions. Bundle size unchanged.
+
+### fe-feedback (2026-04-15)
+- **AnswerFeedback** (`src/components/FeedbackOverlay.tsx`): Shows CheckCircle (green, drop-shadow glow) for correct, XCircle (red) for incorrect. Displays time taken, animated ScoreDelta points counter, and reveals the correct answer text when wrong. Exported as both `AnswerFeedback` and `FeedbackOverlay`.
+- **AnswerGrid enhanced**: Added `correctIndex` and `isCorrect` props. After submission: correct option gets green glow + `animate-glow-correct`, wrong selected gets red + shake + strikethrough via `animate-shake`, non-relevant options fade to 30% opacity.
+- **ScoreDelta** (`src/components/ScoreDelta.tsx`): Counting-up animation over 800ms with ease-out cubic curve using `requestAnimationFrame`. Phosphor TrendUp icon + Electric Lime accent color. `animate-score-float` for entrance.
+- **RoundComplete** (`src/components/RoundComplete.tsx`): Full summary card — per-question breakdown (CheckCircle/XCircle + question text + points), animated total points counter, "View Leaderboard" + "Play Again" buttons. CSS confetti animation on perfect scores (30 pieces, randomized colors/delays/sizes).
+- **QuestionPage refactored**: Tracks `roundResults` array across questions. Auto-advances after 2s (`FEEDBACK_DURATION_MS`) with manual "Next →" skip button. Slide transitions between questions via `animate-fade-slide-in`/`animate-fade-slide-out` with 250ms delay. Added `onNavigateToLeaderboard` prop wired to App.tsx's tab switcher.
+- **CSS animations added to `index.css`**: `feedback-shake` (300ms, 3 oscillations), `feedback-glow` (400ms green shadow), `score-float` (600ms bounce-in), `fade-slide-in`/`fade-slide-out` (300/200ms), `confetti-fall` (randomized per piece), `count-pop` (scale pulse).
+- **Build:** Clean (`tsc -b && vite build` — 0 errors, 0 warnings).
+
+### fe-mobile (2026-04-15)
+- **Viewport:** Added `viewport-fit=cover` to `index.html` meta + `theme-color` meta for notched phones. Body uses `env(safe-area-inset-*)` padding and `min-height: 100dvh`.
+- **Overflow prevention:** `overflow-x: hidden` on `html` and `body` in `index.css` — no horizontal scroll on any view.
+- **Responsive typography:** `index.css` media query at 640px scales `.h1` → 28px, `.h2` → 22px, `.body-mono` → 16px, `.ui-label` → 14px. Mobile-first approach.
+- **App.tsx:** Header uses `min-w-0` + `truncate` on title, `shrink-0` on badge area. Nav tabs use `flex-1` + `min-h-[44px]` for full-width touch targets. Padding tightened to `p-3` on mobile.
+- **UserBadge:** `max-w-[180px]` on mobile with `truncate` on display name. Score and icon elements use `shrink-0`.
+- **QuestionCard:** Card padding reduced to `p-4` on mobile (→ `sm:p-6` on larger). Same mobile-first approach.
+- **AnswerGrid:** `min-h-[48px]` on mobile (→ `sm:min-h-14`), tighter `px-3` mobile padding. Already had single-column mobile layout.
+- **QuestionPage:** Timer display centered on mobile with larger text. "Next Question" / "Play Again" buttons are `w-full min-h-[44px]` on mobile.
+- **Leaderboard:** Table wrapped in `overflow-x-auto` div. Player name cells use `max-w-[120px]` + `truncate` on mobile. "Games" column hidden < sm, "Fastest" hidden < md (already existed).
+- **Timer component:** Progress bar changed from fixed `w-48` to `w-full max-w-48`. Timer font scales `text-4xl sm:text-5xl`.
+- **Build:** Compiles clean (`tsc -b && vite build` — 0 errors).
+
+### fe-signalr (2026-04-15)
+- **Package:** `@microsoft/signalr` added to dependencies. Connects via `/api` (Azure SWA proxies `/api/negotiate` automatically).
+- **Hook:** `src/hooks/useSignalR.ts` — `HubConnectionBuilder` with automatic reconnect `[0, 2s, 5s, 10s, 30s]`. Tracks `connectionState` (connecting/connected/reconnecting/disconnected). Listens for `leaderboardUpdate` and `playerAnswered` events. Cleans up on unmount via `mountedRef` pattern.
+- **Context:** `src/contexts/SignalRContext.tsx` — wraps `useSignalR` hook, provides `{ connection, connectionState, leaderboardData, playerActivity }` to all components. Uses React 19 `<Context value={}>` pattern (no `.Provider`).
+- **ConnectionStatus:** `src/components/ConnectionStatus.tsx` — green/amber/red dot + label. Pulsing ping animation for connecting/reconnecting states.
+- **LeaderboardPage:** Real-time updates via `leaderboardUpdate` event replace polling when connected. Falls back to 30s polling when disconnected. Shows "Live" badge (Broadcast icon) when SignalR is connected.
+- **QuestionPage:** Shows "X answering…" counter from `playerAnswered` events with UsersThree icon + pulse animation.
+- **App.tsx:** `ConnectionStatus` component added to header next to UserBadge.
+- **main.tsx:** `SignalRProvider` wraps `<App />` inside `UserProvider`.
+- **Pre-existing fix:** `Leaderboard.tsx` had swapped `TableHeader`/`TableRow` nesting causing 5 TS errors — fixed as part of this work.
+- **Build:** Clean `tsc -b && vite build` — 0 errors, 0 warnings.

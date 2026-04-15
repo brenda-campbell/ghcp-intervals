@@ -1,0 +1,26 @@
+{
+  "name": "fastestfinger-api",
+  "version": "1.0.0",
+  "description": "Fastest Finger Quiz — Azure Functions backend",
+  "main": "dist/src/functions/*.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "clean": "rimraf dist",
+    "prestart": "npm run clean && npm run build",
+    "start": "func start",
+    "seed": "tsx src/scripts/seedQuestions.ts",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@azure/cosmos": "^4.2.0",
+    "@azure/functions": "^4.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "rimraf": "^5.0.5",
+    "tsx": "^4.21.0",
+    "typescript": "^5.4.0",
+    "vitest": "^4.1.4"
+  }
+}

@@ -1,0 +1,519 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.40.2.10011",
+      "templateHash": "15833994662647690459"
+    }
+  },
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "eastus",
+      "metadata": {
+        "description": "Azure region for all resources"
+      }
+    },
+    "environmentName": {
+      "type": "string",
+      "defaultValue": "dev",
+      "allowedValues": [
+        "dev",
+        "staging",
+        "prod"
+      ],
+      "metadata": {
+        "description": "Environment name (dev, staging, prod)"
+      }
+    },
+    "appName": {
+      "type": "string",
+      "defaultValue": "fastestfinger",
+      "metadata": {
+        "description": "Application name prefix used for all resources"
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "deploy-staticWebApp",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "environmentName": {
+            "value": "[parameters('environmentName')]"
+          },
+          "appName": {
+            "value": "[parameters('appName')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.40.2.10011",
+              "templateHash": "8788332246705352420"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string",
+              "metadata": {
+                "description": "Azure region for the Static Web App"
+              }
+            },
+            "environmentName": {
+              "type": "string",
+              "metadata": {
+                "description": "Environment name (dev, staging, prod)"
+              }
+            },
+            "appName": {
+              "type": "string",
+              "metadata": {
+                "description": "Application name prefix"
+              }
+            }
+          },
+          "variables": {
+            "staticWebAppName": "[format('{0}-{1}-swa', parameters('appName'), parameters('environmentName'))]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Web/staticSites",
+              "apiVersion": "2023-12-01",
+              "name": "[variables('staticWebAppName')]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "Free",
+                "tier": "Free"
+              },
+              "properties": {
+                "stagingEnvironmentPolicy": "Enabled",
+                "allowConfigFileUpdates": true,
+                "buildProperties": {
+                  "appLocation": "/client",
+                  "apiLocation": "/api",
+                  "outputLocation": "dist"
+                }
+              },
+              "tags": {
+                "environment": "[parameters('environmentName')]",
+                "app": "[parameters('appName')]"
+              }
+            }
+          ],
+          "outputs": {
+            "hostname": {
+              "type": "string",
+              "metadata": {
+                "description": "Default hostname of the Static Web App"
+              },
+              "value": "[reference(resourceId('Microsoft.Web/staticSites', variables('staticWebAppName')), '2023-12-01').defaultHostname]"
+            },
+            "resourceId": {
+              "type": "string",
+              "metadata": {
+                "description": "Resource ID of the Static Web App"
+              },
+              "value": "[resourceId('Microsoft.Web/staticSites', variables('staticWebAppName'))]"
+            },
+            "name": {
+              "type": "string",
+              "metadata": {
+                "description": "Name of the Static Web App"
+              },
+              "value": "[variables('staticWebAppName')]"
+            },
+            "deploymentToken": {
+              "type": "string",
+              "metadata": {
+                "description": "Deployment token for CI/CD"
+              },
+              "value": "[listSecrets(resourceId('Microsoft.Web/staticSites', variables('staticWebAppName')), '2023-12-01').properties.apiKey]"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "deploy-cosmosDb",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "environmentName": {
+            "value": "[parameters('environmentName')]"
+          },
+          "appName": {
+            "value": "[parameters('appName')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.40.2.10011",
+              "templateHash": "1100003075068319934"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string",
+              "metadata": {
+                "description": "Azure region for Cosmos DB"
+              }
+            },
+            "environmentName": {
+              "type": "string",
+              "metadata": {
+                "description": "Environment name (dev, staging, prod)"
+              }
+            },
+            "appName": {
+              "type": "string",
+              "metadata": {
+                "description": "Application name prefix"
+              }
+            }
+          },
+          "variables": {
+            "accountName": "[format('{0}-{1}-cosmos', parameters('appName'), parameters('environmentName'))]",
+            "databaseName": "fastestfinger"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.DocumentDB/databaseAccounts",
+              "apiVersion": "2024-02-15-preview",
+              "name": "[variables('accountName')]",
+              "location": "[parameters('location')]",
+              "kind": "GlobalDocumentDB",
+              "properties": {
+                "databaseAccountOfferType": "Standard",
+                "capabilities": [
+                  {
+                    "name": "EnableServerless"
+                  }
+                ],
+                "consistencyPolicy": {
+                  "defaultConsistencyLevel": "Session"
+                },
+                "locations": [
+                  {
+                    "locationName": "[parameters('location')]",
+                    "failoverPriority": 0,
+                    "isZoneRedundant": false
+                  }
+                ]
+              },
+              "tags": {
+                "environment": "[parameters('environmentName')]",
+                "app": "[parameters('appName')]"
+              }
+            },
+            {
+              "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases",
+              "apiVersion": "2024-02-15-preview",
+              "name": "[format('{0}/{1}', variables('accountName'), variables('databaseName'))]",
+              "properties": {
+                "resource": {
+                  "id": "[variables('databaseName')]"
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('accountName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+              "apiVersion": "2024-02-15-preview",
+              "name": "[format('{0}/{1}/{2}', variables('accountName'), variables('databaseName'), 'users')]",
+              "properties": {
+                "resource": {
+                  "id": "users",
+                  "partitionKey": {
+                    "paths": [
+                      "/userId"
+                    ],
+                    "kind": "Hash"
+                  },
+                  "indexingPolicy": {
+                    "indexingMode": "consistent",
+                    "automatic": true,
+                    "includedPaths": [
+                      {
+                        "path": "/*"
+                      }
+                    ],
+                    "excludedPaths": [
+                      {
+                        "path": "/\"_etag\"/?"
+                      }
+                    ],
+                    "compositeIndexes": [
+                      [
+                        {
+                          "path": "/totalScore",
+                          "order": "descending"
+                        },
+                        {
+                          "path": "/userId",
+                          "order": "ascending"
+                        }
+                      ]
+                    ]
+                  }
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('accountName'), variables('databaseName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+              "apiVersion": "2024-02-15-preview",
+              "name": "[format('{0}/{1}/{2}', variables('accountName'), variables('databaseName'), 'questions')]",
+              "properties": {
+                "resource": {
+                  "id": "questions",
+                  "partitionKey": {
+                    "paths": [
+                      "/category"
+                    ],
+                    "kind": "Hash"
+                  },
+                  "indexingPolicy": {
+                    "indexingMode": "consistent",
+                    "automatic": true,
+                    "includedPaths": [
+                      {
+                        "path": "/*"
+                      }
+                    ],
+                    "excludedPaths": [
+                      {
+                        "path": "/\"_etag\"/?"
+                      }
+                    ]
+                  }
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('accountName'), variables('databaseName'))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "endpoint": {
+              "type": "string",
+              "metadata": {
+                "description": "Cosmos DB account endpoint"
+              },
+              "value": "[reference(resourceId('Microsoft.DocumentDB/databaseAccounts', variables('accountName')), '2024-02-15-preview').documentEndpoint]"
+            },
+            "connectionString": {
+              "type": "string",
+              "metadata": {
+                "description": "Cosmos DB connection string"
+              },
+              "value": "[listConnectionStrings(resourceId('Microsoft.DocumentDB/databaseAccounts', variables('accountName')), '2024-02-15-preview').connectionStrings[0].connectionString]"
+            },
+            "accountName": {
+              "type": "string",
+              "metadata": {
+                "description": "Cosmos DB account name"
+              },
+              "value": "[variables('accountName')]"
+            },
+            "databaseName": {
+              "type": "string",
+              "metadata": {
+                "description": "Database name"
+              },
+              "value": "[variables('databaseName')]"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "deploy-signalR",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "environmentName": {
+            "value": "[parameters('environmentName')]"
+          },
+          "appName": {
+            "value": "[parameters('appName')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.40.2.10011",
+              "templateHash": "8043617891296158853"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string",
+              "metadata": {
+                "description": "Azure region for SignalR Service"
+              }
+            },
+            "environmentName": {
+              "type": "string",
+              "metadata": {
+                "description": "Environment name (dev, staging, prod)"
+              }
+            },
+            "appName": {
+              "type": "string",
+              "metadata": {
+                "description": "Application name prefix"
+              }
+            }
+          },
+          "variables": {
+            "signalRName": "[format('{0}-{1}-signalr', parameters('appName'), parameters('environmentName'))]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.SignalRService/signalR",
+              "apiVersion": "2024-03-01",
+              "name": "[variables('signalRName')]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "Free_F1",
+                "tier": "Free",
+                "capacity": 1
+              },
+              "kind": "SignalR",
+              "properties": {
+                "features": [
+                  {
+                    "flag": "ServiceMode",
+                    "value": "Serverless"
+                  },
+                  {
+                    "flag": "EnableConnectivityLogs",
+                    "value": "True"
+                  }
+                ],
+                "cors": {
+                  "allowedOrigins": [
+                    "*"
+                  ]
+                }
+              },
+              "tags": {
+                "environment": "[parameters('environmentName')]",
+                "app": "[parameters('appName')]"
+              }
+            }
+          ],
+          "outputs": {
+            "hostname": {
+              "type": "string",
+              "metadata": {
+                "description": "SignalR Service hostname"
+              },
+              "value": "[reference(resourceId('Microsoft.SignalRService/signalR', variables('signalRName')), '2024-03-01').hostName]"
+            },
+            "connectionString": {
+              "type": "string",
+              "metadata": {
+                "description": "SignalR connection string"
+              },
+              "value": "[listKeys(resourceId('Microsoft.SignalRService/signalR', variables('signalRName')), '2024-03-01').primaryConnectionString]"
+            },
+            "name": {
+              "type": "string",
+              "metadata": {
+                "description": "SignalR resource name"
+              },
+              "value": "[variables('signalRName')]"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "staticWebAppHostname": {
+      "type": "string",
+      "metadata": {
+        "description": "Static Web App default hostname"
+      },
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deploy-staticWebApp'), '2025-04-01').outputs.hostname.value]"
+    },
+    "staticWebAppDeploymentToken": {
+      "type": "string",
+      "metadata": {
+        "description": "Static Web App deployment token for CI/CD"
+      },
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deploy-staticWebApp'), '2025-04-01').outputs.deploymentToken.value]"
+    },
+    "cosmosDbConnectionString": {
+      "type": "string",
+      "metadata": {
+        "description": "Cosmos DB connection string"
+      },
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deploy-cosmosDb'), '2025-04-01').outputs.connectionString.value]"
+    },
+    "cosmosDbEndpoint": {
+      "type": "string",
+      "metadata": {
+        "description": "Cosmos DB endpoint"
+      },
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deploy-cosmosDb'), '2025-04-01').outputs.endpoint.value]"
+    },
+    "signalRConnectionString": {
+      "type": "string",
+      "metadata": {
+        "description": "SignalR connection string"
+      },
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deploy-signalR'), '2025-04-01').outputs.connectionString.value]"
+    },
+    "signalRHostname": {
+      "type": "string",
+      "metadata": {
+        "description": "SignalR hostname"
+      },
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deploy-signalR'), '2025-04-01').outputs.hostname.value]"
+    }
+  }
+}

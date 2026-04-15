@@ -8,3 +8,17 @@
 ## Learnings
 
 <!-- Append new learnings below. Each entry is something lasting about the project. -->
+
+- **Test infra**: vitest + @testing-library/react + jsdom. Config in `vitest.config.ts`, setup in `src/test/setup.ts`. Run with `npm test`.
+- **Fake timers vs async**: Do NOT use `vi.useFakeTimers()` in integration tests that rely on `await act(async () => { render(...) })` — it blocks promise resolution and causes timeouts. Use real timers and `waitFor()` with generous timeouts instead.
+- **Double-click guard**: `QuestionPage.handleSelect` uses `if (submitting || selectedIndex !== null)` as its idempotency guard. After the first `act()` completes, React state is flushed, so the second click in a separate `act()` is properly blocked. Two clicks inside the same `act()` will both fire because state hasn't flushed yet.
+- **Leaderboard error text**: The error message appears in both `AlertTitle` and the error state text, so `getByText` throws on duplicates. Use a selector to disambiguate.
+- **Mock UI components**: All shadcn/ui components must be mocked for unit tests since they rely on CSS/Radix internals that jsdom doesn't support. Use simple HTML element stubs with `data-testid` attributes.
+- **AnimatedScore / ScoreDelta**: These components use `requestAnimationFrame` internally. Must mock `performance.now()` and `requestAnimationFrame` to make them render deterministically in tests.
+
+- **Test infra:** vitest installed as dev dep; `npm test` runs `vitest run`; vitest.config.ts at `src/api/`; test files excluded from tsconfig to avoid tsc conflicts.
+- **Mocking Azure Functions handlers:** Handlers are not exported — they're registered via `app.http()` side-effect. Mock `@azure/functions` and capture handler from `vi.mocked(app.http).mock.calls[0][1].handler` after dynamic import.
+- **Module import inconsistency:** `createUser.ts` and `getUser.ts` use extensionless imports (`from "../services/cosmosClient"`), while other function files use `.js` extensions. vitest resolves both to the same module, so one mock covers both.
+- **calculatePoints is private:** Scoring logic in `submitAnswer.ts` is not exported. Test indirectly through handler by controlling delivery timestamps and mocking Cosmos question lookups.
+- **Score update is best-effort:** `submitAnswer` catches score persistence errors and still returns the answer result. Tests verify this resilience.
+- **76 tests across 9 files** covering services (scoringService, leaderboardService, questionDeliveryTracker) and all 6 Azure Function endpoints with edge cases (validation, 404s, DB errors, timing, double-submit).
