@@ -24,5 +24,6 @@
 
 - **Owner:** Brenda Campbell
 - **Project:** Fastest Finger Quiz — competitive quiz game with Azure/GitHub Copilot themed questions. Fastest correct answer wins the round. Points accumulate across sessions.
+- **PRD:** docs/PRD.md (ingested 2026-04-15)
 - **Stack:** Azure Static Web App (React/HTML), Azure Functions (HTTP triggers), Cosmos DB, SignalR Service, GitHub Actions, Bicep IaC
 - **Created:** 2026-04-15
