@@ -5,28 +5,33 @@ async function debug(
   context: InvocationContext
 ): Promise<HttpResponseInit> {
   const identityVars: Record<string, string> = {};
-  const interesting = [
-    "IDENTITY_ENDPOINT", "IDENTITY_HEADER",
-    "MSI_ENDPOINT", "MSI_SECRET",
-    "WEBSITE_INSTANCE_ID", "WEBSITE_SITE_NAME",
-    "AZURE_CLIENT_ID", "AZURE_TENANT_ID",
-    "COSMOS_ENDPOINT", "CosmosDBConnectionString",
-    "AzureSignalRConnectionString",
-    "FUNCTIONS_WORKER_RUNTIME", "FUNCTIONS_EXTENSION_VERSION",
-  ];
+  // List ALL env vars with identity/MSI/token related names
+  for (const [key, val] of Object.entries(process.env)) {
+    if (/identity|msi|token|secret|header|cosmos|signalr|azure|website|function/i.test(key)) {
+      identityVars[key] = (val && (key.includes("Connection") || key.includes("SECRET") || key.includes("HEADER") || key.includes("KEY")))
+        ? `${val.substring(0, 15)}...(set, len=${val.length})`
+        : val ?? "(null)";
+    }
+  }
 
-  for (const key of interesting) {
-    const val = process.env[key];
-    identityVars[key] = val
-      ? (key.includes("Connection") || key.includes("SECRET") || key.includes("HEADER"))
-        ? `${val.substring(0, 10)}...(set)`
-        : val
-      : "(not set)";
+  // Also try calling MSI endpoint to see exact error
+  let msiResult = "not attempted";
+  const endpoint = process.env.IDENTITY_ENDPOINT ?? process.env.MSI_ENDPOINT;
+  if (endpoint) {
+    try {
+      const url = `${endpoint}?api-version=2019-08-01&resource=https%3A%2F%2Fcosmos.azure.com`;
+      const headers: Record<string, string> = {};
+      if (process.env.IDENTITY_HEADER) headers["X-IDENTITY-HEADER"] = process.env.IDENTITY_HEADER;
+      const resp = await fetch(url, { headers });
+      msiResult = `${resp.status}: ${(await resp.text()).substring(0, 200)}`;
+    } catch (e) {
+      msiResult = `Error: ${e instanceof Error ? e.message : String(e)}`;
+    }
   }
 
   return {
     status: 200,
-    jsonBody: { env: identityVars, nodeVersion: process.version },
+    jsonBody: { env: identityVars, msiResult, nodeVersion: process.version },
   };
 }
 
