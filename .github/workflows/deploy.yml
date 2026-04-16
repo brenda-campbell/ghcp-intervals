@@ -109,7 +109,7 @@ jobs:
 
       # --- Frontend ---
       - name: Install frontend dependencies
-        run: npm ci
+        run: npm install --no-audit --no-fund
         working-directory: src/frontend
 
       - name: Build frontend
@@ -123,7 +123,7 @@ jobs:
 
       # --- Backend (API) ---
       - name: Install API dependencies
-        run: npm ci
+        run: npm install --no-audit --no-fund
         working-directory: src/api
 
       - name: Build API
