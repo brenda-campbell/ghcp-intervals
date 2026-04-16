@@ -154,9 +154,11 @@ const correctResult: AnswerResult = {
 describe("Integration: Quiz Flow", () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    // Mock requestAnimationFrame for RoundComplete's animated score
+    // Mock requestAnimationFrame for RoundComplete's animated score.
+    // Pass performance.now() + 2000 so elapsed always exceeds the 1000ms
+    // animation duration, preventing infinite recursion.
     vi.spyOn(globalThis, "requestAnimationFrame").mockImplementation((cb) => {
-      cb(10000)
+      cb(performance.now() + 2000)
       return 0
     })
   })
