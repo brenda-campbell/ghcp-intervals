@@ -5,15 +5,22 @@
     "_generator": {
       "name": "bicep",
       "version": "0.40.2.10011",
-      "templateHash": "15833994662647690459"
+      "templateHash": "6810176435237228736"
     }
   },
   "parameters": {
     "location": {
       "type": "string",
-      "defaultValue": "eastus",
+      "defaultValue": "northeurope",
       "metadata": {
         "description": "Azure region for all resources"
+      }
+    },
+    "swaLocation": {
+      "type": "string",
+      "defaultValue": "westeurope",
+      "metadata": {
+        "description": "Azure region for Static Web App (must be a supported SWA region)"
       }
     },
     "environmentName": {
@@ -38,6 +45,33 @@
   },
   "resources": [
     {
+      "type": "Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignments",
+      "apiVersion": "2024-02-15-preview",
+      "name": "[format('{0}/{1}', format('{0}-{1}-cosmos', parameters('appName'), parameters('environmentName')), guid(resourceId('Microsoft.DocumentDB/databaseAccounts', format('{0}-{1}-cosmos', parameters('appName'), parameters('environmentName'))), format('{0}-{1}-func', parameters('appName'), parameters('environmentName')), 'cosmos-data-contributor'))]",
+      "properties": {
+        "roleDefinitionId": "[format('{0}/sqlRoleDefinitions/00000000-0000-0000-0000-000000000002', resourceId('Microsoft.DocumentDB/databaseAccounts', format('{0}-{1}-cosmos', parameters('appName'), parameters('environmentName'))))]",
+        "principalId": "[reference(resourceId('Microsoft.Resources/deployments', 'deploy-functionApp'), '2025-04-01').outputs.principalId.value]",
+        "scope": "[resourceId('Microsoft.DocumentDB/databaseAccounts', format('{0}-{1}-cosmos', parameters('appName'), parameters('environmentName')))]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'deploy-cosmosDb')]",
+        "[resourceId('Microsoft.Resources/deployments', 'deploy-functionApp')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Web/staticSites/linkedBackends",
+      "apiVersion": "2022-09-01",
+      "name": "[format('{0}/{1}', format('{0}-{1}-swa', parameters('appName'), parameters('environmentName')), 'backend1')]",
+      "properties": {
+        "backendResourceId": "[reference(resourceId('Microsoft.Resources/deployments', 'deploy-functionApp'), '2025-04-01').outputs.resourceId.value]",
+        "region": "[parameters('location')]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'deploy-functionApp')]",
+        "[resourceId('Microsoft.Resources/deployments', 'deploy-staticWebApp')]"
+      ]
+    },
+    {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-04-01",
       "name": "deploy-staticWebApp",
@@ -48,7 +82,7 @@
         "mode": "Incremental",
         "parameters": {
           "location": {
-            "value": "[parameters('location')]"
+            "value": "[parameters('swaLocation')]"
           },
           "environmentName": {
             "value": "[parameters('environmentName')]"
@@ -64,7 +98,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.40.2.10011",
-              "templateHash": "8788332246705352420"
+              "templateHash": "11389824216940813257"
             }
           },
           "parameters": {
@@ -97,8 +131,11 @@
               "name": "[variables('staticWebAppName')]",
               "location": "[parameters('location')]",
               "sku": {
-                "name": "Free",
-                "tier": "Free"
+                "name": "Standard",
+                "tier": "Standard"
+              },
+              "identity": {
+                "type": "SystemAssigned"
               },
               "properties": {
                 "stagingEnvironmentPolicy": "Enabled",
@@ -136,6 +173,13 @@
                 "description": "Name of the Static Web App"
               },
               "value": "[variables('staticWebAppName')]"
+            },
+            "principalId": {
+              "type": "string",
+              "metadata": {
+                "description": "Principal ID of the system-assigned managed identity"
+              },
+              "value": "[reference(resourceId('Microsoft.Web/staticSites', variables('staticWebAppName')), '2023-12-01', 'full').identity.principalId]"
             },
             "deploymentToken": {
               "type": "string",
@@ -470,6 +514,215 @@
           }
         }
       }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "deploy-functionApp",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "environmentName": {
+            "value": "[parameters('environmentName')]"
+          },
+          "appName": {
+            "value": "[parameters('appName')]"
+          },
+          "cosmosEndpoint": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deploy-cosmosDb'), '2025-04-01').outputs.endpoint.value]"
+          },
+          "signalRConnectionString": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deploy-signalR'), '2025-04-01').outputs.connectionString.value]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.40.2.10011",
+              "templateHash": "5005907482047358903"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string",
+              "metadata": {
+                "description": "Azure region for the Function App"
+              }
+            },
+            "environmentName": {
+              "type": "string",
+              "metadata": {
+                "description": "Environment name (dev, staging, prod)"
+              }
+            },
+            "appName": {
+              "type": "string",
+              "metadata": {
+                "description": "Application name prefix"
+              }
+            },
+            "cosmosEndpoint": {
+              "type": "string",
+              "metadata": {
+                "description": "Cosmos DB endpoint URL"
+              }
+            },
+            "signalRConnectionString": {
+              "type": "string",
+              "metadata": {
+                "description": "SignalR connection string"
+              }
+            }
+          },
+          "variables": {
+            "functionAppName": "[format('{0}-{1}-func', parameters('appName'), parameters('environmentName'))]",
+            "appServicePlanName": "[format('{0}-{1}-plan', parameters('appName'), parameters('environmentName'))]",
+            "storageNamePrefix": "[take(replace(format('{0}{1}', parameters('appName'), parameters('environmentName')), '-', ''), 11)]",
+            "storageName": "[format('{0}{1}', variables('storageNamePrefix'), uniqueString(resourceGroup().id))]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Storage/storageAccounts",
+              "apiVersion": "2023-05-01",
+              "name": "[variables('storageName')]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "Standard_LRS"
+              },
+              "kind": "StorageV2",
+              "properties": {
+                "supportsHttpsTrafficOnly": true,
+                "minimumTlsVersion": "TLS1_2"
+              },
+              "tags": {
+                "environment": "[parameters('environmentName')]",
+                "app": "[parameters('appName')]"
+              }
+            },
+            {
+              "type": "Microsoft.Web/serverfarms",
+              "apiVersion": "2023-12-01",
+              "name": "[variables('appServicePlanName')]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "Y1",
+                "tier": "Dynamic"
+              },
+              "kind": "functionapp",
+              "properties": {
+                "reserved": true
+              },
+              "tags": {
+                "environment": "[parameters('environmentName')]",
+                "app": "[parameters('appName')]"
+              }
+            },
+            {
+              "type": "Microsoft.Web/sites",
+              "apiVersion": "2023-12-01",
+              "name": "[variables('functionAppName')]",
+              "location": "[parameters('location')]",
+              "kind": "functionapp,linux",
+              "identity": {
+                "type": "SystemAssigned"
+              },
+              "properties": {
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
+                "httpsOnly": true,
+                "siteConfig": {
+                  "linuxFxVersion": "Node|20",
+                  "appSettings": [
+                    {
+                      "name": "AzureWebJobsStorage",
+                      "value": "[format('DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1}', variables('storageName'), listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageName')), '2023-05-01').keys[0].value)]"
+                    },
+                    {
+                      "name": "FUNCTIONS_EXTENSION_VERSION",
+                      "value": "~4"
+                    },
+                    {
+                      "name": "FUNCTIONS_WORKER_RUNTIME",
+                      "value": "node"
+                    },
+                    {
+                      "name": "WEBSITE_NODE_DEFAULT_VERSION",
+                      "value": "~20"
+                    },
+                    {
+                      "name": "WEBSITE_RUN_FROM_PACKAGE",
+                      "value": "1"
+                    },
+                    {
+                      "name": "COSMOS_ENDPOINT",
+                      "value": "[parameters('cosmosEndpoint')]"
+                    },
+                    {
+                      "name": "AzureSignalRConnectionString",
+                      "value": "[parameters('signalRConnectionString')]"
+                    }
+                  ],
+                  "cors": {
+                    "allowedOrigins": [
+                      "*"
+                    ]
+                  }
+                }
+              },
+              "tags": {
+                "environment": "[parameters('environmentName')]",
+                "app": "[parameters('appName')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "name": {
+              "type": "string",
+              "metadata": {
+                "description": "Function App name"
+              },
+              "value": "[variables('functionAppName')]"
+            },
+            "principalId": {
+              "type": "string",
+              "metadata": {
+                "description": "Function App principal ID (managed identity)"
+              },
+              "value": "[reference(resourceId('Microsoft.Web/sites', variables('functionAppName')), '2023-12-01', 'full').identity.principalId]"
+            },
+            "hostname": {
+              "type": "string",
+              "metadata": {
+                "description": "Function App default hostname"
+              },
+              "value": "[reference(resourceId('Microsoft.Web/sites', variables('functionAppName')), '2023-12-01').defaultHostName]"
+            },
+            "resourceId": {
+              "type": "string",
+              "metadata": {
+                "description": "Function App resource ID"
+              },
+              "value": "[resourceId('Microsoft.Web/sites', variables('functionAppName'))]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'deploy-cosmosDb')]",
+        "[resourceId('Microsoft.Resources/deployments', 'deploy-signalR')]"
+      ]
     }
   ],
   "outputs": {
@@ -487,12 +740,12 @@
       },
       "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deploy-staticWebApp'), '2025-04-01').outputs.deploymentToken.value]"
     },
-    "cosmosDbConnectionString": {
+    "functionAppName": {
       "type": "string",
       "metadata": {
-        "description": "Cosmos DB connection string"
+        "description": "Function App name"
       },
-      "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deploy-cosmosDb'), '2025-04-01').outputs.connectionString.value]"
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deploy-functionApp'), '2025-04-01').outputs.name.value]"
     },
     "cosmosDbEndpoint": {
       "type": "string",
@@ -500,13 +753,6 @@
         "description": "Cosmos DB endpoint"
       },
       "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deploy-cosmosDb'), '2025-04-01').outputs.endpoint.value]"
-    },
-    "signalRConnectionString": {
-      "type": "string",
-      "metadata": {
-        "description": "SignalR connection string"
-      },
-      "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deploy-signalR'), '2025-04-01').outputs.connectionString.value]"
     },
     "signalRHostname": {
       "type": "string",

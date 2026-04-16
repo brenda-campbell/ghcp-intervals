@@ -52,6 +52,7 @@ jobs:
     outputs:
       swa-token: ${{ steps.deploy-bicep.outputs.swaToken }}
       swa-hostname: ${{ steps.deploy-bicep.outputs.swaHostname }}
+      function-app-name: ${{ steps.deploy-bicep.outputs.functionAppName }}
 
     steps:
       - name: Checkout code
@@ -77,14 +78,16 @@ jobs:
           # Extract outputs for downstream jobs
           SWA_TOKEN=$(echo "$DEPLOYMENT_OUTPUT" | jq -r '.staticWebAppDeploymentToken.value')
           SWA_HOSTNAME=$(echo "$DEPLOYMENT_OUTPUT" | jq -r '.staticWebAppHostname.value')
+          FUNC_APP_NAME=$(echo "$DEPLOYMENT_OUTPUT" | jq -r '.functionAppName.value')
 
           # Mask the deployment token so it doesn't appear in logs
           echo "::add-mask::$SWA_TOKEN"
 
           echo "swaToken=$SWA_TOKEN" >> "$GITHUB_OUTPUT"
           echo "swaHostname=$SWA_HOSTNAME" >> "$GITHUB_OUTPUT"
+          echo "functionAppName=$FUNC_APP_NAME" >> "$GITHUB_OUTPUT"
 
-          echo "✅ Infrastructure deployed — SWA hostname: $SWA_HOSTNAME"
+          echo "✅ Infrastructure deployed — SWA: $SWA_HOSTNAME | Function App: $FUNC_APP_NAME"
 
   # ===========================================================================
   # Job 2 — Build, Test & Deploy Application
@@ -106,6 +109,13 @@ jobs:
           cache-dependency-path: |
             src/frontend/package-lock.json
             src/api/package-lock.json
+
+      - name: Azure Login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       # --- Frontend ---
       - name: Install frontend dependencies
@@ -135,16 +145,26 @@ jobs:
         working-directory: src/api
         continue-on-error: true
 
-      # --- Deploy to Azure Static Web Apps ---
-      # Uses the SWA token from the Bicep deployment output.
-      # Fallback: if the secret AZURE_STATIC_WEB_APPS_API_TOKEN is set,
-      # it takes precedence (useful when infra is already provisioned).
-      - name: Deploy to Azure Static Web Apps
+      # --- Deploy Frontend to SWA (no api_location — API is on standalone Function App) ---
+      - name: Deploy frontend to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN || needs.infrastructure.outputs.swa-token }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: upload
           app_location: src/frontend
-          api_location: src/api
           output_location: dist
+          skip_api_build: true
+
+      # --- Deploy API to standalone Azure Function App ---
+      - name: Prepare API package
+        run: |
+          cd src/api
+          npm prune --production
+          echo "📦 API package ready for deployment"
+
+      - name: Deploy API to Azure Function App
+        uses: Azure/functions-action@v1
+        with:
+          app-name: ${{ needs.infrastructure.outputs.function-app-name }}
+          package: src/api

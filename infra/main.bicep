@@ -43,33 +43,45 @@ module signalR 'modules/signalr.bicep' = {
   }
 }
 
-// --- Cosmos DB RBAC: Grant SWA managed identity data access ---
+// --- Standalone Function App (replaces SWA managed functions) ---
+module functionApp 'modules/functionApp.bicep' = {
+  name: 'deploy-functionApp'
+  params: {
+    location: location
+    environmentName: environmentName
+    appName: appName
+    cosmosEndpoint: cosmosDb.outputs.endpoint
+    signalRConnectionString: signalR.outputs.connectionString
+  }
+}
+
+// --- Cosmos DB RBAC: Grant Function App managed identity data access ---
 resource cosmosAccount 'Microsoft.DocumentDB/databaseAccounts@2024-02-15-preview' existing = {
   name: '${appName}-${environmentName}-cosmos'
 }
 
 resource cosmosRbac 'Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignments@2024-02-15-preview' = {
   parent: cosmosAccount
-  name: guid(cosmosAccount.id, '${appName}-${environmentName}-swa', 'cosmos-data-contributor')
+  name: guid(cosmosAccount.id, '${appName}-${environmentName}-func', 'cosmos-data-contributor')
   properties: {
     roleDefinitionId: '${cosmosAccount.id}/sqlRoleDefinitions/00000000-0000-0000-0000-000000000002'
-    principalId: staticWebApp.outputs.principalId
+    principalId: functionApp.outputs.principalId
     scope: cosmosAccount.id
   }
   dependsOn: [cosmosDb]
 }
 
-// --- SWA App Settings ---
+// --- Link Function App as SWA backend (proxies /api/* to Function App) ---
 resource swaResource 'Microsoft.Web/staticSites@2023-12-01' existing = {
   name: '${appName}-${environmentName}-swa'
 }
 
-resource swaAppSettings 'Microsoft.Web/staticSites/config@2023-12-01' = {
+resource linkedBackend 'Microsoft.Web/staticSites/linkedBackends@2022-09-01' = {
   parent: swaResource
-  name: 'appsettings'
+  name: 'backend1'
   properties: {
-    COSMOS_ENDPOINT: cosmosDb.outputs.endpoint
-    AzureSignalRConnectionString: signalR.outputs.connectionString
+    backendResourceId: functionApp.outputs.resourceId
+    region: location
   }
   dependsOn: [staticWebApp]
 }
@@ -81,14 +93,11 @@ output staticWebAppHostname string = staticWebApp.outputs.hostname
 @description('Static Web App deployment token for CI/CD')
 output staticWebAppDeploymentToken string = staticWebApp.outputs.deploymentToken
 
-@description('Cosmos DB connection string')
-output cosmosDbConnectionString string = cosmosDb.outputs.connectionString
+@description('Function App name')
+output functionAppName string = functionApp.outputs.name
 
 @description('Cosmos DB endpoint')
 output cosmosDbEndpoint string = cosmosDb.outputs.endpoint
-
-@description('SignalR connection string')
-output signalRConnectionString string = signalR.outputs.connectionString
 
 @description('SignalR hostname')
 output signalRHostname string = signalR.outputs.hostname
