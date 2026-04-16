@@ -45,8 +45,9 @@ export function AuthGate({ children, onUserAuthenticated }: AuthGateProps) {
 
     if (storedEmail && storedUserId) {
       // Returning user — verify via loginOrCreate
+      const storedDisplayName = localStorage.getItem(KEY_DISPLAY_NAME);
       setIsLoading(true);
-      loginOrCreate(storedEmail, "")
+      loginOrCreate(storedEmail, storedDisplayName || "")
         .then((u) => {
           completeLogin(u);
         })

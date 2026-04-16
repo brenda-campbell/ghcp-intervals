@@ -139,7 +139,22 @@ describe("loginOrCreate", () => {
     expect((res.jsonBody as any).error).toContain("email");
   });
 
+  it("returns existing user with empty displayName (returning user) → 200", async () => {
+    mockQuery.mockResolvedValue({ resources: [EXISTING_USER] });
+    const req = createMockRequest({
+      body: { email: "existing@example.com", displayName: "" },
+    });
+    const ctx = createMockContext();
+
+    const res = await handler(req, ctx);
+
+    expect(res.status).toBe(200);
+    expect((res.jsonBody as any).userId).toBe("user-existing");
+    expect(mockCreate).not.toHaveBeenCalled();
+  });
+
   it("returns 400 for displayName too short", async () => {
+    mockQuery.mockResolvedValue({ resources: [] });
     const req = createMockRequest({
       body: { email: "ok@example.com", displayName: "A" },
     });
@@ -152,6 +167,7 @@ describe("loginOrCreate", () => {
   });
 
   it("returns 400 for displayName too long", async () => {
+    mockQuery.mockResolvedValue({ resources: [] });
     const req = createMockRequest({
       body: { email: "ok@example.com", displayName: "A".repeat(31) },
     });

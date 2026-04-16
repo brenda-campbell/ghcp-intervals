@@ -34,13 +34,6 @@ async function loginOrCreate(
     return { status: 400, jsonBody: { error: "Invalid email format" } };
   }
 
-  if (displayName.length < 2 || displayName.length > 30) {
-    return {
-      status: 400,
-      jsonBody: { error: "displayName must be 2-30 characters" },
-    };
-  }
-
   try {
     // Look up existing user by email
     const { resources } = await usersContainer.items
@@ -58,6 +51,14 @@ async function loginOrCreate(
       }
 
       return { status: 200, jsonBody: existing };
+    }
+
+    // New user — validate displayName
+    if (displayName.length < 2 || displayName.length > 30) {
+      return {
+        status: 400,
+        jsonBody: { error: "displayName must be 2-30 characters" },
+      };
     }
 
     // No user with this email — check for legacy user linking

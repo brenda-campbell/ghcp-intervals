@@ -6,6 +6,7 @@ import {
   WarningCircle,
   CheckCircle,
   XCircle,
+  Trash,
 } from "@phosphor-icons/react";
 import {
   Table,
@@ -19,7 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useUser } from "@/contexts/UserContext";
-import { listUsers, toggleUserStatus, type User } from "@/services/api";
+import { listUsers, toggleUserStatus, deleteUser, type User } from "@/services/api";
 import { cn } from "@/lib/utils";
 
 export function AdminPanel() {
@@ -28,6 +29,7 @@ export function AdminPanel() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const fetchUsers = useCallback(async () => {
     if (!currentUser) return;
@@ -63,6 +65,20 @@ export function AdminPanel() {
       setError(err instanceof Error ? err.message : "Failed to update user status");
     } finally {
       setTogglingId(null);
+    }
+  };
+
+  const handleDelete = async (targetUser: User) => {
+    if (!currentUser || targetUser.userId === currentUser.userId) return;
+    if (!window.confirm(`Delete ${targetUser.displayName}? This cannot be undone.`)) return;
+    setDeletingId(targetUser.userId);
+    try {
+      await deleteUser(targetUser.userId, currentUser.userId);
+      setUsers((prev) => prev.filter((u) => u.userId !== targetUser.userId));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete user");
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -132,6 +148,7 @@ export function AdminPanel() {
                 <TableHead className="text-right">Score</TableHead>
                 <TableHead className="hidden md:table-cell text-right">Games</TableHead>
                 <TableHead className="text-center">Status</TableHead>
+                <TableHead className="text-center">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -139,6 +156,7 @@ export function AdminPanel() {
                 const isActive = u.isActive !== false;
                 const isSelf = u.userId === currentUser?.userId;
                 const isToggling = togglingId === u.userId;
+                const isDeleting = deletingId === u.userId;
 
                 return (
                   <TableRow
@@ -202,6 +220,25 @@ export function AdminPanel() {
                           <XCircle weight="fill" className="size-3.5" />
                         )}
                         {isActive ? "Active" : "Inactive"}
+                      </button>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <button
+                        onClick={() => void handleDelete(u)}
+                        disabled={isSelf || isDeleting}
+                        title={isSelf ? "Cannot delete yourself" : "Delete user"}
+                        className={cn(
+                          "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium transition-all duration-150",
+                          "bg-red-500/15 text-red-400 hover:bg-red-500/25",
+                          (isSelf || isDeleting) && "cursor-not-allowed opacity-50",
+                          !isSelf && !isDeleting && "hover:scale-[1.05] active:scale-[0.95]",
+                        )}
+                      >
+                        {isDeleting ? (
+                          <SpinnerGap className="size-3.5 animate-spin" />
+                        ) : (
+                          <Trash weight="fill" className="size-3.5" />
+                        )}
                       </button>
                     </TableCell>
                   </TableRow>

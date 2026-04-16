@@ -123,6 +123,20 @@ export async function toggleUserStatus(
   return handleResponse<User>(response);
 }
 
+export async function deleteUser(
+  targetUserId: string,
+  adminUserId: string,
+): Promise<{ deleted: boolean; userId: string }> {
+  const response = await fetch(
+    `/api/users/${encodeURIComponent(targetUserId)}`,
+    {
+      method: "DELETE",
+      headers: { "x-user-id": adminUserId },
+    },
+  );
+  return handleResponse<{ deleted: boolean; userId: string }>(response);
+}
+
 // --- Leaderboard ---
 
 export interface LeaderboardEntry {
