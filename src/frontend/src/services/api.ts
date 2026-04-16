@@ -198,7 +198,8 @@ export async function listCategories(adminUserId?: string): Promise<Category[]> 
   const headers: Record<string, string> = {};
   if (adminUserId) headers["x-user-id"] = adminUserId;
   const response = await fetch("/api/categories", { headers });
-  return handleResponse<Category[]>(response);
+  const data = await handleResponse<{ categories: Category[] }>(response);
+  return data.categories;
 }
 
 export async function createCategory(
