@@ -68,7 +68,7 @@ resource usersContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/cont
         compositeIndexes: [
           [
             { path: '/totalScore', order: 'descending' }
-            { path: '/userId', order: 'ascending' }
+            { path: '/fastestTimeMs', order: 'ascending' }
           ]
         ]
       }

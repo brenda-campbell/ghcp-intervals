@@ -64,7 +64,8 @@ async function getLeaderboard(
     };
   } catch (err) {
     context.error("getLeaderboard failed:", err);
-    return { status: 500, jsonBody: { error: "Failed to fetch leaderboard" } };
+    const msg = err instanceof Error ? err.message : String(err);
+    return { status: 500, jsonBody: { error: "Failed to fetch leaderboard", detail: msg } };
   }
 }
 
