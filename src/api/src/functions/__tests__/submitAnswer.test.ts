@@ -38,6 +38,7 @@ import { questionsContainer } from "../../services/cosmosClient.js";
 import { getDeliveryTimestamp, clearDelivery } from "../../services/questionDeliveryTracker.js";
 import { updateUserScore } from "../../services/scoringService.js";
 import { getTopLeaderboard } from "../../services/leaderboardService.js";
+import { _resetSubmitAnswerCaches } from "../submitAnswer.js";
 
 type Handler = (req: any, ctx: any) => Promise<HttpResponseInit>;
 let handler: Handler;
@@ -61,6 +62,7 @@ describe("submitAnswer", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    _resetSubmitAnswerCaches();
     vi.mocked(questionsContainer.items.query).mockReturnValue({
       fetchAll: mockFetchAll,
     } as any);

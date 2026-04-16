@@ -13,8 +13,8 @@ resource signalR 'Microsoft.SignalRService/signalR@2024-03-01' = {
   name: signalRName
   location: location
   sku: {
-    name: 'Free_F1'
-    tier: 'Free'
+    name: 'Standard_S1'
+    tier: 'Standard'
     capacity: 1
   }
   kind: 'SignalR'

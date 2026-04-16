@@ -12,7 +12,22 @@ import {
 } from "../services/questionDeliveryTracker.js";
 import { updateUserScore } from "../services/scoringService.js";
 import { getTopLeaderboard } from "../services/leaderboardService.js";
-import type { AnswerSubmission, AnswerResult, Question } from "../models/index.js";
+import type { AnswerSubmission, AnswerResult, Question, LeaderboardEntry } from "../models/index.js";
+
+// Module-level question cache (questions don't change during gameplay)
+const questionCache = new Map<string, Question>();
+
+// Throttle leaderboard broadcasts — at most once per second
+let lastLeaderboardBroadcast = 0;
+let cachedLeaderboard: LeaderboardEntry[] | null = null;
+const LEADERBOARD_THROTTLE_MS = 1000;
+
+/** Reset module-level caches (for testing) */
+export function _resetSubmitAnswerCaches(): void {
+  questionCache.clear();
+  lastLeaderboardBroadcast = 0;
+  cachedLeaderboard = null;
+}
 
 interface SignalRMessage {
   target: string;
@@ -73,23 +88,26 @@ async function submitAnswer(
     };
   }
 
-  // Look up question in Cosmos DB (partition key is /category, so cross-partition query)
-  let question: Question;
-  try {
-    const { resources } = await questionsContainer.items
-      .query<Question>({
-        query: "SELECT * FROM c WHERE c.id = @id",
-        parameters: [{ name: "@id", value: questionId }],
-      })
-      .fetchAll();
+  // Look up question — check in-memory cache first to avoid cross-partition query
+  let question = questionCache.get(questionId);
+  if (!question) {
+    try {
+      const { resources } = await questionsContainer.items
+        .query<Question>({
+          query: "SELECT * FROM c WHERE c.id = @id",
+          parameters: [{ name: "@id", value: questionId }],
+        })
+        .fetchAll();
 
-    if (resources.length === 0) {
-      return { status: 404, jsonBody: { error: "Question not found" } };
+      if (resources.length === 0) {
+        return { status: 404, jsonBody: { error: "Question not found" } };
+      }
+      question = resources[0];
+      questionCache.set(questionId, question);
+    } catch (err) {
+      context.error("Cosmos DB query failed:", err);
+      return { status: 500, jsonBody: { error: "Internal server error" } };
     }
-    question = resources[0];
-  } catch (err) {
-    context.error("Cosmos DB query failed:", err);
-    return { status: 500, jsonBody: { error: "Internal server error" } };
   }
 
   // ADR-007: Validate correctness server-side
@@ -139,15 +157,21 @@ async function submitAnswer(
     arguments: [{ usersAnswered: 1 }],
   });
 
-  // "leaderboardUpdate" — push the refreshed top 10 to all clients
-  try {
-    const leaderboard = await getTopLeaderboard();
+  // "leaderboardUpdate" — throttled to avoid 80 queries per round
+  const now = Date.now();
+  if (now - lastLeaderboardBroadcast > LEADERBOARD_THROTTLE_MS || !cachedLeaderboard) {
+    try {
+      cachedLeaderboard = await getTopLeaderboard();
+      lastLeaderboardBroadcast = now;
+    } catch (err) {
+      context.warn("Failed to fetch leaderboard for SignalR broadcast:", err);
+    }
+  }
+  if (cachedLeaderboard) {
     signalRMessages.push({
       target: "leaderboardUpdate",
-      arguments: [{ leaderboard }],
+      arguments: [{ leaderboard: cachedLeaderboard }],
     });
-  } catch (err) {
-    context.warn("Failed to fetch leaderboard for SignalR broadcast:", err);
   }
 
   context.extraOutputs.set(signalROutput, signalRMessages);
