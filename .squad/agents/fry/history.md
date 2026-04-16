@@ -125,3 +125,12 @@
 - **localStorage keys:** `ff_userId`, `ff_email`, `ff_displayName` — all three persisted on successful login.
 - **Phase 3 notes:** `UserContext.tsx` still imports deprecated `createUser` and uses old `/api/user` endpoint via `getUser`. Test mocks in `edge-cases.test.tsx`, `fixtures.ts`, `integration-user-session.test.tsx` reference `createUser`. All need updating when AuthGate replaces the old flow.
 - **Build:** Clean (`tsc -b` — 0 errors).
+
+### fe-auth-wiring-admin (2026-04-16)
+- **main.tsx restructured:** `AuthGate` → `UserProvider` → `SignalRProvider` → `App`. A `Root` component holds `userId` state; `AuthGate.onUserAuthenticated` sets it, and `UserProvider` receives it as a prop. Children only render after authentication.
+- **UserContext simplified:** Removed auto-create logic (`createUser`, `localStorage` management). Now accepts `userId: string` prop, loads user via `getUser(userId)` on mount. `refreshUser` still available for score updates.
+- **UserBadge enhanced:** Shows `ShieldStar` icon (accent color) for admins instead of generic user icon. Admin badge gets `border-accent/40` border highlight. Email shown as tooltip on hover (absolute positioned, 10px text). Score delta animation preserved.
+- **AdminPanel** (`src/components/AdminPanel.tsx`): Full user management table — columns: Player (with admin badge), Email, Score, Games, Status toggle. Uses `listUsers(adminUserId)` and `toggleUserStatus()` from api.ts. Self-deactivation prevented (toggle disabled + tooltip for current user row). Loading skeleton, error state with retry, inline error banner for toggle failures. Row stagger animation matches leaderboard pattern.
+- **App.tsx:** Added `"admin"` to View union type. Admin tab (GearSix icon) conditionally rendered when `user?.isAdmin === true`. Tab indicator logic updated to support dynamic tab refs via a refMap. `AdminPanel` lazy-renders only for admin view.
+- **Tests updated:** `integration-user-session.test.tsx` rewritten for new `UserProvider(userId)` contract — removed createUser/localStorage tests, added load-by-id/error/loading tests. `edge-cases.test.tsx` localStorage test replaced with a UserProvider load test.
+- **Build:** Clean (`tsc -b && vite build` — 0 errors, 0 warnings).

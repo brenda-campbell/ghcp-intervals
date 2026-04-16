@@ -56,6 +56,8 @@ resource usersContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/cont
         paths: ['/userId']
         kind: 'Hash'
       }
+      // Indexing: includedPaths '/*' covers all fields (including /email)
+      // automatically. No explicit /email/? path needed.
       indexingPolicy: {
         indexingMode: 'consistent'
         automatic: true
@@ -66,9 +68,15 @@ resource usersContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/cont
           { path: '/"_etag"/?' }
         ]
         compositeIndexes: [
+          // Leaderboard: ORDER BY totalScore DESC, fastestTimeMs ASC
           [
             { path: '/totalScore', order: 'descending' }
             { path: '/fastestTimeMs', order: 'ascending' }
+          ]
+          // Login lookup: WHERE email = @email AND isActive = true (ADR-008)
+          [
+            { path: '/email', order: 'ascending' }
+            { path: '/isActive', order: 'descending' }
           ]
         ]
       }

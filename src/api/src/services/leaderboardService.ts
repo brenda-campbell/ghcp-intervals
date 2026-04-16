@@ -19,7 +19,7 @@ export async function getTopLeaderboard(): Promise<LeaderboardEntry[]> {
   const { resources: topUsers } = await usersContainer.items
     .query<User>({
       query:
-        "SELECT * FROM c ORDER BY c.totalScore DESC, c.fastestTimeMs ASC OFFSET 0 LIMIT 10",
+        "SELECT * FROM c WHERE c.isActive != false ORDER BY c.totalScore DESC, c.fastestTimeMs ASC OFFSET 0 LIMIT 10",
     })
     .fetchAll();
 

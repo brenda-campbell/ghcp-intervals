@@ -30,6 +30,9 @@ export interface User {
   id: string;
   userId: string;
   displayName: string;
+  email?: string;
+  isActive?: boolean;   // default true when missing (ADR-012)
+  isAdmin?: boolean;    // default false when missing (ADR-012)
   totalScore: number;
   gamesPlayed: number;
   fastestTimeMs: number;
@@ -75,17 +78,48 @@ export async function submitAnswer(
   return handleResponse<AnswerResult>(response);
 }
 
-export async function createUser(displayName?: string): Promise<User> {
-  const response = await fetch("/api/user", {
+export async function loginOrCreate(
+  email: string,
+  displayName: string,
+  legacyUserId?: string,
+): Promise<User> {
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (legacyUserId) headers["x-legacy-user-id"] = legacyUserId;
+  const response = await fetch("/api/users/login-or-create", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(displayName ? { displayName } : {}),
+    headers,
+    body: JSON.stringify({ email, displayName }),
   });
   return handleResponse<User>(response);
 }
 
 export async function getUser(userId: string): Promise<User> {
-  const response = await fetch(`/api/user/${encodeURIComponent(userId)}`);
+  const response = await fetch(`/api/users/${encodeURIComponent(userId)}`);
+  return handleResponse<User>(response);
+}
+
+export async function listUsers(
+  adminUserId: string,
+): Promise<{ users: User[] }> {
+  const response = await fetch("/api/users", {
+    headers: { "x-user-id": adminUserId },
+  });
+  return handleResponse<{ users: User[] }>(response);
+}
+
+export async function toggleUserStatus(
+  targetUserId: string,
+  isActive: boolean,
+  adminUserId: string,
+): Promise<User> {
+  const response = await fetch(
+    `/api/users/${encodeURIComponent(targetUserId)}/status`,
+    {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", "x-user-id": adminUserId },
+      body: JSON.stringify({ isActive }),
+    },
+  );
   return handleResponse<User>(response);
 }
 

@@ -22,6 +22,9 @@ export interface User {
   id: string;
   userId: string;
   displayName: string;
+  email?: string;
+  isActive?: boolean;   // default true when missing (ADR-012)
+  isAdmin?: boolean;    // default false when missing (ADR-012)
   totalScore: number;
   gamesPlayed: number;
   fastestTimeMs: number;

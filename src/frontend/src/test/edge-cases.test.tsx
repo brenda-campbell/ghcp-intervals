@@ -209,13 +209,9 @@ describe("Edge Cases: User with No Previous Scores", () => {
   })
 })
 
-describe("Edge Cases: localStorage Unavailable", () => {
-  it("handles localStorage.getItem throwing", async () => {
-    vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
-      throw new DOMException("Storage is disabled")
-    })
-
-    const mockCreateUser = vi.fn().mockResolvedValue({
+describe("Edge Cases: UserProvider loads user by ID", () => {
+  it("loads user successfully when given a valid userId", async () => {
+    const mockGetUser = vi.fn().mockResolvedValue({
       id: "doc-1",
       userId: "new-id",
       displayName: "Player",
@@ -227,8 +223,7 @@ describe("Edge Cases: localStorage Unavailable", () => {
     })
 
     vi.doMock("@/services/api", () => ({
-      getUser: vi.fn(),
-      createUser: (...args: unknown[]) => mockCreateUser(...args),
+      getUser: (...args: unknown[]) => mockGetUser(...args),
       ApiError: class extends Error {
         status: number
         constructor(s: number, m: string) { super(m); this.status = s }
@@ -238,23 +233,23 @@ describe("Edge Cases: localStorage Unavailable", () => {
     const { UserProvider, useUser } = await import("@/contexts/UserContext")
 
     function TestComp() {
-      const { error, isLoading } = useUser()
+      const { error, isLoading, user } = useUser()
       if (isLoading) return <div data-testid="loading">Loading</div>
       if (error) return <div data-testid="error">{error}</div>
-      return <div data-testid="ok">OK</div>
+      if (user) return <div data-testid="ok">{user.displayName}</div>
+      return <div data-testid="empty">No user</div>
     }
 
     await act(async () => {
       render(
-        <UserProvider>
+        <UserProvider userId="new-id">
           <TestComp />
         </UserProvider>,
       )
     })
 
-    // When localStorage throws, the UserProvider catches it and shows error
     await waitFor(() => {
-      expect(screen.queryByTestId("loading")).not.toBeInTheDocument()
+      expect(screen.getByTestId("ok")).toHaveTextContent("Player")
     })
 
     vi.restoreAllMocks()

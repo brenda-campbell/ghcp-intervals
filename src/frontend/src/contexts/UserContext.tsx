@@ -6,9 +6,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { createUser, getUser, ApiError, type User } from "@/services/api";
-
-const STORAGE_KEY = "ff_userId";
+import { getUser, type User } from "@/services/api";
 
 interface UserContextValue {
   user: User | null;
@@ -19,59 +17,44 @@ interface UserContextValue {
 
 const UserContext = createContext<UserContextValue | undefined>(undefined);
 
-export function UserProvider({ children }: { children: ReactNode }) {
+interface UserProviderProps {
+  children: ReactNode;
+  userId: string;
+}
+
+export function UserProvider({ children, userId }: UserProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const initUser = useCallback(async () => {
+  const loadUser = useCallback(async () => {
     setIsLoading(true);
     setError(null);
-
     try {
-      const storedId = localStorage.getItem(STORAGE_KEY);
-
-      if (storedId) {
-        try {
-          const existing = await getUser(storedId);
-          setUser(existing);
-          return;
-        } catch (err) {
-          // If 404 or invalid, create a new user instead
-          if (err instanceof ApiError && err.status === 404) {
-            localStorage.removeItem(STORAGE_KEY);
-          } else {
-            throw err;
-          }
-        }
-      }
-
-      // No stored user or it was invalid — create a new one
-      const newUser = await createUser();
-      localStorage.setItem(STORAGE_KEY, newUser.userId);
-      setUser(newUser);
+      const loaded = await getUser(userId);
+      setUser(loaded);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to load user";
       setError(message);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [userId]);
 
   const refreshUser = useCallback(async () => {
-    if (!user) return;
+    if (!userId) return;
     try {
-      const refreshed = await getUser(user.userId);
+      const refreshed = await getUser(userId);
       setUser(refreshed);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to refresh user";
       setError(message);
     }
-  }, [user]);
+  }, [userId]);
 
   useEffect(() => {
-    void initUser();
-  }, [initUser]);
+    void loadUser();
+  }, [loadUser]);
 
   return (
     <UserContext value={{ user, isLoading, error, refreshUser }}>

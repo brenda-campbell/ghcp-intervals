@@ -82,3 +82,8 @@
 - **PATCH /api/users/{userId}/status** (`toggleUserStatus.ts`) — Admin-only. Accepts `{ isActive: boolean }`. Point-reads target user, prevents self-deactivation (400), replaces doc with updated `isActive` and `updatedAt`. Standard 404 handling for missing users.
 - **Pattern consistency:** All four endpoints follow existing v4 `app.http()` registration, same error-handling shape, same Cosmos SDK usage as `getUser.ts`/`getQuestions.ts`.
 - **TypeScript compiles clean** — verified via `npx tsc --noEmit`.
+
+### be-phase3cd — Cleanup + Leaderboard Filter (Phase 3C+3D)
+- **Deleted `createUser.ts`** and its test `__tests__/createUser.test.ts`. The old `POST /api/user` endpoint is fully replaced by `loginOrCreate.ts` (`POST /api/users/login-or-create`) per ADR-009. Frontend references to `createUser` are in its own `api.ts` client — no backend import coupling.
+- **Leaderboard inactive filter:** Added `WHERE c.isActive != false` to both the top-10 query in `leaderboardService.ts` and the rank-counting query in `getLeaderboard.ts`. Uses `!= false` (not `= true`) so legacy users without the `isActive` field still appear on the board — per ADR-012's graceful defaults.
+- **TypeScript compiles clean** — verified via `npx tsc --noEmit`.

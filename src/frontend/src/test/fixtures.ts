@@ -85,8 +85,10 @@ export function createMockApis() {
   return {
     fetchQuestions: vi.fn(),
     submitAnswer: vi.fn(),
-    createUser: vi.fn(),
+    loginOrCreate: vi.fn(),
     getUser: vi.fn(),
     getLeaderboard: vi.fn(),
+    listUsers: vi.fn(),
+    toggleUserStatus: vi.fn(),
   }
 }

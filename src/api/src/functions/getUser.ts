@@ -46,6 +46,6 @@ async function getUser(
 app.http("getUser", {
   methods: ["GET"],
   authLevel: "anonymous",
-  route: "user/{userId}",
+  route: "users/{userId}",
   handler: getUser,
 });

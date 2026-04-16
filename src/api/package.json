@@ -10,6 +10,7 @@
     "prestart": "npm run clean && npm run build",
     "start": "func start",
     "seed": "tsx src/scripts/seedQuestions.ts",
+    "seed:admin": "npx tsx src/scripts/seedAdmin.ts",
     "test": "vitest run"
   },
   "dependencies": {

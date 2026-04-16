@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { User as UserIcon, Trophy, TrendUp } from "@phosphor-icons/react";
+import { User as UserIcon, Trophy, TrendUp, ShieldStar } from "@phosphor-icons/react";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useUser } from "@/contexts/UserContext";
+import { cn } from "@/lib/utils";
 
 export function UserBadge() {
   const { user, isLoading, error } = useUser();
@@ -37,17 +38,30 @@ export function UserBadge() {
   }
 
   return (
-    <div className="relative">
+    <div className="relative group">
       <Badge
         variant="secondary"
-        className="max-w-[180px] gap-1.5 px-2 py-1 text-xs transition-transform duration-150 hover:scale-[1.03] sm:max-w-none sm:px-3"
+        className={cn(
+          "max-w-[180px] gap-1.5 px-2 py-1 text-xs transition-transform duration-150 hover:scale-[1.03] sm:max-w-none sm:px-3",
+          user.isAdmin && "border-accent/40",
+        )}
       >
-        <UserIcon weight="bold" className="size-3.5 shrink-0" />
+        {user.isAdmin ? (
+          <ShieldStar weight="fill" className="size-3.5 shrink-0 text-accent" />
+        ) : (
+          <UserIcon weight="bold" className="size-3.5 shrink-0" />
+        )}
         <span className="truncate">{user.displayName}</span>
         <span className="shrink-0 text-muted-foreground">|</span>
         <Trophy weight="bold" className="size-3.5 shrink-0 text-accent" />
         <span className="shrink-0 font-mono">{user.totalScore}</span>
       </Badge>
+      {/* Email tooltip on hover */}
+      {user.email && (
+        <span className="pointer-events-none absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-card px-2 py-0.5 text-[10px] text-muted-foreground opacity-0 shadow-md transition-opacity group-hover:opacity-100 border border-border">
+          {user.email}
+        </span>
+      )}
       {scoreDelta > 0 && (
         <span
           className="pointer-events-none absolute -top-3 right-0 inline-flex items-center gap-0.5 font-mono text-xs font-bold text-accent"

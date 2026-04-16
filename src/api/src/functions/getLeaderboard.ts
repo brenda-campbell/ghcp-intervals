@@ -37,7 +37,7 @@ async function getLeaderboard(
             const { resources: countResult } = await usersContainer.items
               .query<number>({
                 query:
-                  "SELECT VALUE COUNT(1) FROM c WHERE c.totalScore > @score OR (c.totalScore = @score AND c.fastestTimeMs < @time)",
+                  "SELECT VALUE COUNT(1) FROM c WHERE c.isActive != false AND (c.totalScore > @score OR (c.totalScore = @score AND c.fastestTimeMs < @time))",
                 parameters: [
                   { name: "@score", value: userDoc.totalScore },
                   { name: "@time", value: userDoc.fastestTimeMs ?? Number.MAX_SAFE_INTEGER },

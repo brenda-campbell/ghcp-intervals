@@ -1,31 +1,40 @@
 import { useState, useRef, useEffect } from "react"
-import { Lightning, Trophy } from "@phosphor-icons/react"
+import { Lightning, Trophy, GearSix } from "@phosphor-icons/react"
 import { UserBadge } from "@/components/UserBadge"
 import { ConnectionStatus } from "@/components/ConnectionStatus"
 import { useUser } from "@/contexts/UserContext"
 import { Skeleton } from "@/components/ui/skeleton"
 import { LeaderboardPage } from "@/components/LeaderboardPage"
 import { QuestionPage } from "@/components/QuestionPage"
+import { AdminPanel } from "@/components/AdminPanel"
 import { cn } from "@/lib/utils"
 
-type View = "quiz" | "leaderboard"
+type View = "quiz" | "leaderboard" | "admin"
 
 function App() {
   const { user, isLoading } = useUser()
   const [view, setView] = useState<View>("quiz")
   const quizTabRef = useRef<HTMLButtonElement>(null)
   const leaderboardTabRef = useRef<HTMLButtonElement>(null)
+  const adminTabRef = useRef<HTMLButtonElement>(null)
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 })
 
+  const showAdmin = user?.isAdmin === true
+
   useEffect(() => {
-    const activeRef = view === "quiz" ? quizTabRef.current : leaderboardTabRef.current
+    const refMap: Record<View, React.RefObject<HTMLButtonElement | null>> = {
+      quiz: quizTabRef,
+      leaderboard: leaderboardTabRef,
+      admin: adminTabRef,
+    }
+    const activeRef = refMap[view]?.current
     if (activeRef) {
       setIndicatorStyle({
         left: activeRef.offsetLeft,
         width: activeRef.offsetWidth,
       })
     }
-  }, [view])
+  }, [view, showAdmin])
 
   return (
     <div className="min-h-[100dvh] p-3 sm:p-8">
@@ -73,6 +82,21 @@ function App() {
             <Trophy weight={view === "leaderboard" ? "fill" : "regular"} className="size-4" />
             Leaderboard
           </button>
+          {showAdmin && (
+            <button
+              ref={adminTabRef}
+              onClick={() => setView("admin")}
+              className={cn(
+                "relative z-10 flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors duration-200 sm:px-4",
+                view === "admin"
+                  ? "text-primary-foreground"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
+            >
+              <GearSix weight={view === "admin" ? "fill" : "regular"} className="size-4" />
+              Admin
+            </button>
+          )}
         </nav>
 
         {/* View content with page transition */}
@@ -90,6 +114,7 @@ function App() {
             {view === "leaderboard" && (
               <LeaderboardPage userId={user?.userId} />
             )}
+            {view === "admin" && showAdmin && <AdminPanel />}
           </div>
         )}
       </div>

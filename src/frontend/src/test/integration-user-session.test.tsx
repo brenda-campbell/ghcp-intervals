@@ -4,11 +4,9 @@ import { UserProvider, useUser } from "@/contexts/UserContext"
 import type { User } from "@/services/api"
 
 const mockGetUser = vi.fn()
-const mockCreateUser = vi.fn()
 
 vi.mock("@/services/api", () => ({
   getUser: (...args: unknown[]) => mockGetUser(...args),
-  createUser: (...args: unknown[]) => mockCreateUser(...args),
   ApiError: class ApiError extends Error {
     status: number
     constructor(status: number, message: string) {
@@ -39,50 +37,20 @@ const testUser: User = {
 }
 
 describe("Integration: User Session", () => {
-  let mockStorage: Record<string, string>
-
   beforeEach(() => {
     vi.clearAllMocks()
-    mockStorage = {}
-    vi.spyOn(Storage.prototype, "getItem").mockImplementation((key: string) => mockStorage[key] ?? null)
-    vi.spyOn(Storage.prototype, "setItem").mockImplementation((key: string, value: string) => {
-      mockStorage[key] = value
-    })
-    vi.spyOn(Storage.prototype, "removeItem").mockImplementation((key: string) => {
-      delete mockStorage[key]
-    })
   })
 
   afterEach(() => {
     vi.restoreAllMocks()
   })
 
-  it("creates new user on first visit (no stored ID)", async () => {
-    mockCreateUser.mockResolvedValue(testUser)
-
-    await act(async () => {
-      render(
-        <UserProvider>
-          <UserDisplay />
-        </UserProvider>,
-      )
-    })
-
-    await waitFor(() => {
-      expect(screen.getByTestId("user")).toHaveTextContent("TestPlayer - 500")
-    })
-
-    expect(mockCreateUser).toHaveBeenCalledOnce()
-    expect(localStorage.setItem).toHaveBeenCalledWith("ff_userId", "user-abc-123")
-  })
-
-  it("loads existing user from localStorage on refresh", async () => {
-    mockStorage["ff_userId"] = "user-abc-123"
+  it("loads user by userId on mount", async () => {
     mockGetUser.mockResolvedValue(testUser)
 
     await act(async () => {
       render(
-        <UserProvider>
+        <UserProvider userId="user-abc-123">
           <UserDisplay />
         </UserProvider>,
       )
@@ -93,36 +61,14 @@ describe("Integration: User Session", () => {
     })
 
     expect(mockGetUser).toHaveBeenCalledWith("user-abc-123")
-    expect(mockCreateUser).not.toHaveBeenCalled()
-  })
-
-  it("creates new user when stored ID returns 404", async () => {
-    const { ApiError } = await import("@/services/api")
-    mockStorage["ff_userId"] = "stale-id"
-    mockGetUser.mockRejectedValue(new ApiError(404, "Not found"))
-    mockCreateUser.mockResolvedValue(testUser)
-
-    await act(async () => {
-      render(
-        <UserProvider>
-          <UserDisplay />
-        </UserProvider>,
-      )
-    })
-
-    await waitFor(() => {
-      expect(screen.getByTestId("user")).toHaveTextContent("TestPlayer - 500")
-    })
-
-    expect(mockCreateUser).toHaveBeenCalledOnce()
   })
 
   it("shows error on API failure", async () => {
-    mockCreateUser.mockRejectedValue(new Error("Network failure"))
+    mockGetUser.mockRejectedValue(new Error("Network failure"))
 
     await act(async () => {
       render(
-        <UserProvider>
+        <UserProvider userId="user-abc-123">
           <UserDisplay />
         </UserProvider>,
       )
@@ -133,23 +79,15 @@ describe("Integration: User Session", () => {
     })
   })
 
-  it("handles localStorage being unavailable", async () => {
-    vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
-      throw new Error("localStorage is not available")
-    })
-    mockCreateUser.mockResolvedValue(testUser)
+  it("shows loading state initially", async () => {
+    mockGetUser.mockImplementation(() => new Promise(() => {}))
 
-    await act(async () => {
-      render(
-        <UserProvider>
-          <UserDisplay />
-        </UserProvider>,
-      )
-    })
+    render(
+      <UserProvider userId="user-abc-123">
+        <UserDisplay />
+      </UserProvider>,
+    )
 
-    // Should show error since localStorage throws
-    await waitFor(() => {
-      expect(screen.getByTestId("error")).toBeInTheDocument()
-    })
+    expect(screen.getByTestId("loading")).toBeInTheDocument()
   })
 })

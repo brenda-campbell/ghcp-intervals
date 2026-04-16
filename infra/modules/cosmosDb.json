@@ -1,0 +1,197 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.40.2.10011",
+      "templateHash": "13036393740445973461"
+    }
+  },
+  "parameters": {
+    "location": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure region for Cosmos DB"
+      }
+    },
+    "environmentName": {
+      "type": "string",
+      "metadata": {
+        "description": "Environment name (dev, staging, prod)"
+      }
+    },
+    "appName": {
+      "type": "string",
+      "metadata": {
+        "description": "Application name prefix"
+      }
+    }
+  },
+  "variables": {
+    "accountName": "[format('{0}-{1}-cosmos', parameters('appName'), parameters('environmentName'))]",
+    "databaseName": "fastestfinger"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts",
+      "apiVersion": "2024-02-15-preview",
+      "name": "[variables('accountName')]",
+      "location": "[parameters('location')]",
+      "kind": "GlobalDocumentDB",
+      "properties": {
+        "databaseAccountOfferType": "Standard",
+        "capabilities": [
+          {
+            "name": "EnableServerless"
+          }
+        ],
+        "consistencyPolicy": {
+          "defaultConsistencyLevel": "Session"
+        },
+        "locations": [
+          {
+            "locationName": "[parameters('location')]",
+            "failoverPriority": 0,
+            "isZoneRedundant": false
+          }
+        ]
+      },
+      "tags": {
+        "environment": "[parameters('environmentName')]",
+        "app": "[parameters('appName')]"
+      }
+    },
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases",
+      "apiVersion": "2024-02-15-preview",
+      "name": "[format('{0}/{1}', variables('accountName'), variables('databaseName'))]",
+      "properties": {
+        "resource": {
+          "id": "[variables('databaseName')]"
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('accountName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+      "apiVersion": "2024-02-15-preview",
+      "name": "[format('{0}/{1}/{2}', variables('accountName'), variables('databaseName'), 'users')]",
+      "properties": {
+        "resource": {
+          "id": "users",
+          "partitionKey": {
+            "paths": [
+              "/userId"
+            ],
+            "kind": "Hash"
+          },
+          "indexingPolicy": {
+            "indexingMode": "consistent",
+            "automatic": true,
+            "includedPaths": [
+              {
+                "path": "/*"
+              }
+            ],
+            "excludedPaths": [
+              {
+                "path": "/\"_etag\"/?"
+              }
+            ],
+            "compositeIndexes": [
+              [
+                {
+                  "path": "/totalScore",
+                  "order": "descending"
+                },
+                {
+                  "path": "/fastestTimeMs",
+                  "order": "ascending"
+                }
+              ],
+              [
+                {
+                  "path": "/email",
+                  "order": "ascending"
+                },
+                {
+                  "path": "/isActive",
+                  "order": "descending"
+                }
+              ]
+            ]
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('accountName'), variables('databaseName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+      "apiVersion": "2024-02-15-preview",
+      "name": "[format('{0}/{1}/{2}', variables('accountName'), variables('databaseName'), 'questions')]",
+      "properties": {
+        "resource": {
+          "id": "questions",
+          "partitionKey": {
+            "paths": [
+              "/category"
+            ],
+            "kind": "Hash"
+          },
+          "indexingPolicy": {
+            "indexingMode": "consistent",
+            "automatic": true,
+            "includedPaths": [
+              {
+                "path": "/*"
+              }
+            ],
+            "excludedPaths": [
+              {
+                "path": "/\"_etag\"/?"
+              }
+            ]
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('accountName'), variables('databaseName'))]"
+      ]
+    }
+  ],
+  "outputs": {
+    "endpoint": {
+      "type": "string",
+      "metadata": {
+        "description": "Cosmos DB account endpoint"
+      },
+      "value": "[reference(resourceId('Microsoft.DocumentDB/databaseAccounts', variables('accountName')), '2024-02-15-preview').documentEndpoint]"
+    },
+    "connectionString": {
+      "type": "string",
+      "metadata": {
+        "description": "Cosmos DB connection string"
+      },
+      "value": "[listConnectionStrings(resourceId('Microsoft.DocumentDB/databaseAccounts', variables('accountName')), '2024-02-15-preview').connectionStrings[0].connectionString]"
+    },
+    "accountName": {
+      "type": "string",
+      "metadata": {
+        "description": "Cosmos DB account name"
+      },
+      "value": "[variables('accountName')]"
+    },
+    "databaseName": {
+      "type": "string",
+      "metadata": {
+        "description": "Database name"
+      },
+      "value": "[variables('databaseName')]"
+    }
+  }
+}
