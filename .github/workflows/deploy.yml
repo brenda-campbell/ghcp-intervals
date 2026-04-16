@@ -1,28 +1,13 @@
 # =============================================================================
 # Fastest Finger Quiz — CI/CD Pipeline
 # =============================================================================
-# Single workflow per ADR-005: infra → build + test → deploy
-#
-# Required GitHub Repository Secrets & Variables:
-#   Secrets:
-#     AZURE_STATIC_WEB_APPS_API_TOKEN — SWA deployment token (set after first
-#                                        infra run, or use Bicep output)
-#   Variables (or Secrets):
-#     AZURE_CLIENT_ID        — App registration client ID (OIDC federated credential)
+# Required GitHub Repository Secrets:
+#     AZURE_CLIENT_ID        — App registration client ID (OIDC + Cosmos auth)
+#     AZURE_CLIENT_SECRET    — App registration client secret (Cosmos AAD auth)
 #     AZURE_TENANT_ID        — Azure AD tenant ID
 #     AZURE_SUBSCRIPTION_ID  — Target Azure subscription
 #     AZURE_RG               — Resource group name (e.g. rg-fastestfinger-dev)
-#
-# OIDC Setup:
-#   1. Create an App Registration in Azure AD
-#   2. Add a Federated Credential for this repo (subject: repo:<owner>/<repo>:ref:refs/heads/main)
-#   3. Grant the App Registration "Contributor" on the resource group
-#   4. Store the IDs above as GitHub repo secrets/variables
-#
-# Production deployment:
-#   For a prod environment, add an Environment protection rule in GitHub Settings
-#   (Settings → Environments → "production" → Required reviewers) so deploys
-#   require manual approval before running.
+#     AZURE_STATIC_WEB_APPS_API_TOKEN — (optional) SWA deployment token override
 # =============================================================================
 
 name: Deploy Fastest Finger Quiz
@@ -32,13 +17,12 @@ on:
     branches: [main]
   workflow_dispatch:
 
-# Cancel any in-progress run on the same branch to save resources
 concurrency:
   group: deploy-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
-  id-token: write   # Required for OIDC federated credential login
+  id-token: write
   contents: read
 
 jobs:
@@ -52,7 +36,6 @@ jobs:
     outputs:
       swa-token: ${{ steps.deploy-bicep.outputs.swaToken }}
       swa-hostname: ${{ steps.deploy-bicep.outputs.swaHostname }}
-      function-app-name: ${{ steps.deploy-bicep.outputs.functionAppName }}
 
     steps:
       - name: Checkout code
@@ -75,19 +58,30 @@ jobs:
             --query 'properties.outputs' \
             --output json)
 
-          # Extract outputs for downstream jobs
           SWA_TOKEN=$(echo "$DEPLOYMENT_OUTPUT" | jq -r '.staticWebAppDeploymentToken.value')
           SWA_HOSTNAME=$(echo "$DEPLOYMENT_OUTPUT" | jq -r '.staticWebAppHostname.value')
-          FUNC_APP_NAME=$(echo "$DEPLOYMENT_OUTPUT" | jq -r '.functionAppName.value')
+          SWA_NAME=$(echo "$DEPLOYMENT_OUTPUT" | jq -r '.staticWebAppName.value')
+          COSMOS_ENDPOINT=$(echo "$DEPLOYMENT_OUTPUT" | jq -r '.cosmosDbEndpoint.value')
+          SIGNALR_CONN=$(echo "$DEPLOYMENT_OUTPUT" | jq -r '.signalRConnectionString.value')
 
-          # Mask the deployment token so it doesn't appear in logs
           echo "::add-mask::$SWA_TOKEN"
+          echo "::add-mask::$SIGNALR_CONN"
 
           echo "swaToken=$SWA_TOKEN" >> "$GITHUB_OUTPUT"
           echo "swaHostname=$SWA_HOSTNAME" >> "$GITHUB_OUTPUT"
-          echo "functionAppName=$FUNC_APP_NAME" >> "$GITHUB_OUTPUT"
 
-          echo "✅ Infrastructure deployed — SWA: $SWA_HOSTNAME | Function App: $FUNC_APP_NAME"
+          # Configure SWA app settings (service principal for Cosmos AAD auth)
+          az staticwebapp appsettings set \
+            --name "$SWA_NAME" \
+            --setting-names \
+              COSMOS_ENDPOINT="$COSMOS_ENDPOINT" \
+              AzureSignalRConnectionString="$SIGNALR_CONN" \
+              AZURE_CLIENT_ID="${{ secrets.AZURE_CLIENT_ID }}" \
+              AZURE_CLIENT_SECRET="${{ secrets.AZURE_CLIENT_SECRET }}" \
+              AZURE_TENANT_ID="${{ secrets.AZURE_TENANT_ID }}" \
+            > /dev/null
+
+          echo "✅ Infrastructure deployed — SWA: $SWA_HOSTNAME"
 
   # ===========================================================================
   # Job 2 — Build, Test & Deploy Application
@@ -109,13 +103,6 @@ jobs:
           cache-dependency-path: |
             src/frontend/package-lock.json
             src/api/package-lock.json
-
-      - name: Azure Login (OIDC)
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       # --- Frontend ---
       - name: Install frontend dependencies
@@ -145,26 +132,13 @@ jobs:
         working-directory: src/api
         continue-on-error: true
 
-      # --- Deploy Frontend to SWA (no api_location — API is on standalone Function App) ---
-      - name: Deploy frontend to Azure Static Web Apps
+      # --- Deploy to Azure Static Web Apps ---
+      - name: Deploy to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN || needs.infrastructure.outputs.swa-token }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: upload
           app_location: src/frontend
+          api_location: src/api
           output_location: dist
-          skip_api_build: true
-
-      # --- Deploy API to standalone Azure Function App ---
-      - name: Prepare API package
-        run: |
-          cd src/api
-          npm prune --production
-          echo "📦 API package ready for deployment"
-
-      - name: Deploy API to Azure Function App
-        uses: Azure/functions-action@v1
-        with:
-          app-name: ${{ needs.infrastructure.outputs.function-app-name }}
-          package: src/api

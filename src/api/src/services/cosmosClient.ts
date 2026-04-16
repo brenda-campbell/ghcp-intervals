@@ -1,5 +1,5 @@
 import { CosmosClient, Database, Container } from "@azure/cosmos";
-import { DefaultAzureCredential, ManagedIdentityCredential } from "@azure/identity";
+import { ClientSecretCredential, DefaultAzureCredential } from "@azure/identity";
 
 const connectionString = process.env.CosmosDBConnectionString ?? "";
 const cosmosEndpoint = process.env.COSMOS_ENDPOINT ?? "";
@@ -8,10 +8,14 @@ function createClient(): CosmosClient {
   if (connectionString) {
     return new CosmosClient(connectionString);
   }
-  // Standalone Function App: ManagedIdentityCredential works out-of-the-box.
-  // Falls back to DefaultAzureCredential for local development.
-  const credential = process.env.WEBSITE_INSTANCE_ID
-    ? new ManagedIdentityCredential()
+  // Use service principal when credentials are available (Azure),
+  // otherwise DefaultAzureCredential for local dev (az login).
+  const credential = process.env.AZURE_CLIENT_SECRET
+    ? new ClientSecretCredential(
+        process.env.AZURE_TENANT_ID!,
+        process.env.AZURE_CLIENT_ID!,
+        process.env.AZURE_CLIENT_SECRET
+      )
     : new DefaultAzureCredential();
   return new CosmosClient({ endpoint: cosmosEndpoint, aadCredentials: credential });
 }
