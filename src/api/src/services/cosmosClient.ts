@@ -1,8 +1,12 @@
 import { CosmosClient, Database, Container } from "@azure/cosmos";
+import { DefaultAzureCredential } from "@azure/identity";
 
 const connectionString = process.env.CosmosDBConnectionString ?? "";
+const cosmosEndpoint = process.env.COSMOS_ENDPOINT ?? "";
 
-const client = new CosmosClient(connectionString);
+const client = connectionString
+  ? new CosmosClient(connectionString)
+  : new CosmosClient({ endpoint: cosmosEndpoint, aadCredentials: new DefaultAzureCredential() });
 
 const DATABASE_NAME = "fastestfinger";
 const USERS_CONTAINER = "users";

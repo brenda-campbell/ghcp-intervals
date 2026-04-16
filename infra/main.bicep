@@ -1,7 +1,10 @@
 targetScope = 'resourceGroup'
 
 @description('Azure region for all resources')
-param location string = 'eastus'
+param location string = 'northeurope'
+
+@description('Azure region for Static Web App (must be a supported SWA region)')
+param swaLocation string = 'westeurope'
 
 @description('Environment name (dev, staging, prod)')
 @allowed(['dev', 'staging', 'prod'])
@@ -14,7 +17,7 @@ param appName string = 'fastestfinger'
 module staticWebApp 'modules/staticWebApp.bicep' = {
   name: 'deploy-staticWebApp'
   params: {
-    location: location
+    location: swaLocation
     environmentName: environmentName
     appName: appName
   }
