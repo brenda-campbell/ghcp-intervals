@@ -120,3 +120,130 @@ Add `email`, `isActive`, `isAdmin` to User interface. Treat missing `isActive` a
 - All meaningful changes require team consensus
 - Document architectural decisions here
 - Keep history focused on work, decisions focused on direction
+
+---
+
+### ADR-013: Quiz Start/Stop via GameState.isStarted
+
+Added `isStarted: boolean` to the singleton `GameState` document (default `false`). Two new admin-only endpoints control quiz launch:
+- `POST /api/game/start-quiz` → sets `isStarted = true`, broadcasts `quizStarted`
+- `POST /api/game/stop-quiz` → sets `isStarted = false`, broadcasts `quizStopped`
+
+Category changes (`setCategory`) preserve the current `isStarted` value — switching categories mid-quiz doesn't accidentally reset started state.
+
+**Rationale:** Single boolean on existing singleton is simpler than a separate `quizSession` document. Admin has explicit control over timing (auto-start rejected). Preserving isStarted on category switch prevents accidental resets.
+
+---
+
+### ADR-014: Waiting Room Pattern (Frontend)
+
+New `WaitingScreen` component gates the Quiz tab when `GameState.isStarted === false`. Both admin and non-admin players see the waiting room (same UX). Admin controls quiz via `QuizControlSection` in AdminPanel. State synced via initial `getGameState()` fetch + SignalR `quizStarted`/`quizStopped` events.
+
+**Rationale:** Separates concerns — all players wait together, admin has separate control. SignalR events eliminate polling and ensure real-time sync across all connected clients.
+
+---
+
+### ADR-015: Quiz Launch Broadcast
+
+SignalR broadcasts `quizStarted { startedAt, startedBy }` and `quizStopped { stoppedAt, stoppedBy }` events to all connected clients when quiz state changes. Event payloads include metadata for audit and UI context.
+
+**Rationale:** Real-time broadcast is more responsive than polling `getGameState()` every N seconds. Metadata enables future audit logging and user attribution.
+
+---
+
+### ADR-016: Categories and Category Scores in Cosmos DB
+
+Three new containers added:
+- `categories` (partition key `/id`) — category metadata
+- `categoryScores` (partition key `/categoryId`, composite index on `totalScore DESC, fastestTimeMs ASC`) — per-category leaderboards
+- `gameState` (partition key `/id`) — active game session state
+
+**Rationale:** `categoryScores` partitioned by `/categoryId` enables efficient single-partition leaderboard queries. Composite index mirrors global leaderboard pattern for consistency. `categories` and `gameState` use `/id` for simple point-read lookups.
+
+---
+
+### ADR-017: Per-Category Score Tracking and Leaderboard
+
+`submitAnswer` endpoint updates `categoryScoresContainer` after each answer using read-then-write pattern. `leaderboardService.ts` exports `getCategoryLeaderboard(categoryId)` for category-scoped boards. `getLeaderboard` accepts optional `?categoryId=` query param.
+
+**Rationale:** Per-category stats enable future features (category rankings, category-specific achievements). Read-then-write has acceptable race window at current scale; production multi-instance setup would use Cosmos transactions or Redis.
+
+---
+
+### ADR-018: Online Presence via In-Memory Map
+
+`presenceService.ts` maintains a Map-based presence store with 60-second timeout. `GET /api/game/online-players` returns count for non-admin, full list for admins. `POST /api/game/heartbeat` registers/refreshes presence.
+
+**Rationale:** In-memory presence is MVP-grade; per-instance only (not shared across Azure Functions scale-out). Acceptable for current scale; production would migrate to Redis or Cosmos. Heartbeat interval matches existing polling patterns (30s).
+
+---
+
+### ADR-019: Category CRUD Endpoints and Cascade Delete
+
+Six new admin-only endpoints:
+- `POST /api/categories` — create category
+- `GET /api/categories` — list (admin sees all, non-admin sees only active)
+- `PATCH /api/categories/{categoryId}` — update category
+- `DELETE /api/categories/{categoryId}` — delete + cascade all questions in category
+- `POST /api/game/set-category` — set active category + broadcast
+- `GET /api/game/state` — get current GameState
+
+Category names are unique (case-insensitive). Deleting a category cascades all its questions. `setCategory` preserves `isStarted` state.
+
+**Rationale:** Cascade prevents orphaned questions. Case-insensitive uniqueness prevents confusion. Cascade delete is simpler than soft-delete or orphan cleanup.
+
+---
+
+### ADR-020: Admin Category Management UI (Single-File Components)
+
+AdminPanel decomposed into four internal components in one file: `OnlinePlayersSection`, `ActiveCategorySwitcher`, `CategoryManagement`, and orchestrating `AdminPanel` root. Each sub-component independently fetches data (no cascading errors). User Management remains untouched.
+
+**Rationale:** Single-file architecture keeps tightly coupled admin features co-located. Independent loading prevents category errors from blocking user table. Minimal blast radius on existing components.
+
+---
+
+### ADR-021: AuthGate and UserProvider Boundary
+
+AuthGate owns login flow (localStorage, `loginOrCreate` calls, deactivated/error gates, EmailEntry). UserProvider is a pure data provider (takes `userId` as prop, loads user, no auto-create). Root component in main.tsx bridges them.
+
+**Rationale:** Clean separation makes UserProvider testable without mocking localStorage. AuthGate is single source of truth for "is user logged in?"
+
+---
+
+### ADR-022: Question Type Support (Multiple-Choice and True-False)
+
+`Question` model updated: `options` changed from 4-element tuple to `string[]` (supports 2 or 4 options). New `type: QuestionType` field (`"multiple-choice" | "true-false"`). Backward compat: missing `type` defaults to `"multiple-choice"` at mapping time.
+
+**Rationale:** Variable-length options support T/F (2 options) and MC (4 options). Default fallback ensures old questions render as MC. No schema migration needed.
+
+---
+
+### ADR-023: Game UI for True-False Questions
+
+AnswerGrid component conditionally renders labels (✓/✗ vs A/B/C/D), grid layout (2-col vs responsive), and button sizing based on `questionType` prop. Green/red tints applied to borders and badge backgrounds for visual affordance.
+
+**Rationale:** Visual hierarchy differentiates T/F from MC without modal/toast overhead. Matches existing animation patterns.
+
+---
+
+### ADR-024: Category Notification (Non-Intrusive Banner)
+
+Auto-dismissing banner (3s timeout) displays at top of quiz area when category changes (via SignalR `categoryChanged` event). Native `<select>` element for leaderboard category filter (styled with Tailwind, no Radix UI dependency).
+
+**Rationale:** Lightweight notification matches existing patterns. Graceful degradation if backend doesn't broadcast event (notification simply won't appear).
+
+---
+
+### ADR-025: SignalR Upgrade to Standard_S1 and HTTP Concurrency Tuning
+
+SignalR upgraded from Free_F1 (20 connections) to Standard_S1 (1000 connections). Azure Functions HTTP concurrency set to 100 concurrent requests.
+
+**Rationale:** Free tier was hard blocker for 80-user scalability. Standard_S1 supports target concurrent player count.
+
+---
+
+### ADR-026: Question Cache and Leaderboard Throttle for Scale
+
+`submitAnswer` caches questions in-memory (per-instance) and throttles leaderboard broadcast to 1/second. Question cache eliminates redundant cross-partition queries when many users answer same question. Throttle reduces Cosmos reads from N/round to ~1/round.
+
+**Rationale:** Main backend bottlenecks for 80 concurrent players. In-memory cache is MVP-grade per-instance optimization; production would use distributed cache.
