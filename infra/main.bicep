@@ -43,6 +43,37 @@ module signalR 'modules/signalr.bicep' = {
   }
 }
 
+// --- Cosmos DB RBAC: Grant SWA managed identity data access ---
+resource cosmosAccount 'Microsoft.DocumentDB/databaseAccounts@2024-02-15-preview' existing = {
+  name: '${appName}-${environmentName}-cosmos'
+}
+
+resource cosmosRbac 'Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignments@2024-02-15-preview' = {
+  parent: cosmosAccount
+  name: guid(cosmosAccount.id, '${appName}-${environmentName}-swa', 'cosmos-data-contributor')
+  properties: {
+    roleDefinitionId: '${cosmosAccount.id}/sqlRoleDefinitions/00000000-0000-0000-0000-000000000002'
+    principalId: staticWebApp.outputs.principalId
+    scope: cosmosAccount.id
+  }
+  dependsOn: [cosmosDb]
+}
+
+// --- SWA App Settings ---
+resource swaResource 'Microsoft.Web/staticSites@2023-12-01' existing = {
+  name: '${appName}-${environmentName}-swa'
+}
+
+resource swaAppSettings 'Microsoft.Web/staticSites/config@2023-12-01' = {
+  parent: swaResource
+  name: 'appsettings'
+  properties: {
+    COSMOS_ENDPOINT: cosmosDb.outputs.endpoint
+    AzureSignalRConnectionString: signalR.outputs.connectionString
+  }
+  dependsOn: [staticWebApp]
+}
+
 // --- Outputs ---
 @description('Static Web App default hostname')
 output staticWebAppHostname string = staticWebApp.outputs.hostname

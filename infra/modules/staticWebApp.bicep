@@ -13,8 +13,11 @@ resource staticWebApp 'Microsoft.Web/staticSites@2023-12-01' = {
   name: staticWebAppName
   location: location
   sku: {
-    name: 'Free'
-    tier: 'Free'
+    name: 'Standard'
+    tier: 'Standard'
+  }
+  identity: {
+    type: 'SystemAssigned'
   }
   properties: {
     stagingEnvironmentPolicy: 'Enabled'
@@ -39,6 +42,9 @@ output resourceId string = staticWebApp.id
 
 @description('Name of the Static Web App')
 output name string = staticWebApp.name
+
+@description('Principal ID of the system-assigned managed identity')
+output principalId string = staticWebApp.identity.principalId
 
 @description('Deployment token for CI/CD')
 output deploymentToken string = staticWebApp.listSecrets().properties.apiKey
