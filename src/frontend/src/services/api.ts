@@ -17,6 +17,7 @@ export interface GameState {
   activeCategoryName: string | null;
   activeQuestionFormat: QuestionType;
   isStarted: boolean;
+  questionIds?: string[];
   updatedAt?: string;
 }
 
@@ -283,6 +284,22 @@ export async function getOnlinePlayers(adminUserId?: string): Promise<OnlinePlay
   if (adminUserId) headers["x-user-id"] = adminUserId;
   const response = await fetch("/api/game/online-players", { headers });
   return handleResponse<OnlinePlayersResponse>(response);
+}
+
+// --- Score Reset ---
+
+export async function resetScores(
+  adminUserId: string,
+  scope: "all" | "selected",
+  userIds?: string[],
+  categoryId?: string,
+): Promise<{ reset: boolean; usersAffected: number }> {
+  const response = await fetch("/api/scores/reset", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "x-user-id": adminUserId },
+    body: JSON.stringify({ scope, userIds, categoryId }),
+  });
+  return handleResponse<{ reset: boolean; usersAffected: number }>(response);
 }
 
 export async function sendHeartbeat(userId: string, displayName: string): Promise<{ count: number }> {

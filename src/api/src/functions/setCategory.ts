@@ -86,13 +86,14 @@ async function setCategory(
     // No existing state — default isStarted to false
   }
 
-  // Upsert game state
+  // Upsert game state — clear pinned questions when category changes
   const gameState: GameState = {
     id: "current",
     activeCategoryId: category.id,
     activeCategoryName: category.name,
     activeQuestionFormat: category.questionFormat,
     isStarted: currentIsStarted,
+    questionIds: [],
     updatedAt: new Date().toISOString(),
     updatedBy: admin.userId,
   };

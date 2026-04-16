@@ -25,9 +25,10 @@ A competitive speed-trivia game where players race to answer Azure and GitHub Co
 │  Tailwind CSS v4│     │                       │     │               │
 │  shadcn/ui      │     │  GET  /api/questions   │     │  users        │
 │  SignalR client │     │  POST /api/answer      │     │  questions    │
-│                 │     │  POST /api/user        │     └───────────────┘
-│                 │     │  GET  /api/user/:id    │
-│                 │     │  GET  /api/leaderboard │     ┌───────────────┐
+│                 │     │  POST /api/user        │     │  categories   │
+│                 │     │  GET  /api/user/:id    │     │  categoryScores│
+│                 │     │  GET  /api/leaderboard │     │  gameState    │
+│                 │     │  POST /api/scores/reset│     └───────────────┘
 │                 │◀───▶│  POST /api/negotiate   │────▶│ SignalR Service│
 │                 │     │                       │     │  (Serverless)  │
 └─────────────────┘     └──────────────────────┘     └───────────────┘
@@ -167,10 +168,14 @@ The workflow (`.github/workflows/deploy.yml`) runs on push to `main`:
 ## Game Features
 
 - **🎯 Quiz Flow** — 1–3 questions per round, 2×2 answer grid, progress tracking
+- **🔒 Synchronized Questions** — Admin-started quizzes pin the same questions for all players, ensuring fairness
 - **⏱️ Precision Timer** — `requestAnimationFrame`-based, color-coded (green → amber → red)
 - **📊 Live Leaderboard** — Top 10 with gold/silver/bronze badges, real-time SignalR updates
+- **🏷️ Multi-Category** — 6+ quiz categories (Technical, Movies, Geography, etc.) with admin switching
+- **⏸️ Waiting Room** — Players see a waiting screen until admin starts the quiz
+- **🔄 Score Reset** — Admin can reset scores for all, selected, or per-category players
 - **🔒 Anti-Cheat** — Server-authoritative timing, correct answers never sent to client
-- **👤 Anonymous Identity** — Auto-generated profiles, localStorage persistence
+- **👤 Email Identity** — Email-based login, localStorage persistence, admin panel for user management
 - **✨ Animations** — Answer feedback, page transitions, score counter, confetti on perfect rounds
 - **📱 Mobile Responsive** — Touch-optimized, safe areas, fluid typography
 

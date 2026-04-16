@@ -104,6 +104,7 @@ export interface GameState {
   activeCategoryName: string;
   activeQuestionFormat: QuestionType;
   isStarted: boolean;
+  questionIds?: string[];  // pinned question IDs for synchronized quiz rounds
   updatedAt: string;
   updatedBy: string;   // userId of admin who changed it
 }

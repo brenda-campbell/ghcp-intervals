@@ -17,6 +17,11 @@ vi.mock("../../services/cosmosClient.js", () => ({
     item: vi.fn(),
     items: { query: vi.fn() },
   },
+  questionsContainer: {
+    items: {
+      query: vi.fn(),
+    },
+  },
   database: {},
 }));
 
@@ -25,7 +30,7 @@ vi.mock("../../services/adminAuth.js", () => ({
 }));
 
 import { app } from "@azure/functions";
-import { gameStateContainer } from "../../services/cosmosClient.js";
+import { gameStateContainer, questionsContainer } from "../../services/cosmosClient.js";
 import { requireAdmin } from "../../services/adminAuth.js";
 
 type Handler = (req: any, ctx: any) => Promise<HttpResponseInit>;
@@ -55,6 +60,13 @@ const EXISTING_GAME_STATE = {
   updatedBy: "admin-1",
 };
 
+const MOCK_QUESTIONS = [
+  { id: "q1", category: "cat-azure", questionText: "Q1?", options: ["A","B","C","D"], correctIndex: 0, difficulty: "easy", type: "multiple-choice" },
+  { id: "q2", category: "cat-azure", questionText: "Q2?", options: ["A","B","C","D"], correctIndex: 1, difficulty: "medium", type: "multiple-choice" },
+  { id: "q3", category: "cat-azure", questionText: "Q3?", options: ["A","B","C","D"], correctIndex: 2, difficulty: "hard", type: "multiple-choice" },
+  { id: "q4", category: "cat-azure", questionText: "Q4?", options: ["A","B","C","D"], correctIndex: 3, difficulty: "easy", type: "multiple-choice" },
+];
+
 beforeAll(async () => {
   await import("../startQuiz.js");
   handler = vi.mocked(app.http).mock.calls[0][1].handler;
@@ -72,6 +84,11 @@ describe("startQuiz", () => {
     } as any);
     mockRead.mockResolvedValue({ resource: { ...EXISTING_GAME_STATE } });
     mockUpsert.mockImplementation(async (doc: any) => ({ resource: doc } as any));
+
+    // Mock questionsContainer query to return pool of questions
+    vi.mocked(questionsContainer.items.query).mockReturnValue({
+      fetchAll: vi.fn().mockResolvedValue({ resources: [...MOCK_QUESTIONS] }),
+    } as any);
   });
 
   // === Auth ===

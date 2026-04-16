@@ -60,8 +60,9 @@ async function stopQuiz(
       };
     }
 
-    // Set isStarted to false
+    // Set isStarted to false and clear pinned questions
     gameState.isStarted = false;
+    gameState.questionIds = [];
     gameState.updatedAt = new Date().toISOString();
     gameState.updatedBy = admin.userId;
 

@@ -37,36 +37,81 @@ async function getQuestions(
 ): Promise<HttpResponseInit> {
   context.log("getQuestions called");
 
-  // Parse and validate count
-  const countParam = request.query.get("count");
-  let count = DEFAULT_COUNT;
+  try {
+    // Check for pinned (synchronized) questions first
+    let gameState: GameState | undefined;
+    try {
+      const { resource } = await gameStateContainer
+        .item("current", "current")
+        .read<GameState>();
+      gameState = resource ?? undefined;
+    } catch {
+      // No game state
+    }
 
-  if (countParam !== null) {
-    count = parseInt(countParam, 10);
-    if (isNaN(count) || count < 1 || count > MAX_QUESTIONS) {
+    if (
+      gameState?.isStarted === true &&
+      gameState.questionIds &&
+      gameState.questionIds.length > 0
+    ) {
+      // Fetch pinned questions by their IDs
+      const idList = gameState.questionIds
+        .map((_, i) => `@id${i}`)
+        .join(", ");
+      const params = gameState.questionIds.map((id, i) => ({
+        name: `@id${i}`,
+        value: id,
+      }));
+
+      const { resources: pinnedQuestions } = await questionsContainer.items
+        .query<Question>({
+          query: `SELECT * FROM c WHERE c.id IN (${idList})`,
+          parameters: params,
+        })
+        .fetchAll();
+
+      // Return in the same order as questionIds for fairness
+      const orderMap = new Map(
+        gameState.questionIds.map((id, idx) => [id, idx])
+      );
+      pinnedQuestions.sort(
+        (a, b) => (orderMap.get(a.id) ?? 0) - (orderMap.get(b.id) ?? 0)
+      );
+
+      const roundId = randomUUID();
       return {
-        status: 400,
+        status: 200,
         jsonBody: {
-          error: `Invalid count. Must be between 1 and ${MAX_QUESTIONS}.`,
+          roundId,
+          questions: pinnedQuestions.map(toQuestionResponse),
         },
       };
     }
-  }
 
-  try {
+    // --- Fallback: random selection (quiz not started or no pinned questions) ---
+
+    // Parse and validate count
+    const countParam = request.query.get("count");
+    let count = DEFAULT_COUNT;
+
+    if (countParam !== null) {
+      count = parseInt(countParam, 10);
+      if (isNaN(count) || count < 1 || count > MAX_QUESTIONS) {
+        return {
+          status: 400,
+          jsonBody: {
+            error: `Invalid count. Must be between 1 and ${MAX_QUESTIONS}.`,
+          },
+        };
+      }
+    }
+
     // Determine active category
     const categoryParam = request.query.get("category");
     let activeCategory: string | null = categoryParam || null;
 
-    if (!activeCategory) {
-      try {
-        const { resource: gameState } = await gameStateContainer.item("current", "current").read<GameState>();
-        if (gameState?.activeCategoryId) {
-          activeCategory = gameState.activeCategoryId;
-        }
-      } catch {
-        // No game state — query all questions
-      }
+    if (!activeCategory && gameState?.activeCategoryId) {
+      activeCategory = gameState.activeCategoryId;
     }
 
     // Query questions (category-filtered or all)

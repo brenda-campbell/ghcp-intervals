@@ -47,6 +47,20 @@ This is a focused competitive game with core mechanics (questions, timer, scorin
 - **Progression**: Round begins → Server randomly selects question(s) from pool → Question delivered to frontend → User completes question(s) → Round ends → Next round becomes available
 - **Success criteria**: No duplicate questions within same round, questions rotate across sessions, difficulty feels consistent, all questions have verified correct answers
 
+### Synchronized Questions (Fairness)
+- **Functionality**: When the admin starts a quiz, the server selects a fixed set of questions and pins them to the game state. ALL connected players receive the exact same questions in the same order.
+- **Purpose**: Ensures competitive fairness — every player answers identical questions, so the only differentiator is speed and knowledge.
+- **Trigger**: Admin clicks "Start Quiz" in the Admin panel
+- **Progression**: Admin starts quiz → Server selects 3 random questions from active category → Question IDs pinned to GameState → All players' `getQuestions` calls return the same pinned set → Players race through at their own pace → Admin stops quiz → Pinned questions cleared → Next start picks fresh random set
+- **Success criteria**: All connected players see identical questions in identical order, new quiz start always picks a fresh random set, category changes clear stale pinned questions, stopping the quiz clears the pinned set
+
+### Admin Score Reset
+- **Functionality**: Admin can reset player scores to zero — individually, for a selection of players, or for all players at once. Optionally scoped to a specific category.
+- **Purpose**: Allows fresh starts for new game sessions, tournament rounds, or correcting scoring issues
+- **Trigger**: Admin uses the Score Management section in the Admin panel
+- **Progression**: Admin selects scope (all / selected users) → Optional category filter → Confirms action → Server resets scores → SignalR broadcasts `scoresReset` → Leaderboards refresh automatically
+- **Success criteria**: Global reset zeroes all users' totalScore/gamesPlayed/fastestTimeMs and deletes all categoryScores, selected reset only affects chosen users, category-scoped reset only deletes that category's scores without touching global stats, confirmation required before destructive action
+
 ## Edge Case Handling
 
 - **Network interruption during answer** - Timer freezes, answer queued locally, auto-submits when connection restored with original timestamp

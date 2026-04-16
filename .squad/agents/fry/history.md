@@ -169,3 +169,12 @@
 - **useSignalR.ts:** Added `quizStarted` and `quizStopped` event handlers. New `quizStarted: boolean | null` in return state. New `QuizStartedEvent` / `QuizStoppedEvent` interfaces.
 - **App.tsx:** Imports `useSignalRContext` and `getGameState`. On mount fetches game state for `isStarted` + `activeCategoryName`. Quiz tab renders `<WaitingScreen>` when stopped, `<QuestionPage>` when live. Both admin and non-admin see waiting screen; admin uses Admin tab to start quiz.
 - **Verification:** TypeScript compiles clean (`npx tsc --noEmit` — 0 errors).
+
+### fe-score-reset (2026-04-16)
+- **api.ts:** Added `resetScores(adminUserId, scope, userIds?, categoryId?)` function calling `POST /api/scores/reset`. Added `questionIds?: string[]` to `GameState` interface.
+- **useSignalR.ts:** Added `scoresReset` event handler with new `ScoresResetEvent` interface and `scoresResetSignal` state. Auto-exposed via SignalRContext since it mirrors `UseSignalRReturn`.
+- **AdminPanel — ScoreResetSection:** New card component with "Reset All Scores" button (red/destructive), optional category scope dropdown, inline confirmation prompt showing user count, loading spinner, success/error feedback with auto-dismiss.
+- **AdminPanel — User table checkboxes:** Added checkbox column with Select All header checkbox. "Reset Selected" button appears in card header when ≥1 user selected. Inline confirmation banner with confirm/cancel. Selection state cleared after successful reset.
+- **AdminPanel — SignalR integration:** `scoresResetSignal` from context triggers automatic user list refresh, keeping table scores current after any reset (even from another admin).
+- **AdminPanel — categories fetch:** `fetchUsers` now parallel-fetches `listCategories` so ScoreResetSection has category data for scope dropdown.
+- **Verification:** TypeScript compiles clean (`npx tsc --noEmit` — 0 errors).

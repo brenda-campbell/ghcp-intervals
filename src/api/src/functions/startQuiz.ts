@@ -7,10 +7,13 @@ import {
 } from "@azure/functions";
 import {
   gameStateContainer,
+  questionsContainer,
   usersContainer,
 } from "../services/cosmosClient.js";
 import { requireAdmin } from "../services/adminAuth.js";
-import type { GameState, User } from "../models/index.js";
+import type { GameState, Question, User } from "../models/index.js";
+
+const QUESTION_COUNT = 3;
 
 const signalROutput = output.generic({
   type: "signalR",
@@ -60,8 +63,32 @@ async function startQuiz(
       };
     }
 
-    // Set isStarted to true
+    // Select and pin random questions from the active category
+    const { resources: pool } = await questionsContainer.items
+      .query<Question>({
+        query: "SELECT * FROM c WHERE c.category = @category",
+        parameters: [{ name: "@category", value: gameState.activeCategoryId }],
+      })
+      .fetchAll();
+
+    if (!pool || pool.length === 0) {
+      return {
+        status: 400,
+        jsonBody: { error: "No questions available for the active category." },
+      };
+    }
+
+    // Fisher-Yates shuffle and pick up to QUESTION_COUNT
+    const shuffled = [...pool];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    const pinned = shuffled.slice(0, Math.min(QUESTION_COUNT, shuffled.length));
+
+    // Set isStarted to true and store pinned question IDs
     gameState.isStarted = true;
+    gameState.questionIds = pinned.map((q) => q.id);
     gameState.updatedAt = new Date().toISOString();
     gameState.updatedBy = admin.userId;
 

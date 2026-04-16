@@ -139,3 +139,20 @@
 - **Pattern:** Both new endpoints follow the same SignalR output binding + admin auth pattern as `setCategory.ts`.
 - **Frontend contract:** Clients should listen for `"quizStarted"` and `"quizStopped"` events on their SignalR connection.
 - **TypeScript compiles clean, all 100 tests pass.**
+
+### be-sync-questions — Synchronized Questions for Fair Play (2026-04-16)
+- **GameState extended** with `questionIds?: string[]` in `src/api/src/models/index.ts`. When admin starts a quiz, `startQuiz.ts` queries all questions from the active category, Fisher-Yates shuffles, selects up to 3 (QUESTION_COUNT), and stores their IDs in `gameState.questionIds`.
+- **getQuestions.ts** updated: checks GameState first — if `isStarted === true` and `questionIds` is non-empty, fetches those specific questions by ID (`SELECT * FROM c WHERE c.id IN (...)`) and returns them in the same order as `questionIds`. Falls back to random selection when quiz is not started.
+- **stopQuiz.ts** updated: clears `questionIds` (sets to empty array) when admin stops the quiz.
+- **setCategory.ts** updated: clears `questionIds` on category change since old questions belong to different category.
+- **Pattern:** Cross-partition query for pinned questions is acceptable — max 3 IDs, bounded cost.
+- **TypeScript compiles clean.**
+
+### be-score-reset — Score Reset API (2026-04-16)
+- **New endpoint** `POST /api/scores/reset` in `src/api/src/functions/resetScores.ts`. Admin-only via `requireAdmin()`.
+- **Request body:** `{ scope: "all" | "selected", userIds?: string[], categoryId?: string }`.
+- **scope "all":** Resets all users' global scores (totalScore, gamesPlayed, fastestTimeMs = 0) and deletes all categoryScores documents. If `categoryId` is provided, only deletes that category's scores (leaves global user scores untouched).
+- **scope "selected":** Same but only for specified userIds. Partial failures are handled gracefully (logged, skipped).
+- **SignalR broadcast:** Sends `scoresReset` event with `{ resetAt, resetBy, scope, usersAffected }` so frontends can refresh leaderboards.
+- **Pattern:** Follows same admin auth + SignalR output binding pattern as startQuiz/stopQuiz.
+- **TypeScript compiles clean.**

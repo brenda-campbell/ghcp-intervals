@@ -14,6 +14,7 @@ import {
   Broadcast,
   Play,
   Stop,
+  Eraser,
 } from "@phosphor-icons/react";
 import {
   Table,
@@ -33,6 +34,7 @@ import {
   listUsers,
   toggleUserStatus,
   deleteUser,
+  resetScores,
   listCategories,
   createCategory,
   updateCategory,
@@ -669,24 +671,176 @@ function CategoryManagement({ adminUserId }: { adminUserId: string }) {
 }
 
 /* ------------------------------------------------------------------ */
+/*  Score Reset Management                                            */
+/* ------------------------------------------------------------------ */
+
+function ScoreResetSection({
+  adminUserId,
+  categories,
+  userCount,
+  onResetComplete,
+}: {
+  adminUserId: string;
+  categories: Category[];
+  userCount: number;
+  onResetComplete: () => void;
+}) {
+  const [isResetting, setIsResetting] = useState(false);
+  const [confirmingAll, setConfirmingAll] = useState(false);
+  const [categoryId, setCategoryId] = useState<string>("");
+  const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
+
+  const clearFeedback = () => {
+    setTimeout(() => setFeedback(null), 3000);
+  };
+
+  const handleResetAll = async () => {
+    setIsResetting(true);
+    setFeedback(null);
+    try {
+      const result = await resetScores(
+        adminUserId,
+        "all",
+        undefined,
+        categoryId || undefined,
+      );
+      setFeedback({
+        type: "success",
+        message: `Reset complete — ${result.usersAffected} user${result.usersAffected !== 1 ? "s" : ""} affected`,
+      });
+      setConfirmingAll(false);
+      onResetComplete();
+      clearFeedback();
+    } catch (err) {
+      setFeedback({
+        type: "error",
+        message: err instanceof Error ? err.message : "Failed to reset scores",
+      });
+      clearFeedback();
+    } finally {
+      setIsResetting(false);
+    }
+  };
+
+  return (
+    <Card className="border-border bg-card">
+      <CardHeader className="flex flex-row items-center justify-between gap-2">
+        <CardTitle className="flex items-center gap-2 text-lg">
+          <Eraser weight="fill" className="size-5 text-red-400" />
+          Score Management
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {feedback && (
+          <div
+            className={cn(
+              "flex items-center gap-2 rounded-md border px-3 py-2 text-sm",
+              feedback.type === "success"
+                ? "border-green-500/30 bg-green-500/10 text-green-400"
+                : "border-destructive/30 bg-destructive/10 text-destructive",
+            )}
+          >
+            {feedback.type === "success" ? (
+              <CheckCircle weight="bold" className="size-4 shrink-0" />
+            ) : (
+              <WarningCircle weight="bold" className="size-4 shrink-0" />
+            )}
+            {feedback.message}
+          </div>
+        )}
+
+        <div className="flex flex-wrap items-end gap-3">
+          {/* Category filter */}
+          <div className="space-y-1">
+            <label className="text-xs text-muted-foreground">Scope (optional)</label>
+            <select
+              value={categoryId}
+              onChange={(e) => setCategoryId(e.target.value)}
+              className="h-9 rounded-md border border-border bg-background px-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-accent"
+            >
+              <option value="">All categories</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Reset All button + confirmation */}
+          {!confirmingAll ? (
+            <Button
+              size="sm"
+              onClick={() => setConfirmingAll(true)}
+              className="min-h-[36px] bg-red-500 hover:bg-red-600 text-white font-semibold transition-transform duration-150 hover:scale-[1.03] active:scale-[0.97]"
+            >
+              <Eraser weight="bold" className="mr-1.5 size-4" />
+              Reset All Scores
+            </Button>
+          ) : (
+            <div className="flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2">
+              <WarningCircle weight="fill" className="size-4 text-red-400 shrink-0" />
+              <span className="text-sm text-red-300">
+                Reset scores for {userCount} user{userCount !== 1 ? "s" : ""}
+                {categoryId ? " in selected category" : ""}?
+              </span>
+              <Button
+                size="sm"
+                onClick={() => void handleResetAll()}
+                disabled={isResetting}
+                className="min-h-[32px] bg-red-500 hover:bg-red-600 text-white font-semibold text-xs"
+              >
+                {isResetting ? (
+                  <SpinnerGap className="mr-1 size-3.5 animate-spin" />
+                ) : (
+                  <CheckCircle weight="bold" className="mr-1 size-3.5" />
+                )}
+                Confirm
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setConfirmingAll(false)}
+                disabled={isResetting}
+                className="min-h-[32px] text-xs"
+              >
+                Cancel
+              </Button>
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /*  Main AdminPanel                                                   */
 /* ------------------------------------------------------------------ */
 
 export function AdminPanel() {
   const { user: currentUser } = useUser();
+  const { scoresResetSignal } = useSignalRContext();
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [selectedUserIds, setSelectedUserIds] = useState<Set<string>>(new Set());
+  const [isResettingSelected, setIsResettingSelected] = useState(false);
+  const [confirmingSelected, setConfirmingSelected] = useState(false);
+  const [resetFeedback, setResetFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   const fetchUsers = useCallback(async () => {
     if (!currentUser) return;
     setIsLoading(true);
     setError(null);
     try {
-      const data = await listUsers(currentUser.userId);
+      const [data, cats] = await Promise.all([
+        listUsers(currentUser.userId),
+        listCategories(currentUser.userId),
+      ]);
       setUsers(data.users);
+      setCategories(cats);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load users");
     } finally {
@@ -697,6 +851,57 @@ export function AdminPanel() {
   useEffect(() => {
     void fetchUsers();
   }, [fetchUsers]);
+
+  // Refresh user list when scores are reset via SignalR
+  useEffect(() => {
+    if (scoresResetSignal) void fetchUsers();
+  }, [scoresResetSignal, fetchUsers]);
+
+  const toggleUserSelection = (userId: string) => {
+    setSelectedUserIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(userId)) next.delete(userId);
+      else next.add(userId);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedUserIds.size === users.length) {
+      setSelectedUserIds(new Set());
+    } else {
+      setSelectedUserIds(new Set(users.map((u) => u.userId)));
+    }
+  };
+
+  const handleResetSelected = async () => {
+    if (!currentUser || selectedUserIds.size === 0) return;
+    setIsResettingSelected(true);
+    setResetFeedback(null);
+    try {
+      const result = await resetScores(
+        currentUser.userId,
+        "selected",
+        Array.from(selectedUserIds),
+      );
+      setResetFeedback({
+        type: "success",
+        message: `Reset complete — ${result.usersAffected} user${result.usersAffected !== 1 ? "s" : ""} affected`,
+      });
+      setSelectedUserIds(new Set());
+      setConfirmingSelected(false);
+      void fetchUsers();
+      setTimeout(() => setResetFeedback(null), 3000);
+    } catch (err) {
+      setResetFeedback({
+        type: "error",
+        message: err instanceof Error ? err.message : "Failed to reset scores",
+      });
+      setTimeout(() => setResetFeedback(null), 3000);
+    } finally {
+      setIsResettingSelected(false);
+    }
+  };
 
   const handleToggle = async (targetUser: User) => {
     if (!currentUser || targetUser.userId === currentUser.userId) return;
@@ -764,14 +969,26 @@ export function AdminPanel() {
           <ShieldStar weight="fill" className="size-5 text-accent" />
           User Management
         </CardTitle>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={fetchUsers}
-          className="transition-transform duration-150 hover:scale-[1.03] active:scale-[0.97]"
-        >
-          <ArrowClockwise className="h-4 w-4" />
-        </Button>
+        <div className="flex items-center gap-2">
+          {selectedUserIds.size > 0 && !confirmingSelected && (
+            <Button
+              size="sm"
+              onClick={() => setConfirmingSelected(true)}
+              className="min-h-[32px] bg-red-500 hover:bg-red-600 text-white font-semibold text-xs transition-transform duration-150 hover:scale-[1.03] active:scale-[0.97]"
+            >
+              <Eraser weight="bold" className="mr-1 size-3.5" />
+              Reset Selected ({selectedUserIds.size})
+            </Button>
+          )}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={fetchUsers}
+            className="transition-transform duration-150 hover:scale-[1.03] active:scale-[0.97]"
+          >
+            <ArrowClockwise className="h-4 w-4" />
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         {error && (
@@ -780,10 +997,66 @@ export function AdminPanel() {
             {error}
           </div>
         )}
+        {resetFeedback && (
+          <div
+            className={cn(
+              "mb-4 flex items-center gap-2 rounded-md border px-3 py-2 text-sm",
+              resetFeedback.type === "success"
+                ? "border-green-500/30 bg-green-500/10 text-green-400"
+                : "border-destructive/30 bg-destructive/10 text-destructive",
+            )}
+          >
+            {resetFeedback.type === "success" ? (
+              <CheckCircle weight="bold" className="size-4 shrink-0" />
+            ) : (
+              <WarningCircle weight="bold" className="size-4 shrink-0" />
+            )}
+            {resetFeedback.message}
+          </div>
+        )}
+        {confirmingSelected && selectedUserIds.size > 0 && (
+          <div className="mb-4 flex flex-wrap items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2">
+            <WarningCircle weight="fill" className="size-4 text-red-400 shrink-0" />
+            <span className="text-sm text-red-300">
+              Reset scores for {selectedUserIds.size} selected user{selectedUserIds.size !== 1 ? "s" : ""}?
+            </span>
+            <Button
+              size="sm"
+              onClick={() => void handleResetSelected()}
+              disabled={isResettingSelected}
+              className="min-h-[32px] bg-red-500 hover:bg-red-600 text-white font-semibold text-xs"
+            >
+              {isResettingSelected ? (
+                <SpinnerGap className="mr-1 size-3.5 animate-spin" />
+              ) : (
+                <CheckCircle weight="bold" className="mr-1 size-3.5" />
+              )}
+              Confirm Reset
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setConfirmingSelected(false)}
+              disabled={isResettingSelected}
+              className="min-h-[32px] text-xs"
+            >
+              Cancel
+            </Button>
+          </div>
+        )}
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-10">
+                  <input
+                    type="checkbox"
+                    checked={users.length > 0 && selectedUserIds.size === users.length}
+                    onChange={toggleSelectAll}
+                    className="size-4 rounded border-border accent-accent cursor-pointer"
+                    title="Select all"
+                  />
+                </TableHead>
                 <TableHead>Player</TableHead>
                 <TableHead className="hidden sm:table-cell">Email</TableHead>
                 <TableHead className="text-right">Score</TableHead>
@@ -811,6 +1084,14 @@ export function AdminPanel() {
                       animation: `row-enter 350ms ease-out ${i * 50}ms backwards`,
                     }}
                   >
+                    <TableCell className="w-10">
+                      <input
+                        type="checkbox"
+                        checked={selectedUserIds.has(u.userId)}
+                        onChange={() => toggleUserSelection(u.userId)}
+                        className="size-4 rounded border-border accent-accent cursor-pointer"
+                      />
+                    </TableCell>
                     <TableCell className="font-sans">
                       <div className="flex items-center gap-1.5">
                         <span className="max-w-[120px] truncate sm:max-w-none">
@@ -906,7 +1187,17 @@ export function AdminPanel() {
       {/* 2. Category Management + Active Switcher */}
       {currentUser && <CategoryManagement adminUserId={currentUser.userId} />}
 
-      {/* 3. User Management (existing) */}
+      {/* 3. Score Management */}
+      {currentUser && (
+        <ScoreResetSection
+          adminUserId={currentUser.userId}
+          categories={categories}
+          userCount={users.length}
+          onResetComplete={() => void fetchUsers()}
+        />
+      )}
+
+      {/* 4. User Management */}
       {userCard}
     </div>
   );

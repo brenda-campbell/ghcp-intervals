@@ -30,6 +30,14 @@ export interface QuizStoppedEvent {
   stoppedBy: string;
 }
 
+export interface ScoresResetEvent {
+  scope: "all" | "selected";
+  usersAffected: number;
+  resetBy: string;
+  resetAt: string;
+  categoryId?: string;
+}
+
 export interface UseSignalRReturn {
   connection: signalR.HubConnection | null;
   connectionState: ConnectionState;
@@ -37,6 +45,7 @@ export interface UseSignalRReturn {
   playerActivity: PlayerActivity | null;
   categoryChanged: CategoryChangedEvent | null;
   quizStarted: boolean | null;
+  scoresResetSignal: ScoresResetEvent | null;
 }
 
 export function useSignalR(): UseSignalRReturn {
@@ -50,6 +59,7 @@ export function useSignalR(): UseSignalRReturn {
   );
   const [categoryChanged, setCategoryChanged] = useState<CategoryChangedEvent | null>(null);
   const [quizStarted, setQuizStarted] = useState<boolean | null>(null);
+  const [scoresResetSignal, setScoresResetSignal] = useState<ScoresResetEvent | null>(null);
 
   const connectionRef = useRef<signalR.HubConnection | null>(null);
   const mountedRef = useRef(true);
@@ -100,6 +110,10 @@ export function useSignalR(): UseSignalRReturn {
       if (mountedRef.current) setQuizStarted(false);
     });
 
+    conn.on("scoresReset", (data: ScoresResetEvent) => {
+      if (mountedRef.current) setScoresResetSignal(data);
+    });
+
     try {
       setConnectionState("connecting");
       await conn.start();
@@ -131,5 +145,6 @@ export function useSignalR(): UseSignalRReturn {
     playerActivity,
     categoryChanged,
     quizStarted,
+    scoresResetSignal,
   };
 }
