@@ -14,11 +14,18 @@ export interface PlayerActivity {
   timestamp: string;
 }
 
+export interface CategoryChangedEvent {
+  categoryId: string;
+  categoryName: string;
+  questionFormat: string;
+}
+
 export interface UseSignalRReturn {
   connection: signalR.HubConnection | null;
   connectionState: ConnectionState;
   leaderboardData: LeaderboardEntry[] | null;
   playerActivity: PlayerActivity | null;
+  categoryChanged: CategoryChangedEvent | null;
 }
 
 export function useSignalR(): UseSignalRReturn {
@@ -30,6 +37,7 @@ export function useSignalR(): UseSignalRReturn {
   const [playerActivity, setPlayerActivity] = useState<PlayerActivity | null>(
     null,
   );
+  const [categoryChanged, setCategoryChanged] = useState<CategoryChangedEvent | null>(null);
 
   const connectionRef = useRef<signalR.HubConnection | null>(null);
   const mountedRef = useRef(true);
@@ -68,6 +76,10 @@ export function useSignalR(): UseSignalRReturn {
       if (mountedRef.current) setPlayerActivity(data);
     });
 
+    conn.on("categoryChanged", (data: CategoryChangedEvent) => {
+      if (mountedRef.current) setCategoryChanged(data);
+    });
+
     try {
       setConnectionState("connecting");
       await conn.start();
@@ -97,5 +109,6 @@ export function useSignalR(): UseSignalRReturn {
     connectionState,
     leaderboardData,
     playerActivity,
+    categoryChanged,
   };
 }

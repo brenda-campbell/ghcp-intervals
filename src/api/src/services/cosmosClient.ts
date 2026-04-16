@@ -25,7 +25,13 @@ const client = createClient();
 const DATABASE_NAME = "fastestfinger";
 const USERS_CONTAINER = "users";
 const QUESTIONS_CONTAINER = "questions";
+const CATEGORIES_CONTAINER = "categories";
+const CATEGORY_SCORES_CONTAINER = "categoryScores";
+const GAME_STATE_CONTAINER = "gameState";
 
 export const database: Database = client.database(DATABASE_NAME);
 export const usersContainer: Container = database.container(USERS_CONTAINER);
 export const questionsContainer: Container = database.container(QUESTIONS_CONTAINER);
+export const categoriesContainer: Container = database.container(CATEGORIES_CONTAINER);
+export const categoryScoresContainer: Container = database.container(CATEGORY_SCORES_CONTAINER);
+export const gameStateContainer: Container = database.container(GAME_STATE_CONTAINER);

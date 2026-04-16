@@ -101,3 +101,30 @@
 - **DELETE /api/users/{userId}:** New admin-only endpoint in `deleteUser.ts`. Point-delete via Cosmos, returns 204 on success, 404 for missing users, 403 for non-admins.
 - **Frontend client:** Added `deleteUser(userId, adminUserId)` to `api.ts` for AdminPanel integration.
 - **Verification:** TypeScript clean, Cosmos point-delete works, admin auth check prevents unauthorized deletions.
+
+### be-category-models — Category & Game State Models (Phase 1A-D)
+- **Models added/updated** in `src/api/src/models/index.ts`: Added `QuestionType` discriminator, `Category`, `CategoryScore`, `GameState`, `CategoryLeaderboardEntry` interfaces. Updated `Question` and `QuestionResponse` (`options` → `string[]`, added `type: QuestionType`). Added optional `categoryId` to `AnswerResult`.
+- **Cosmos containers** added in `src/api/src/services/cosmosClient.ts`: `categoriesContainer`, `categoryScoresContainer`, `gameStateContainer`.
+- **Downstream fix:** `getQuestions.ts` `toQuestionResponse()` now maps the `type` field, defaulting to `"multiple-choice"` for backward compat with existing question docs that lack it.
+- **Backward compat preserved:** `string[]` is a superset of the old 4-tuple, optional fields don't break existing docs, `type` defaults gracefully.
+
+### be-category-endpoints — Category Support + Online Presence (Phase 2)
+- **getQuestions.ts** updated: Reads `gameStateContainer` doc (id="current") for `activeCategoryId`. If set, filters questions with `WHERE c.category = @category` (efficient single-partition query). Accepts `?category=` query param override. Falls back to all questions if no game state exists.
+- **submitAnswer.ts** updated: Moved `selectedOption` range validation to after question lookup. Now dynamic based on `question.type` — true-false allows 0-1, multiple-choice allows 0-3. Added per-category score tracking via `categoryScoresContainer` (read-update or create-upsert pattern). Non-fatal — never blocks answer response. Added `categoryId` to response.
+- **leaderboardService.ts** updated: Added `getCategoryLeaderboard(categoryId)` and `toCategoryLeaderboardEntry()`. Queries `categoryScoresContainer` ordered by totalScore DESC, fastestTimeMs ASC, top 10.
+- **getLeaderboard.ts** updated: Accepts optional `?categoryId=` query param. If present, returns category-specific leaderboard. Otherwise falls through to existing global leaderboard logic.
+- **presenceService.ts** created: Shared module-level Map for in-memory player presence. Exports `registerPlayer()`, `removePlayer()`, `cleanStalePresence()`, `getOnlineCount()`, `getOnlinePlayersList()`. 60-second timeout for stale entries.
+- **getOnlinePlayers.ts** created: `GET /api/game/online-players`. Cleans stale presence, returns count for regular users, full player list for admins (checks `isAdmin` via usersContainer).
+- **heartbeat.ts** created: `POST /api/game/heartbeat`. Accepts `{ userId, displayName }`, registers presence, returns online count.
+- **Tests:** All 100 existing tests pass. Updated mocks to include `gameStateContainer`, `categoryScoresContainer`, `getCategoryLeaderboard`.
+
+### be-category-crud-apis — Categories CRUD + Game State Endpoints (Phase 2)
+- **6 new Azure Functions** created in `src/api/src/functions/`:
+  1. `createCategory.ts` — `POST /api/categories` (admin-only). Validates name (required, non-empty), checks case-insensitive duplicate, generates UUID, creates category with `isActive: true`.
+  2. `listCategories.ts` — `GET /api/categories` (public). Returns all categories ordered by name. Counts questions per category from `questionsContainer`. Admins see all; non-admins see only `isActive` categories.
+  3. `updateCategory.ts` — `PATCH /api/categories/{categoryId}` (admin-only). Partial update of name/description/questionFormat/isActive. Duplicate name check on rename. Uses Cosmos `replace()`.
+  4. `deleteCategory.ts` — `DELETE /api/categories/{categoryId}` (admin-only). Cascade-deletes all questions in the category, then deletes the category doc. Returns 204.
+  5. `setCategory.ts` — `POST /api/game/set-category` (admin-only). Sets active quiz category. Validates category exists and is active. Upserts `gameState` doc (id="current"). Broadcasts `categoryChanged` event via SignalR output binding.
+  6. `getGameState.ts` — `GET /api/game/state` (public). Point-reads `gameState` container for id="current". Returns state or `{ activeCategoryId: null, activeCategoryName: null }` if none set.
+- **Patterns followed:** All use v4 `app.http()` registration, `authLevel: "anonymous"`, same `requireAdmin()` error handling shape as existing endpoints. SignalR binding matches `submitAnswer.ts` pattern.
+- **TypeScript compiles clean** — verified via `npx tsc --noEmit`.

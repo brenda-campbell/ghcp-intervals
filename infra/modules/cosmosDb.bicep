@@ -108,6 +108,84 @@ resource questionsContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/
   }
 }
 
+resource categoriesContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2024-02-15-preview' = {
+  parent: database
+  name: 'categories'
+  properties: {
+    resource: {
+      id: 'categories'
+      partitionKey: {
+        paths: ['/id']
+        kind: 'Hash'
+      }
+      indexingPolicy: {
+        indexingMode: 'consistent'
+        automatic: true
+        includedPaths: [
+          { path: '/*' }
+        ]
+        excludedPaths: [
+          { path: '/"_etag"/?' }
+        ]
+      }
+    }
+  }
+}
+
+resource categoryScoresContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2024-02-15-preview' = {
+  parent: database
+  name: 'categoryScores'
+  properties: {
+    resource: {
+      id: 'categoryScores'
+      partitionKey: {
+        paths: ['/categoryId']
+        kind: 'Hash'
+      }
+      indexingPolicy: {
+        indexingMode: 'consistent'
+        automatic: true
+        includedPaths: [
+          { path: '/*' }
+        ]
+        excludedPaths: [
+          { path: '/"_etag"/?' }
+        ]
+        compositeIndexes: [
+          [
+            { path: '/totalScore', order: 'descending' }
+            { path: '/fastestTimeMs', order: 'ascending' }
+          ]
+        ]
+      }
+    }
+  }
+}
+
+resource gameStateContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2024-02-15-preview' = {
+  parent: database
+  name: 'gameState'
+  properties: {
+    resource: {
+      id: 'gameState'
+      partitionKey: {
+        paths: ['/id']
+        kind: 'Hash'
+      }
+      indexingPolicy: {
+        indexingMode: 'consistent'
+        automatic: true
+        includedPaths: [
+          { path: '/*' }
+        ]
+        excludedPaths: [
+          { path: '/"_etag"/?' }
+        ]
+      }
+    }
+  }
+}
+
 @description('Cosmos DB account endpoint')
 output endpoint string = cosmosAccount.properties.documentEndpoint
 

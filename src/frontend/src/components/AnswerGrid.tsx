@@ -1,7 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import type { QuestionType } from "@/services/api";
 
-const LABELS = ["A", "B", "C", "D"] as const;
+const MC_LABELS = ["A", "B", "C", "D"] as const;
+const TF_LABELS = ["✓", "✗"] as const;
 
 interface AnswerGridProps {
   options: string[];
@@ -12,6 +14,7 @@ interface AnswerGridProps {
   correctIndex?: number | null;
   /** Whether the user's selected answer was correct */
   isCorrect?: boolean | null;
+  questionType?: QuestionType;
 }
 
 export function AnswerGrid({
@@ -21,16 +24,28 @@ export function AnswerGrid({
   onSelect,
   correctIndex = null,
   isCorrect = null,
+  questionType = "multiple-choice",
 }: AnswerGridProps) {
   const hasResult = correctIndex !== null && isCorrect !== null;
+  const isTrueFalse = questionType === "true-false";
+  const labels = isTrueFalse ? TF_LABELS : MC_LABELS;
+  const gridCols = isTrueFalse ? "grid-cols-2" : "grid-cols-1 sm:grid-cols-2";
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <div className={cn("grid gap-4", gridCols)}>
       {options.map((option, i) => {
         const isSelected = selectedIndex === i;
         const hasSelection = selectedIndex !== null;
         const isCorrectOption = hasResult && i === correctIndex;
         const isWrongSelected = hasResult && isSelected && !isCorrect;
+
+        // Subtle tint for T/F buttons in default (pre-selection) state
+        const tfDefaultTint =
+          isTrueFalse && !hasResult && !hasSelection
+            ? i === 0
+              ? "border-green-500/30 hover:border-green-500/50"
+              : "border-red-500/30 hover:border-red-500/50"
+            : "";
 
         return (
           <Button
@@ -40,10 +55,14 @@ export function AnswerGrid({
             onClick={() => onSelect(i)}
             style={{ animationDelay: `${i * 75}ms` }}
             className={cn(
-              "h-auto min-h-[48px] cursor-pointer justify-start px-3 py-3 text-left sm:min-h-14 sm:px-4",
+              "h-auto cursor-pointer justify-start px-3 py-3 text-left",
               "body-mono whitespace-normal",
               "animate-[option-stagger-in_300ms_ease-out_backwards]",
               "transition-all duration-150",
+              isTrueFalse ? "min-h-[64px] sm:min-h-[72px]" : "min-h-[48px] sm:min-h-14 sm:px-4",
+
+              // T/F default tint
+              tfDefaultTint,
 
               // Pre-result: selected state
               !hasResult && isSelected &&
@@ -66,16 +85,21 @@ export function AnswerGrid({
             <span
               className={cn(
                 "ui-label mr-3 shrink-0 inline-flex h-7 w-7 items-center justify-center rounded-md transition-colors duration-150",
+                isTrueFalse && "text-base",
                 isCorrectOption
                   ? "bg-green-500/30 text-green-300"
                   : isWrongSelected
                     ? "bg-destructive/30 text-destructive"
                     : isSelected
                       ? "bg-white/20 text-primary-foreground"
-                      : "bg-muted text-muted-foreground",
+                      : isTrueFalse && i === 0
+                        ? "bg-green-500/15 text-green-400"
+                        : isTrueFalse && i === 1
+                          ? "bg-red-500/15 text-red-400"
+                          : "bg-muted text-muted-foreground",
               )}
             >
-              {LABELS[i]}
+              {labels[i]}
             </span>
             <span className="flex-1">{option}</span>
           </Button>

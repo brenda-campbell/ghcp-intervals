@@ -9,6 +9,7 @@ import { LeaderboardPage } from "@/components/LeaderboardPage"
 import { QuestionPage } from "@/components/QuestionPage"
 import { AdminPanel } from "@/components/AdminPanel"
 import { cn } from "@/lib/utils"
+import { sendHeartbeat } from "@/services/api"
 
 type View = "quiz" | "leaderboard" | "admin"
 
@@ -16,6 +17,7 @@ function App() {
   const { user, isLoading } = useUser()
   const logout = useLogout()
   const [view, setView] = useState<View>("quiz")
+  const [onlineCount, setOnlineCount] = useState(0)
   const quizTabRef = useRef<HTMLButtonElement>(null)
   const leaderboardTabRef = useRef<HTMLButtonElement>(null)
   const adminTabRef = useRef<HTMLButtonElement>(null)
@@ -38,6 +40,21 @@ function App() {
     }
   }, [view, showAdmin])
 
+  // Send heartbeat every 30 seconds for online presence
+  useEffect(() => {
+    if (!user) return
+
+    const beat = () => {
+      sendHeartbeat(user.userId, user.displayName)
+        .then(r => setOnlineCount(r.count))
+        .catch(() => {})
+    }
+
+    beat()
+    const interval = setInterval(beat, 30000)
+    return () => clearInterval(interval)
+  }, [user])
+
   return (
     <div className="min-h-[100dvh] p-3 sm:p-8">
       <div className="mx-auto max-w-3xl space-y-4 sm:space-y-6">
@@ -48,6 +65,12 @@ function App() {
           </div>
           <div className="flex shrink-0 items-center gap-2 sm:gap-3">
             <ConnectionStatus />
+            {onlineCount > 0 && (
+              <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                {onlineCount} online
+              </span>
+            )}
             <UserBadge />
             <button
               onClick={logout}

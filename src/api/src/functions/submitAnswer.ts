@@ -5,14 +5,14 @@ import {
   InvocationContext,
   output,
 } from "@azure/functions";
-import { questionsContainer } from "../services/cosmosClient.js";
+import { questionsContainer, categoryScoresContainer, usersContainer } from "../services/cosmosClient.js";
 import {
   getDeliveryTimestamp,
   clearDelivery,
 } from "../services/questionDeliveryTracker.js";
 import { updateUserScore } from "../services/scoringService.js";
 import { getTopLeaderboard } from "../services/leaderboardService.js";
-import type { AnswerSubmission, AnswerResult, Question, LeaderboardEntry } from "../models/index.js";
+import type { AnswerSubmission, AnswerResult, Question, LeaderboardEntry, CategoryScore } from "../models/index.js";
 
 // Module-level question cache (questions don't change during gameplay)
 const questionCache = new Map<string, Question>();
@@ -81,13 +81,6 @@ async function submitAnswer(
   if (typeof selectedOption !== "number" || !Number.isInteger(selectedOption)) {
     return { status: 400, jsonBody: { error: "Missing or invalid selectedOption" } };
   }
-  if (selectedOption < 0 || selectedOption > 3) {
-    return {
-      status: 400,
-      jsonBody: { error: "selectedOption must be 0, 1, 2, or 3" },
-    };
-  }
-
   // Look up question — check in-memory cache first to avoid cross-partition query
   let question = questionCache.get(questionId);
   if (!question) {
@@ -108,6 +101,16 @@ async function submitAnswer(
       context.error("Cosmos DB query failed:", err);
       return { status: 500, jsonBody: { error: "Internal server error" } };
     }
+  }
+
+  // Validate selectedOption range based on question type (after lookup)
+  const questionType = question.type ?? "multiple-choice";
+  const maxOption = questionType === "true-false" ? 1 : 3;
+  if (selectedOption < 0 || selectedOption > maxOption) {
+    return {
+      status: 400,
+      jsonBody: { error: `selectedOption must be 0 to ${maxOption} for ${questionType} questions` },
+    };
   }
 
   // ADR-007: Validate correctness server-side
@@ -148,6 +151,54 @@ async function submitAnswer(
     // The user still gets their result; score update can be retried
   }
 
+  // Update per-category score (best-effort)
+  try {
+    const scoreId = `${userId}_${question.category}`;
+    let categoryScore: CategoryScore;
+
+    try {
+      const { resource } = await categoryScoresContainer.item(scoreId, question.category).read<CategoryScore>();
+      if (resource) {
+        categoryScore = resource;
+        categoryScore.totalScore += pointsAwarded;
+        categoryScore.gamesPlayed += 1;
+        if (elapsedTimeMs < categoryScore.fastestTimeMs || categoryScore.fastestTimeMs === 0) {
+          categoryScore.fastestTimeMs = elapsedTimeMs;
+        }
+        categoryScore.updatedAt = new Date().toISOString();
+        await categoryScoresContainer.item(scoreId, question.category).replace(categoryScore);
+      } else {
+        throw new Error("Not found");
+      }
+    } catch {
+      // Create new category score record
+      categoryScore = {
+        id: scoreId,
+        userId,
+        categoryId: question.category,
+        categoryName: question.category,
+        displayName: "",
+        totalScore: pointsAwarded,
+        gamesPlayed: 1,
+        fastestTimeMs: elapsedTimeMs,
+        updatedAt: new Date().toISOString(),
+      };
+
+      // Get display name from user
+      try {
+        const { resource: user } = await usersContainer.item(userId, userId).read();
+        if (user) {
+          categoryScore.displayName = (user as any).displayName || "Unknown";
+        }
+      } catch { /* use default */ }
+
+      await categoryScoresContainer.items.upsert(categoryScore);
+    }
+  } catch (err) {
+    context.warn("Failed to update category score:", err);
+    // Non-fatal — don't fail the answer response
+  }
+
   // Broadcast real-time updates via SignalR (best-effort)
   const signalRMessages: SignalRMessage[] = [];
 
@@ -183,6 +234,7 @@ async function submitAnswer(
     elapsedTimeMs,
     timeTaken: elapsedTimeMs,
     pointsAwarded,
+    categoryId: question.category,
   };
 
   return { status: 200, jsonBody: result };

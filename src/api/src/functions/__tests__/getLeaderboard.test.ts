@@ -16,12 +16,17 @@ vi.mock("../../services/cosmosClient.js", () => ({
     item: vi.fn(),
     items: { create: vi.fn(), query: vi.fn() },
   },
+  categoryScoresContainer: {
+    item: vi.fn(),
+    items: { query: vi.fn() },
+  },
   database: {},
 }));
 
 vi.mock("../../services/leaderboardService.js", () => ({
   getTopLeaderboard: vi.fn(),
   toLeaderboardEntry: vi.fn(),
+  getCategoryLeaderboard: vi.fn(),
 }));
 
 import { app } from "@azure/functions";

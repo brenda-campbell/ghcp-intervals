@@ -5,7 +5,7 @@ import {
   InvocationContext,
 } from "@azure/functions";
 import { usersContainer } from "../services/cosmosClient.js";
-import { getTopLeaderboard, toLeaderboardEntry } from "../services/leaderboardService.js";
+import { getTopLeaderboard, toLeaderboardEntry, getCategoryLeaderboard } from "../services/leaderboardService.js";
 import type { User, LeaderboardEntry } from "../models/index.js";
 
 async function getLeaderboard(
@@ -13,6 +13,20 @@ async function getLeaderboard(
   context: InvocationContext
 ): Promise<HttpResponseInit> {
   context.log("getLeaderboard called");
+
+  const categoryId = request.query.get("categoryId") || undefined;
+
+  if (categoryId) {
+    // Category-specific leaderboard
+    try {
+      const leaderboard = await getCategoryLeaderboard(categoryId);
+      return { status: 200, jsonBody: { leaderboard, categoryId } };
+    } catch (err) {
+      context.error("getCategoryLeaderboard failed:", err);
+      const msg = err instanceof Error ? err.message : String(err);
+      return { status: 500, jsonBody: { error: "Failed to fetch category leaderboard", detail: msg } };
+    }
+  }
 
   const userId = request.query.get("userId") || undefined;
 

@@ -142,3 +142,21 @@
 - **api.ts export:** New `deleteUser(userId, adminUserId)` function wraps `DELETE /api/users/{userId}`.
 - **UX improvements:** Confirmation modal for destructive action, instant table refresh, error visibility, self-deletion guard.
 - **Verification:** TypeScript clean (`tsc -b`), AuthGate auto-login no longer infinite-loops, build passes (`vite build` — 0 errors).
+
+### fe-admin-categories (2026-04-15)
+- **Category API functions** added to `api.ts`: `listCategories`, `createCategory`, `updateCategory`, `deleteCategory`, `getGameState`, `setActiveCategory`, `getOnlinePlayers`, `sendHeartbeat`. New types: `Category`, `GameState`, `QuestionType`, `OnlinePlayersResponse`.
+- **Question.type** field added (optional `QuestionType`) for true-false support.
+- **getLeaderboard** updated to accept optional `categoryId` parameter.
+- **AdminPanel** restructured: now renders three sections — Online Players (auto-refreshing every 15s), Category Management (CRUD table + active switcher), and User Management (unchanged). Each section loads independently.
+- **Category CRUD:** Inline edit mode for name/description/format. Create form toggles with New button. Delete with confirm dialog. Active/inactive toggle per category.
+- **Active Category Switcher:** Dropdown of active categories + prominent "Set Active" button with success indicator. Fetches game state on mount.
+- **Verification:** TypeScript compiles clean (`npx tsc --noEmit` — 0 errors).
+
+### fe-game-ui-updates (2026-04-16)
+- **useSignalR** (`hooks/useSignalR.ts`): Added `categoryChanged` event handler and state. New `CategoryChangedEvent` interface exported. Fires when admin switches active category via SignalR.
+- **SignalRContext** auto-exposes `categoryChanged` since it mirrors `UseSignalRReturn`.
+- **AnswerGrid** (`components/AnswerGrid.tsx`): Now accepts optional `questionType` prop. When `"true-false"`: uses ✓/✗ labels, 2-col grid always, larger buttons (min-h-[64px]), green/red tinted borders and label badges. Multiple-choice unchanged.
+- **QuestionPage** (`components/QuestionPage.tsx`): Listens for `categoryChanged` — reloads questions on category switch. Shows auto-dismissing (3s) category change banner. Passes `questionType` to AnswerGrid.
+- **LeaderboardPage** (`components/LeaderboardPage.tsx`): Added category filter dropdown. Fetches active categories on mount. `selectedCategoryId` passed to `getLeaderboard`. Dark-theme styled select element.
+- **App.tsx**: Added online presence indicator — sends heartbeat every 30s via `sendHeartbeat`, displays green pulsing dot + count next to ConnectionStatus.
+- **Verification:** TypeScript compiles clean (`npx tsc --noEmit` — 0 errors).

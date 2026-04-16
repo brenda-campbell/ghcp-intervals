@@ -7,6 +7,11 @@ import {
   CheckCircle,
   XCircle,
   Trash,
+  Tag,
+  ListBullets,
+  Plus,
+  PencilSimple,
+  Broadcast,
 } from "@phosphor-icons/react";
 import {
   Table,
@@ -19,9 +24,553 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
 import { useUser } from "@/contexts/UserContext";
-import { listUsers, toggleUserStatus, deleteUser, type User } from "@/services/api";
+import {
+  listUsers,
+  toggleUserStatus,
+  deleteUser,
+  listCategories,
+  createCategory,
+  updateCategory,
+  deleteCategory as deleteCategoryApi,
+  getGameState,
+  setActiveCategory,
+  getOnlinePlayers,
+  type User,
+  type Category,
+  type GameState,
+  type QuestionType,
+  type OnlinePlayersResponse,
+} from "@/services/api";
 import { cn } from "@/lib/utils";
+
+/* ------------------------------------------------------------------ */
+/*  Online Players (auto-refresh)                                     */
+/* ------------------------------------------------------------------ */
+
+function OnlinePlayersSection({ adminUserId }: { adminUserId: string }) {
+  const [data, setData] = useState<OnlinePlayersResponse | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const res = await getOnlinePlayers(adminUserId);
+        if (!cancelled) setData(res);
+      } catch {
+        /* silent — non-critical */
+      }
+    };
+    void load();
+    const id = setInterval(() => void load(), 15_000);
+    return () => { cancelled = true; clearInterval(id); };
+  }, [adminUserId]);
+
+  return (
+    <div className="flex items-center gap-3 rounded-lg border border-border bg-card px-4 py-2.5">
+      <Broadcast weight="fill" className="size-4 text-green-400" />
+      <span className="text-sm font-medium">
+        Online Players:{" "}
+        <span className="font-mono text-accent">{data?.count ?? "—"}</span>
+      </span>
+      {data?.players && data.players.length > 0 && (
+        <span className="text-xs text-muted-foreground truncate max-w-[300px]">
+          {data.players.map((p) => p.displayName).join(", ")}
+        </span>
+      )}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Active Category Switcher                                          */
+/* ------------------------------------------------------------------ */
+
+function ActiveCategorySwitcher({
+  adminUserId,
+  categories,
+  gameState,
+  onGameStateChange,
+}: {
+  adminUserId: string;
+  categories: Category[];
+  gameState: GameState | null;
+  onGameStateChange: (gs: GameState) => void;
+}) {
+  const [selectedId, setSelectedId] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  const handleSetActive = async () => {
+    if (!selectedId) return;
+    setIsSaving(true);
+    try {
+      const gs = await setActiveCategory(selectedId, adminUserId);
+      onGameStateChange(gs);
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 2000);
+    } catch {
+      /* error handled upstream */
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-wrap items-center gap-3 rounded-lg border border-border bg-card px-4 py-2.5">
+      <Tag weight="fill" className="size-4 text-accent" />
+      <span className="text-sm font-medium">Active Category:</span>
+      {gameState?.activeCategoryName ? (
+        <Badge className="bg-accent/20 text-accent">{gameState.activeCategoryName}</Badge>
+      ) : (
+        <span className="text-xs text-muted-foreground">None set</span>
+      )}
+
+      <div className="ml-auto flex items-center gap-2">
+        <select
+          value={selectedId}
+          onChange={(e) => setSelectedId(e.target.value)}
+          className="h-8 rounded-md border border-border bg-background px-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-accent"
+        >
+          <option value="">Choose category…</option>
+          {categories
+            .filter((c) => c.isActive)
+            .map((c) => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+        </select>
+        <Button
+          size="sm"
+          onClick={() => void handleSetActive()}
+          disabled={!selectedId || isSaving}
+          className="min-h-[36px] bg-accent text-background font-semibold transition-transform duration-150 hover:scale-[1.03] active:scale-[0.97]"
+        >
+          {isSaving ? (
+            <SpinnerGap className="mr-1 size-3.5 animate-spin" />
+          ) : (
+            <CheckCircle weight="bold" className="mr-1 size-3.5" />
+          )}
+          Set Active
+        </Button>
+        {showSuccess && (
+          <span className="text-xs text-green-400 flex items-center gap-1">
+            <CheckCircle weight="fill" className="size-3.5" /> Updated!
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Category Management Card                                          */
+/* ------------------------------------------------------------------ */
+
+function CategoryManagement({ adminUserId }: { adminUserId: string }) {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [gameState, setGameState] = useState<GameState | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
+
+  // Create form state
+  const [newName, setNewName] = useState("");
+  const [newDesc, setNewDesc] = useState("");
+  const [newFormat, setNewFormat] = useState<QuestionType>("multiple-choice");
+  const [isCreating, setIsCreating] = useState(false);
+  const [showForm, setShowForm] = useState(false);
+
+  // Inline edit state
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editDesc, setEditDesc] = useState("");
+  const [editFormat, setEditFormat] = useState<QuestionType>("multiple-choice");
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
+
+  const fetchData = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const [cats, gs] = await Promise.all([
+        listCategories(adminUserId),
+        getGameState(),
+      ]);
+      setCategories(cats);
+      setGameState(gs);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load categories");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [adminUserId]);
+
+  useEffect(() => {
+    void fetchData();
+  }, [fetchData]);
+
+  const handleCreate = async () => {
+    if (!newName.trim()) return;
+    setIsCreating(true);
+    try {
+      const cat = await createCategory(newName.trim(), newDesc.trim(), newFormat, adminUserId);
+      setCategories((prev) => [...prev, cat]);
+      setNewName("");
+      setNewDesc("");
+      setNewFormat("multiple-choice");
+      setShowForm(false);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to create category");
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  const handleDelete = async (cat: Category) => {
+    if (!window.confirm(`Delete category "${cat.name}"? This cannot be undone.`)) return;
+    setDeletingId(cat.id);
+    try {
+      await deleteCategoryApi(cat.id, adminUserId);
+      setCategories((prev) => prev.filter((c) => c.id !== cat.id));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete category");
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  const handleToggleActive = async (cat: Category) => {
+    setTogglingId(cat.id);
+    try {
+      const updated = await updateCategory(cat.id, { isActive: !cat.isActive }, adminUserId);
+      setCategories((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update category");
+    } finally {
+      setTogglingId(null);
+    }
+  };
+
+  const startEdit = (cat: Category) => {
+    setEditingId(cat.id);
+    setEditName(cat.name);
+    setEditDesc(cat.description);
+    setEditFormat(cat.questionFormat);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingId || !editName.trim()) return;
+    setIsSavingEdit(true);
+    try {
+      const updated = await updateCategory(
+        editingId,
+        { name: editName.trim(), description: editDesc.trim(), questionFormat: editFormat },
+        adminUserId,
+      );
+      setCategories((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+      setEditingId(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save category");
+    } finally {
+      setIsSavingEdit(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <>
+        <Skeleton className="h-10 w-full rounded-lg" />
+        <Card className="border-border bg-card">
+          <CardHeader><Skeleton className="h-6 w-48" /></CardHeader>
+          <CardContent className="space-y-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="h-10 w-full" />
+            ))}
+          </CardContent>
+        </Card>
+      </>
+    );
+  }
+
+  return (
+    <>
+      {/* Active Category Switcher */}
+      <ActiveCategorySwitcher
+        adminUserId={adminUserId}
+        categories={categories}
+        gameState={gameState}
+        onGameStateChange={setGameState}
+      />
+
+      {/* Category CRUD Card */}
+      <Card className="border-border bg-card">
+        <CardHeader className="flex flex-row items-center justify-between gap-2">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <ListBullets weight="fill" className="size-5 text-accent" />
+            Category Management
+          </CardTitle>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={fetchData}
+              className="transition-transform duration-150 hover:scale-[1.03] active:scale-[0.97]"
+            >
+              <ArrowClockwise className="h-4 w-4" />
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => setShowForm((v) => !v)}
+              className="transition-transform duration-150 hover:scale-[1.03] active:scale-[0.97]"
+            >
+              <Plus weight="bold" className="mr-1 h-3.5 w-3.5" />
+              New
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {error && (
+            <div className="mb-4 flex items-center gap-2 rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+              <WarningCircle weight="bold" className="size-4 shrink-0" />
+              {error}
+            </div>
+          )}
+
+          {/* Create form */}
+          {showForm && (
+            <div className="mb-4 space-y-3 rounded-lg border border-border bg-muted/20 p-4">
+              <div className="grid gap-3 sm:grid-cols-3">
+                <input
+                  type="text"
+                  placeholder="Category name *"
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  className="h-9 rounded-md border border-border bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-accent"
+                />
+                <input
+                  type="text"
+                  placeholder="Description"
+                  value={newDesc}
+                  onChange={(e) => setNewDesc(e.target.value)}
+                  className="h-9 rounded-md border border-border bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-accent"
+                />
+                <select
+                  value={newFormat}
+                  onChange={(e) => setNewFormat(e.target.value as QuestionType)}
+                  className="h-9 rounded-md border border-border bg-background px-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-accent"
+                >
+                  <option value="multiple-choice">Multiple Choice</option>
+                  <option value="true-false">True / False</option>
+                </select>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  onClick={() => void handleCreate()}
+                  disabled={!newName.trim() || isCreating}
+                  className="min-h-[36px] transition-transform duration-150 hover:scale-[1.03] active:scale-[0.97]"
+                >
+                  {isCreating ? (
+                    <SpinnerGap className="mr-1 size-3.5 animate-spin" />
+                  ) : (
+                    <Plus weight="bold" className="mr-1 size-3.5" />
+                  )}
+                  Create
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowForm(false)}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Category table */}
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead className="hidden sm:table-cell">Format</TableHead>
+                  <TableHead className="hidden md:table-cell text-right">Questions</TableHead>
+                  <TableHead className="text-center">Status</TableHead>
+                  <TableHead className="text-center">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {categories.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center text-muted-foreground py-6">
+                      No categories yet. Create one to get started.
+                    </TableCell>
+                  </TableRow>
+                )}
+                {categories.map((cat, i) => {
+                  const isActiveCat = gameState?.activeCategoryId === cat.id;
+                  const isToggling = togglingId === cat.id;
+                  const isDeleting = deletingId === cat.id;
+                  const isEditing = editingId === cat.id;
+
+                  return (
+                    <TableRow
+                      key={cat.id}
+                      className={cn(
+                        i % 2 === 0 ? "bg-muted/20" : "",
+                        isActiveCat && "border-l-2 border-l-accent",
+                      )}
+                      style={{
+                        animation: `row-enter 350ms ease-out ${i * 50}ms backwards`,
+                      }}
+                    >
+                      <TableCell>
+                        {isEditing ? (
+                          <div className="space-y-1">
+                            <input
+                              type="text"
+                              value={editName}
+                              onChange={(e) => setEditName(e.target.value)}
+                              className="h-7 w-full rounded border border-border bg-background px-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-accent"
+                            />
+                            <input
+                              type="text"
+                              value={editDesc}
+                              onChange={(e) => setEditDesc(e.target.value)}
+                              placeholder="Description"
+                              className="h-7 w-full rounded border border-border bg-background px-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-accent"
+                            />
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-1.5">
+                            <span className="max-w-[150px] truncate sm:max-w-none font-sans">
+                              {cat.name}
+                            </span>
+                            {isActiveCat && (
+                              <Badge className="bg-accent/20 text-accent text-[10px] px-1.5 py-0">
+                                LIVE
+                              </Badge>
+                            )}
+                          </div>
+                        )}
+                      </TableCell>
+
+                      <TableCell className="hidden sm:table-cell text-muted-foreground text-xs">
+                        {isEditing ? (
+                          <select
+                            value={editFormat}
+                            onChange={(e) => setEditFormat(e.target.value as QuestionType)}
+                            className="h-7 rounded border border-border bg-background px-1 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-accent"
+                          >
+                            <option value="multiple-choice">Multiple Choice</option>
+                            <option value="true-false">True / False</option>
+                          </select>
+                        ) : (
+                          cat.questionFormat === "true-false" ? "True/False" : "Multiple Choice"
+                        )}
+                      </TableCell>
+
+                      <TableCell className="hidden md:table-cell text-right font-mono">
+                        {cat.questionCount ?? "—"}
+                      </TableCell>
+
+                      <TableCell className="text-center">
+                        <button
+                          onClick={() => void handleToggleActive(cat)}
+                          disabled={isToggling}
+                          title={cat.isActive ? "Deactivate category" : "Activate category"}
+                          className={cn(
+                            "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium transition-all duration-150",
+                            cat.isActive
+                              ? "bg-green-500/15 text-green-400 hover:bg-green-500/25"
+                              : "bg-red-500/15 text-red-400 hover:bg-red-500/25",
+                            isToggling && "cursor-not-allowed opacity-50",
+                            !isToggling && "hover:scale-[1.05] active:scale-[0.95]",
+                          )}
+                        >
+                          {isToggling ? (
+                            <SpinnerGap className="size-3.5 animate-spin" />
+                          ) : cat.isActive ? (
+                            <CheckCircle weight="fill" className="size-3.5" />
+                          ) : (
+                            <XCircle weight="fill" className="size-3.5" />
+                          )}
+                          {cat.isActive ? "Active" : "Inactive"}
+                        </button>
+                      </TableCell>
+
+                      <TableCell className="text-center">
+                        <div className="inline-flex items-center gap-1">
+                          {isEditing ? (
+                            <>
+                              <button
+                                onClick={() => void handleSaveEdit()}
+                                disabled={isSavingEdit || !editName.trim()}
+                                className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium bg-green-500/15 text-green-400 hover:bg-green-500/25 transition-all duration-150 hover:scale-[1.05] active:scale-[0.95] disabled:cursor-not-allowed disabled:opacity-50"
+                              >
+                                {isSavingEdit ? (
+                                  <SpinnerGap className="size-3.5 animate-spin" />
+                                ) : (
+                                  <CheckCircle weight="fill" className="size-3.5" />
+                                )}
+                              </button>
+                              <button
+                                onClick={() => setEditingId(null)}
+                                className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium bg-muted/40 text-muted-foreground hover:bg-muted/60 transition-all duration-150 hover:scale-[1.05] active:scale-[0.95]"
+                              >
+                                <XCircle weight="fill" className="size-3.5" />
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <button
+                                onClick={() => startEdit(cat)}
+                                title="Edit category"
+                                className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium bg-blue-500/15 text-blue-400 hover:bg-blue-500/25 transition-all duration-150 hover:scale-[1.05] active:scale-[0.95]"
+                              >
+                                <PencilSimple weight="fill" className="size-3.5" />
+                              </button>
+                              <button
+                                onClick={() => void handleDelete(cat)}
+                                disabled={isDeleting}
+                                title="Delete category"
+                                className={cn(
+                                  "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium transition-all duration-150",
+                                  "bg-red-500/15 text-red-400 hover:bg-red-500/25",
+                                  isDeleting && "cursor-not-allowed opacity-50",
+                                  !isDeleting && "hover:scale-[1.05] active:scale-[0.95]",
+                                )}
+                              >
+                                {isDeleting ? (
+                                  <SpinnerGap className="size-3.5 animate-spin" />
+                                ) : (
+                                  <Trash weight="fill" className="size-3.5" />
+                                )}
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
+          <p className="mt-3 text-xs text-muted-foreground">
+            {categories.length} categor{categories.length !== 1 ? "ies" : "y"} total
+          </p>
+        </CardContent>
+      </Card>
+    </>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Main AdminPanel                                                   */
+/* ------------------------------------------------------------------ */
 
 export function AdminPanel() {
   const { user: currentUser } = useUser();
@@ -82,41 +631,33 @@ export function AdminPanel() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <Card className="border-border bg-card">
-        <CardHeader>
-          <Skeleton className="h-6 w-48" />
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Skeleton key={i} className="h-10 w-full" />
-          ))}
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (error && users.length === 0) {
-    return (
-      <Card className="border-destructive/30 bg-card">
-        <CardContent className="flex flex-col items-center gap-4 pt-6 text-center">
-          <WarningCircle weight="fill" className="h-10 w-10 text-destructive" />
-          <p className="caption text-destructive">{error}</p>
-          <Button
-            variant="outline"
-            onClick={fetchUsers}
-            className="min-h-[44px] transition-transform duration-150 hover:scale-[1.03] active:scale-[0.97]"
-          >
-            <ArrowClockwise className="mr-2 h-4 w-4" />
-            Retry
-          </Button>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  return (
+  const userCard = isLoading ? (
+    <Card className="border-border bg-card">
+      <CardHeader>
+        <Skeleton className="h-6 w-48" />
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <Skeleton key={i} className="h-10 w-full" />
+        ))}
+      </CardContent>
+    </Card>
+  ) : error && users.length === 0 ? (
+    <Card className="border-destructive/30 bg-card">
+      <CardContent className="flex flex-col items-center gap-4 pt-6 text-center">
+        <WarningCircle weight="fill" className="h-10 w-10 text-destructive" />
+        <p className="caption text-destructive">{error}</p>
+        <Button
+          variant="outline"
+          onClick={fetchUsers}
+          className="min-h-[44px] transition-transform duration-150 hover:scale-[1.03] active:scale-[0.97]"
+        >
+          <ArrowClockwise className="mr-2 h-4 w-4" />
+          Retry
+        </Button>
+      </CardContent>
+    </Card>
+  ) : (
     <Card className="border-border bg-card">
       <CardHeader className="flex flex-row items-center justify-between gap-2">
         <CardTitle className="flex items-center gap-2 text-lg">
@@ -252,5 +793,18 @@ export function AdminPanel() {
         </p>
       </CardContent>
     </Card>
+  );
+
+  return (
+    <div className="space-y-4">
+      {/* 1. Online Players */}
+      {currentUser && <OnlinePlayersSection adminUserId={currentUser.userId} />}
+
+      {/* 2. Category Management + Active Switcher */}
+      {currentUser && <CategoryManagement adminUserId={currentUser.userId} />}
+
+      {/* 3. User Management (existing) */}
+      {userCard}
+    </div>
   );
 }

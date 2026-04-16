@@ -4,7 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Leaderboard } from "@/components/Leaderboard";
-import { getLeaderboard, type LeaderboardEntry } from "@/services/api";
+import { getLeaderboard, listCategories, type LeaderboardEntry, type Category } from "@/services/api";
 import { useSignalRContext } from "@/contexts/SignalRContext";
 
 const REFRESH_INTERVAL_MS = 30_000;
@@ -21,13 +21,20 @@ export function LeaderboardPage({ userId }: LeaderboardPageProps) {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const { connectionState, leaderboardData } = useSignalRContext();
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | undefined>();
 
   const isLive = connectionState === "connected";
+
+  // Fetch categories on mount
+  useEffect(() => {
+    listCategories().then(cats => setCategories(cats.filter(c => c.isActive))).catch(() => {});
+  }, []);
 
   const fetchData = useCallback(async () => {
     try {
       setError(null);
-      const data = await getLeaderboard(userId);
+      const data = await getLeaderboard(userId, selectedCategoryId);
       setEntries(data.leaderboard);
       setUserRank(data.userRank);
       setLastUpdated(new Date());
@@ -37,7 +44,7 @@ export function LeaderboardPage({ userId }: LeaderboardPageProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [userId]);
+  }, [userId, selectedCategoryId]);
 
   // Real-time leaderboard updates from SignalR
   useEffect(() => {
@@ -131,11 +138,28 @@ export function LeaderboardPage({ userId }: LeaderboardPageProps) {
             </span>
           )}
         </div>
-        {lastUpdated && (
-          <span className="caption text-muted-foreground">
-            Updated {lastUpdated.toLocaleTimeString()}
-          </span>
-        )}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <select
+              value={selectedCategoryId ?? ""}
+              onChange={(e) => {
+                setSelectedCategoryId(e.target.value || undefined);
+                setIsLoading(true);
+              }}
+              className="rounded-md border border-border bg-card px-3 py-1.5 text-sm text-foreground"
+            >
+              <option value="">All Categories</option>
+              {categories.map(cat => (
+                <option key={cat.id} value={cat.id}>{cat.name}</option>
+              ))}
+            </select>
+          </div>
+          {lastUpdated && (
+            <span className="caption text-muted-foreground">
+              Updated {lastUpdated.toLocaleTimeString()}
+            </span>
+          )}
+        </div>
       </div>
 
       <div className="rounded-lg border border-border bg-card">

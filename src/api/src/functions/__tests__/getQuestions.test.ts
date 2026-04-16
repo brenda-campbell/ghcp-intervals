@@ -16,6 +16,9 @@ vi.mock("../../services/cosmosClient.js", () => ({
     item: vi.fn(),
     items: { create: vi.fn(), query: vi.fn() },
   },
+  gameStateContainer: {
+    item: vi.fn(),
+  },
   database: {},
 }));
 

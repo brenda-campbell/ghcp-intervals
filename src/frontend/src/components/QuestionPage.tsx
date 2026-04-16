@@ -34,7 +34,7 @@ interface QuestionPageProps {
 
 export function QuestionPage({ onNavigateToLeaderboard }: QuestionPageProps) {
   const { user } = useUser();
-  const { playerActivity } = useSignalRContext();
+  const { playerActivity, categoryChanged } = useSignalRContext();
 
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -51,6 +51,7 @@ export function QuestionPage({ onNavigateToLeaderboard }: QuestionPageProps) {
 
   const [roundResults, setRoundResults] = useState<QuestionResultEntry[]>([]);
   const autoAdvanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [categoryNotice, setCategoryNotice] = useState<string | null>(null);
 
   const currentQuestion: Question | undefined = questions[currentIndex];
 
@@ -89,6 +90,24 @@ export function QuestionPage({ onNavigateToLeaderboard }: QuestionPageProps) {
       if (autoAdvanceTimer.current) clearTimeout(autoAdvanceTimer.current);
     };
   }, []);
+
+  // When admin switches category, reload questions
+  useEffect(() => {
+    if (categoryChanged && phase !== "loading") {
+      setPhase("loading");
+      void loadQuestions();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [categoryChanged]);
+
+  // Show category change notification
+  useEffect(() => {
+    if (categoryChanged) {
+      setCategoryNotice(`Category switched to: ${categoryChanged.categoryName}`);
+      const timer = setTimeout(() => setCategoryNotice(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [categoryChanged]);
 
   // Elapsed-time display (updates every 100ms while playing)
   useEffect(() => {
@@ -238,6 +257,12 @@ export function QuestionPage({ onNavigateToLeaderboard }: QuestionPageProps) {
           : "animate-question-slide-in",
       )}
     >
+      {categoryNotice && (
+        <div className="animate-fade-slide-in rounded-md border border-accent/30 bg-accent/10 px-4 py-2 text-center text-sm text-accent">
+          {categoryNotice}
+        </div>
+      )}
+
       <div className="flex items-center justify-center sm:justify-between">
         <span className="ui-label flex items-center gap-2 text-lg text-muted-foreground sm:text-base">
           <Clock weight="regular" className="h-5 w-5" />
@@ -265,6 +290,7 @@ export function QuestionPage({ onNavigateToLeaderboard }: QuestionPageProps) {
           onSelect={(i) => void handleSelect(i)}
           correctIndex={result ? result.correctIndex : null}
           isCorrect={result ? result.correct : null}
+          questionType={currentQuestion.type || "multiple-choice"}
         />
 
         {phase === "feedback" && result && (

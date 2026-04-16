@@ -7,6 +7,11 @@ vi.mock("../cosmosClient.js", () => ({
     },
   },
   questionsContainer: { items: { query: vi.fn() } },
+  categoryScoresContainer: {
+    items: {
+      query: vi.fn(),
+    },
+  },
   database: {},
 }));
 

@@ -40,3 +40,10 @@
 - **host.json tuning:** Added function concurrency settings to optimize scaling under load.
 - **Impact:** Player activity broadcasts (`playerAnswered` events) now reliable at scale. Leaderboard updates remain best-effort (non-blocking).
 - **Verification:** Bicep compiles clean, Azure deployment validates, SignalR broadcast in submitAnswer.ts still functional.
+
+### 2026-04-16 — Cosmos DB Containers: categories, categoryScores, gameState (phase-1e-containers)
+- **What:** Added 3 new containers to `infra/modules/cosmosDb.bicep`: `categories` (pk `/id`), `categoryScores` (pk `/categoryId`, composite index for leaderboard), `gameState` (pk `/id`).
+- **Pattern:** All containers follow exact same API version and structure as existing `users` and `questions` containers.
+- **`categoryScores` composite index:** `totalScore DESC, fastestTimeMs ASC` — mirrors the `users` leaderboard index for consistency.
+- **ARM rebuild:** `main.json` regenerated successfully. Only pre-existing `outputs-should-not-contain-secrets` warnings.
+- **No breaking changes:** Existing containers untouched.
