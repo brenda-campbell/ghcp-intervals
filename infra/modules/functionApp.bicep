@@ -37,10 +37,10 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2023-12-01' = {
   name: appServicePlanName
   location: location
   sku: {
-    name: 'Y1'
-    tier: 'Dynamic'
+    name: 'B1'
+    tier: 'Basic'
   }
-  kind: 'functionapp'
+  kind: 'linux'
   properties: {
     reserved: true
   }
@@ -67,7 +67,6 @@ resource functionApp 'Microsoft.Web/sites@2023-12-01' = {
         { name: 'FUNCTIONS_EXTENSION_VERSION', value: '~4' }
         { name: 'FUNCTIONS_WORKER_RUNTIME', value: 'node' }
         { name: 'WEBSITE_NODE_DEFAULT_VERSION', value: '~20' }
-        { name: 'WEBSITE_RUN_FROM_PACKAGE', value: '1' }
         { name: 'COSMOS_ENDPOINT', value: cosmosEndpoint }
         { name: 'AzureSignalRConnectionString', value: signalRConnectionString }
       ]

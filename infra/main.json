@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.40.2.10011",
-      "templateHash": "6810176435237228736"
+      "templateHash": "11262181137870294185"
     }
   },
   "parameters": {
@@ -548,7 +548,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.40.2.10011",
-              "templateHash": "5005907482047358903"
+              "templateHash": "6825094900063246970"
             }
           },
           "parameters": {
@@ -614,10 +614,10 @@
               "name": "[variables('appServicePlanName')]",
               "location": "[parameters('location')]",
               "sku": {
-                "name": "Y1",
-                "tier": "Dynamic"
+                "name": "B1",
+                "tier": "Basic"
               },
-              "kind": "functionapp",
+              "kind": "linux",
               "properties": {
                 "reserved": true
               },
@@ -656,10 +656,6 @@
                     {
                       "name": "WEBSITE_NODE_DEFAULT_VERSION",
                       "value": "~20"
-                    },
-                    {
-                      "name": "WEBSITE_RUN_FROM_PACKAGE",
-                      "value": "1"
                     },
                     {
                       "name": "COSMOS_ENDPOINT",
