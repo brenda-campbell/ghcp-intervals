@@ -157,6 +157,32 @@
 - **SignalRContext** auto-exposes `categoryChanged` since it mirrors `UseSignalRReturn`.
 - **AnswerGrid** (`components/AnswerGrid.tsx`): Now accepts optional `questionType` prop. When `"true-false"`: uses ✓/✗ labels, 2-col grid always, larger buttons (min-h-[64px]), green/red tinted borders and label badges. Multiple-choice unchanged.
 - **QuestionPage** (`components/QuestionPage.tsx`): Listens for `categoryChanged` — reloads questions on category switch. Shows auto-dismissing (3s) category change banner. Passes `questionType` to AnswerGrid.
+
+### fe-score-reset-ui — Admin Score Reset UI (2026-04-16)
+
+**API Integration:**
+- **api.ts** updated — Added `resetScores(payload)` async function calling `POST /api/scores/reset` with scope/userIds/categoryId
+- **useSignalR** updated — Added `scoresReset` event handler that auto-refreshes user list when admin broadcasts reset
+
+**UI Components:**
+- **ScoreResetSection (new):** Placed between CategoryManagement and UserManagement in AdminPanel. Features:
+  - "Reset All Scores" button with optional category dropdown for scoped reset
+  - Inline confirmation banner (expands in-place, not modal) with user count + confirm/cancel buttons
+  - Matches existing AdminPanel patterns (lightweight UX, no page reload)
+- **User table (AdminPanel):** Added checkbox column for per-user selection
+  - Checkbox header auto-checks/unchecks all visible users
+  - "Reset Selected" action button appears conditionally when users are selected
+  - Works with ScoreResetSection scope logic
+- **AdminPanel** now fetches categories in parallel with users (was users-only before)
+- **GameState type** extended with `questionIds: string[]` field to stay in sync with Bender's backend model
+
+**Design Decisions:**
+- Inline confirmation over modal — simpler UX, consistent with existing patterns
+- Checkbox column in user table rather than separate "select users" UI — keeps mental model clean
+- SignalR auto-refresh ensures Admin A's reset is immediately visible to Admin B
+- Category scope optional on "Reset All" for isolated leaderboard resets
+
+**Verification:** TypeScript compiles clean, manual smoke tests for all reset flows passed
 - **LeaderboardPage** (`components/LeaderboardPage.tsx`): Added category filter dropdown. Fetches active categories on mount. `selectedCategoryId` passed to `getLeaderboard`. Dark-theme styled select element.
 - **App.tsx**: Added online presence indicator — sends heartbeat every 30s via `sendHeartbeat`, displays green pulsing dot + count next to ConnectionStatus.
 - **Verification:** TypeScript compiles clean (`npx tsc --noEmit` — 0 errors).

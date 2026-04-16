@@ -135,6 +135,29 @@
 - **POST /api/game/stop-quiz** (`stopQuiz.ts`) — Admin-only. Same pattern, sets `isStarted = false`, broadcasts `quizStopped` with `{ stoppedAt, stoppedBy }`.
 - **getGameState.ts** updated — default fallback (no state in Cosmos) now returns `isStarted: false` alongside null category fields.
 - **setCategory.ts** updated — reads existing game state before upsert and preserves `isStarted` value. Category change no longer resets quiz started status.
+
+### be-sync-questions-score-reset — Synchronized Questions + Score Reset API (2026-04-16)
+
+**Synchronized Questions (ADR-027):**
+- **GameState extended** with `questionIds: string[]` field to pin questions when quiz starts
+- **startQuiz.ts updated** — After selecting N random questions from active category, stores their IDs in `gameState.questionIds`
+- **getQuestions.ts updated** — When `isStarted === true`, returns pinned questions in order (fetches by ID from `questionsContainer`); falls back to random when quiz is stopped
+- **stopQuiz.ts updated** — Clears `questionIds` array when quiz stops
+- **setCategory.ts updated** — Clears `questionIds` array when category changes (new quiz = new questions)
+- **Rationale:** Without synchronization, different players got different random questions each call, breaking fairness. Pinning ensures all players see identical sequences. Cross-partition query cost is negligible (max 3 questions).
+
+**Score Reset API (ADR-028):**
+- **resetScores.ts (new)** — `POST /api/scores/reset` admin-only endpoint
+- **Scope support:** `scope: "all"` resets all users + deletes all categoryScores; `scope: "selected"` resets only specified userIds; optional `categoryId` narrows reset to single category (skips user upsert)
+- **Mocking pattern:** Uses `usersContainer` (item().read/upsert) + `categoryScoresContainer` (query/item.delete) — two-container coordination
+- **SignalR broadcast:** Emits `scoresReset` event so all connected clients auto-refresh leaderboards
+- **Error handling:** Validates scope, rejects empty userIds array, logs partial failures (resets 9/10 rather than 0/10)
+- **Test coverage:** Amy wrote 14 tests covering all scope combinations and edge cases; all passing
+
+**Cross-endpoint Behavior (via syncQuestions.test.ts):**
+- startQuiz stores questionIds → getQuestions returns pinned in order → stopQuiz/setCategory clears → next startQuiz pins new set
+- 7 new integration tests verify all 4 endpoints coordinate correctly
+- 6 pre-existing startQuiz.test.ts mocks fixed (added questionsContainer mock + question pool)
 - **seedQuestions.ts** updated — seed game state now includes `isStarted: false`.
 - **Pattern:** Both new endpoints follow the same SignalR output binding + admin auth pattern as `setCategory.ts`.
 - **Frontend contract:** Clients should listen for `"quizStarted"` and `"quizStopped"` events on their SignalR connection.

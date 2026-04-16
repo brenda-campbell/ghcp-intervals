@@ -247,3 +247,42 @@ SignalR upgraded from Free_F1 (20 connections) to Standard_S1 (1000 connections)
 `submitAnswer` caches questions in-memory (per-instance) and throttles leaderboard broadcast to 1/second. Question cache eliminates redundant cross-partition queries when many users answer same question. Throttle reduces Cosmos reads from N/round to ~1/round.
 
 **Rationale:** Main backend bottlenecks for 80 concurrent players. In-memory cache is MVP-grade per-instance optimization; production would use distributed cache.
+
+---
+
+### ADR-027: Synchronized Questions via GameState.questionIds
+
+Pin question IDs in the GameState singleton when admin starts a quiz. All players receive the exact same questions in the same order.
+
+- `startQuiz` selects N random questions from the active category and stores their IDs in `gameState.questionIds`
+- `getQuestions` returns pinned questions (in order) when quiz is started; falls back to random when not
+- `stopQuiz` and `setCategory` clear pinned questions
+
+**Rationale:** Without synchronization, different players received different random questions each time `getQuestions` was called, making the quiz unfair. Pinning ensures identical question sequences across all participants once a quiz starts. Cross-partition query to fetch pinned questions by ID is bounded to max 3 IDs (negligible cost). Question order determinism is a feature—all players see identical sequence.
+
+---
+
+### ADR-028: Score Reset API (POST /api/scores/reset)
+
+Admin endpoint with flexible scope for resetting player scores:
+- `scope: "all"` — resets every user's scores and deletes all categoryScores docs
+- `scope: "selected"` — resets only specified userIds
+- Optional `categoryId` parameter narrows reset to a single category's scores (global user scores untouched)
+- Broadcasts `scoresReset` SignalR event so frontends refresh leaderboards in real-time
+
+**Rationale:** Admins need flexibility to reset scores—globally (new tournament round), per-user (individual reset), or per-category (isolated leaderboard reset). Sequential Cosmos operations per user are acceptable at quiz game scale. Partial failures on "selected" scope are logged and skipped rather than rolled back—better to reset 9/10 users than 0/10. SignalR broadcast ensures all connected clients see leaderboard updates immediately.
+
+---
+
+### ADR-029: Pre-existing startQuiz Tests Require Mock Updates
+
+`startQuiz.test.ts` was written before Bender's sync questions update, which added a `questionsContainer` import. The old tests do not mock `questionsContainer`, causing 6 of 11 tests to fail with 500 errors.
+
+**Fix:** Update `startQuiz.test.ts` to:
+1. Add `questionsContainer` to the cosmosClient mock
+2. Provide a mock question pool in `beforeEach` for happy-path tests
+3. Add a test case for "returns 400 when no questions available for active category"
+
+The new `syncQuestions.test.ts` already covers question-pinning behavior cross-endpoint, so the old test just needs its mocks fixed—not rewritten.
+
+**Rationale:** Test coverage remains valid; only infrastructure (mocks) needed updating. New tests (resetScores + syncQuestions) verify all behaviors in isolation and integration.
