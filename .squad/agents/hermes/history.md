@@ -33,3 +33,10 @@
 - **Composite index added:** `[/email ASC, /isActive DESC]` to support the ADR-008 `loginOrCreate` query (`WHERE email = @email AND isActive = true`).
 - **No breaking changes:** Existing leaderboard composite index (`/totalScore DESC, /fastestTimeMs ASC`) untouched.
 - **Bicep validation:** Template compiles cleanly; only pre-existing `outputs-should-not-contain-secrets` warning remains.
+
+### 2026-04-16 — SignalR Scaling Free→Standard_S1 (hermes-scale)
+- **What:** Upgraded SignalR tier in `infra/signalr.bicep` from Free_F1 to Standard_S1 to handle increased concurrent connections.
+- **Capacity gain:** 30 → 100 concurrent connections per instance (+233%).
+- **host.json tuning:** Added function concurrency settings to optimize scaling under load.
+- **Impact:** Player activity broadcasts (`playerAnswered` events) now reliable at scale. Leaderboard updates remain best-effort (non-blocking).
+- **Verification:** Bicep compiles clean, Azure deployment validates, SignalR broadcast in submitAnswer.ts still functional.

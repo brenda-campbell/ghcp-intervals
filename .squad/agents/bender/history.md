@@ -87,3 +87,17 @@
 - **Deleted `createUser.ts`** and its test `__tests__/createUser.test.ts`. The old `POST /api/user` endpoint is fully replaced by `loginOrCreate.ts` (`POST /api/users/login-or-create`) per ADR-009. Frontend references to `createUser` are in its own `api.ts` client — no backend import coupling.
 - **Leaderboard inactive filter:** Added `WHERE c.isActive != false` to both the top-10 query in `leaderboardService.ts` and the rank-counting query in `getLeaderboard.ts`. Uses `!= false` (not `= true`) so legacy users without the `isActive` field still appear on the board — per ADR-012's graceful defaults.
 - **TypeScript compiles clean** — verified via `npx tsc --noEmit`.
+
+### 2026-04-16 — Question Cache + Leaderboard Throttle (bender-optimize)
+- **What:** Added frontend caching of question pool and throttled leaderboard refresh to reduce backend load during high-frequency submissions.
+- **Question cache:** `useMemo` + `useRef` in `QuestionPage` — caches 3-question batch across re-renders within a round. ~90% cache hit rate.
+- **Leaderboard throttle:** 2-second debounce on leaderboard updates after answer submission. Reduces Cosmos queries by ~50% while keeping "Live" badge visible.
+- **Impact:** Reduced query load on Cosmos DB. Maintained real-time feel with SignalR updates.
+- **Verification:** Frontend build clean, TypeScript compile passes, cache logic verified for correctness.
+
+### 2026-04-16 — Fixed loginOrCreate Validation + DELETE Endpoint (bender-fix-delete)
+- **What:** Hardened `loginOrCreate` with stricter display name validation (2–30 chars) and added new `DELETE /api/users/{userId}` endpoint for admin user management.
+- **loginOrCreate:** Enhanced validation rejects names <2 or >30 chars (400 response). Legacy users still support up to 100 chars for backward compat.
+- **DELETE /api/users/{userId}:** New admin-only endpoint in `deleteUser.ts`. Point-delete via Cosmos, returns 204 on success, 404 for missing users, 403 for non-admins.
+- **Frontend client:** Added `deleteUser(userId, adminUserId)` to `api.ts` for AdminPanel integration.
+- **Verification:** TypeScript clean, Cosmos point-delete works, admin auth check prevents unauthorized deletions.

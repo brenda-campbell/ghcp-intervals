@@ -134,3 +134,11 @@
 - **App.tsx:** Added `"admin"` to View union type. Admin tab (GearSix icon) conditionally rendered when `user?.isAdmin === true`. Tab indicator logic updated to support dynamic tab refs via a refMap. `AdminPanel` lazy-renders only for admin view.
 - **Tests updated:** `integration-user-session.test.tsx` rewritten for new `UserProvider(userId)` contract — removed createUser/localStorage tests, added load-by-id/error/loading tests. `edge-cases.test.tsx` localStorage test replaced with a UserProvider load test.
 - **Build:** Clean (`tsc -b && vite build` — 0 errors, 0 warnings).
+
+### 2026-04-16 — Fixed AuthGate Auto-Login + Delete Button (fry-fix-delete)
+- **What:** Resolved race condition in AuthGate where returning users weren't being auto-logged in on first load, and added delete user button to AdminPanel.
+- **AuthGate fix:** Fixed `useEffect` dependency array to include `isAuthenticated` state — prevents infinite loops during auto-login. Added fallback for inactive users (403 errors now display: "Your account has been deactivated. Contact an admin to reactivate.").
+- **AdminPanel delete:** Added delete button (Trash icon) per user row with confirmation modal showing user's display name. Calls `deleteUser()` endpoint. On success, removes user from table instantly (optimistic update). Shows error toast on failure. Self-deletion prevented.
+- **api.ts export:** New `deleteUser(userId, adminUserId)` function wraps `DELETE /api/users/{userId}`.
+- **UX improvements:** Confirmation modal for destructive action, instant table refresh, error visibility, self-deletion guard.
+- **Verification:** TypeScript clean (`tsc -b`), AuthGate auto-login no longer infinite-loops, build passes (`vite build` — 0 errors).
