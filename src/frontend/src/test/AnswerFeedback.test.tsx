@@ -20,7 +20,9 @@ describe("AnswerFeedback", () => {
   it("shows correct state with check icon and message", () => {
     const result: AnswerResult = {
       correct: true,
+      correctAnswer: "Answer",
       correctIndex: 0,
+      elapsedTimeMs: 2500,
       pointsAwarded: 100,
       timeTaken: 2500,
     }
@@ -33,7 +35,9 @@ describe("AnswerFeedback", () => {
   it("shows points awarded for correct answer", () => {
     const result: AnswerResult = {
       correct: true,
+      correctAnswer: "Answer",
       correctIndex: 0,
+      elapsedTimeMs: 1800,
       pointsAwarded: 150,
       timeTaken: 1800,
     }
@@ -44,7 +48,9 @@ describe("AnswerFeedback", () => {
   it("shows incorrect state with X icon", () => {
     const result: AnswerResult = {
       correct: false,
+      correctAnswer: "WebSocket",
       correctIndex: 2,
+      elapsedTimeMs: 5000,
       pointsAwarded: 0,
       timeTaken: 5000,
     }
@@ -56,7 +62,9 @@ describe("AnswerFeedback", () => {
   it("shows correct answer text when incorrect", () => {
     const result: AnswerResult = {
       correct: false,
+      correctAnswer: "WebSocket",
       correctIndex: 2,
+      elapsedTimeMs: 5000,
       pointsAwarded: 0,
       timeTaken: 5000,
     }
@@ -72,7 +80,9 @@ describe("AnswerFeedback", () => {
   it("shows time taken for incorrect answer", () => {
     const result: AnswerResult = {
       correct: false,
+      correctAnswer: "Answer",
       correctIndex: 0,
+      elapsedTimeMs: 3200,
       pointsAwarded: 0,
       timeTaken: 3200,
     }
@@ -83,7 +93,9 @@ describe("AnswerFeedback", () => {
   it("does not show correct answer text when not provided", () => {
     const result: AnswerResult = {
       correct: false,
+      correctAnswer: "Answer",
       correctIndex: 0,
+      elapsedTimeMs: 4000,
       pointsAwarded: 0,
       timeTaken: 4000,
     }

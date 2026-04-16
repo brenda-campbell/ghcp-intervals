@@ -14,6 +14,7 @@ export interface QuestionResponse {
   category: string;
   questionText: string;
   options: [string, string, string, string];
+  difficulty: "easy" | "medium" | "hard";
 }
 
 /** User profile document in Cosmos DB (users container, partition /userId) */
@@ -40,7 +41,9 @@ export interface AnswerSubmission {
 export interface AnswerResult {
   correct: boolean;
   correctAnswer: string;
+  correctIndex: number;
   elapsedTimeMs: number;
+  timeTaken: number;
   pointsAwarded: number;
 }
 

@@ -19,9 +19,11 @@ export interface AnswerSubmission {
 
 export interface AnswerResult {
   correct: boolean;
+  correctAnswer: string;
   correctIndex: number;
-  pointsAwarded: number;
+  elapsedTimeMs: number;
   timeTaken: number;
+  pointsAwarded: number;
 }
 
 export interface User {

@@ -80,7 +80,7 @@ describe("getQuestions", () => {
     const body = res.jsonBody as any;
     expect(body.questions).toHaveLength(1);
     expect(body.questions[0]).not.toHaveProperty("correctIndex");
-    expect(body.questions[0]).not.toHaveProperty("difficulty");
+    expect(body.questions[0]).toHaveProperty("difficulty");
     expect(body.questions[0]).toHaveProperty("id");
     expect(body.questions[0]).toHaveProperty("questionText");
     expect(body.questions[0]).toHaveProperty("options");

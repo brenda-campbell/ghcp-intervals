@@ -26,6 +26,7 @@ function toQuestionResponse(q: Question): QuestionResponse {
     category: q.category,
     questionText: q.questionText,
     options: q.options,
+    difficulty: q.difficulty,
   };
 }
 

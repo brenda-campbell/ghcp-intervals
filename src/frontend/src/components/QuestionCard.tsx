@@ -26,7 +26,7 @@ export function QuestionCard({
   children,
 }: QuestionCardProps) {
   const diffClass =
-    difficultyColor[difficulty.toLowerCase()] ?? "bg-secondary text-secondary-foreground";
+    difficultyColor[difficulty?.toLowerCase()] ?? "bg-secondary text-secondary-foreground";
 
   return (
     <Card className="border-border/50 bg-card shadow-lg">

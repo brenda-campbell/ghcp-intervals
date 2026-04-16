@@ -144,7 +144,9 @@ const testQuestions: Question[] = [
 
 const correctResult: AnswerResult = {
   correct: true,
+  correctAnswer: "Answer A",
   correctIndex: 0,
+  elapsedTimeMs: 2500,
   pointsAwarded: 100,
   timeTaken: 2500,
 }

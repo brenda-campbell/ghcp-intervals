@@ -48,14 +48,18 @@ vi.spyOn(globalThis, "requestAnimationFrame").mockImplementation((cb) => {
 describe("RoundComplete", () => {
   const correctResult: AnswerResult = {
     correct: true,
+    correctAnswer: "Answer A",
     correctIndex: 0,
+    elapsedTimeMs: 2500,
     pointsAwarded: 100,
     timeTaken: 2500,
   }
 
   const incorrectResult: AnswerResult = {
     correct: false,
+    correctAnswer: "Answer C",
     correctIndex: 2,
+    elapsedTimeMs: 5000,
     pointsAwarded: 0,
     timeTaken: 5000,
   }

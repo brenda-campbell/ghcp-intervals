@@ -48,14 +48,18 @@ export const mockQuestions: Question[] = [
 
 export const mockCorrectResult: AnswerResult = {
   correct: true,
+  correctAnswer: "Answer A",
   correctIndex: 0,
+  elapsedTimeMs: 2500,
   pointsAwarded: 100,
   timeTaken: 2500,
 }
 
 export const mockIncorrectResult: AnswerResult = {
   correct: false,
+  correctAnswer: "Answer A",
   correctIndex: 0,
+  elapsedTimeMs: 5000,
   pointsAwarded: 0,
   timeTaken: 5000,
 }

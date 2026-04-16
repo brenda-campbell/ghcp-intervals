@@ -155,7 +155,9 @@ async function submitAnswer(
   const result: AnswerResult = {
     correct,
     correctAnswer,
+    correctIndex: question.correctIndex,
     elapsedTimeMs,
+    timeTaken: elapsedTimeMs,
     pointsAwarded,
   };
 
