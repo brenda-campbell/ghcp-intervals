@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from "react"
-import { Lightning, Trophy, GearSix } from "@phosphor-icons/react"
+import { Lightning, Trophy, GearSix, SignOut } from "@phosphor-icons/react"
 import { UserBadge } from "@/components/UserBadge"
 import { ConnectionStatus } from "@/components/ConnectionStatus"
 import { useUser } from "@/contexts/UserContext"
+import { useLogout } from "@/contexts/LogoutContext"
 import { Skeleton } from "@/components/ui/skeleton"
 import { LeaderboardPage } from "@/components/LeaderboardPage"
 import { QuestionPage } from "@/components/QuestionPage"
@@ -13,6 +14,7 @@ type View = "quiz" | "leaderboard" | "admin"
 
 function App() {
   const { user, isLoading } = useUser()
+  const logout = useLogout()
   const [view, setView] = useState<View>("quiz")
   const quizTabRef = useRef<HTMLButtonElement>(null)
   const leaderboardTabRef = useRef<HTMLButtonElement>(null)
@@ -47,6 +49,13 @@ function App() {
           <div className="flex shrink-0 items-center gap-2 sm:gap-3">
             <ConnectionStatus />
             <UserBadge />
+            <button
+              onClick={logout}
+              title="Sign out"
+              className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+            >
+              <SignOut className="h-4 w-4" />
+            </button>
           </div>
         </header>
 

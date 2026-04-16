@@ -4,6 +4,7 @@ import { loginOrCreate, ApiError, type User } from "@/services/api";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ShieldSlash, SpinnerGap, ArrowClockwise } from "@phosphor-icons/react";
+import { LogoutProvider } from "@/contexts/LogoutContext";
 
 const KEY_USER_ID = "ff_userId";
 const KEY_EMAIL = "ff_email";
@@ -12,14 +13,26 @@ const KEY_DISPLAY_NAME = "ff_displayName";
 interface AuthGateProps {
   children: React.ReactNode;
   onUserAuthenticated: (user: User) => void;
+  onLogout?: () => void;
 }
 
-export function AuthGate({ children, onUserAuthenticated }: AuthGateProps) {
+export function AuthGate({ children, onUserAuthenticated, onLogout }: AuthGateProps) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isLegacy, setIsLegacy] = useState(false);
   const [isDeactivated, setIsDeactivated] = useState(false);
+
+  const handleLogout = useCallback(() => {
+    localStorage.removeItem(KEY_USER_ID);
+    localStorage.removeItem(KEY_EMAIL);
+    localStorage.removeItem(KEY_DISPLAY_NAME);
+    setUser(null);
+    setError(null);
+    setIsLegacy(false);
+    setIsDeactivated(false);
+    onLogout?.();
+  }, [onLogout]);
 
   // Persist user to localStorage and notify parent
   const completeLogin = useCallback(
@@ -180,5 +193,5 @@ export function AuthGate({ children, onUserAuthenticated }: AuthGateProps) {
   }
 
   // --- Authenticated — render children ---
-  return <>{children}</>;
+  return <LogoutProvider value={handleLogout}>{children}</LogoutProvider>;
 }

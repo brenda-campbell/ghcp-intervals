@@ -15,7 +15,7 @@ function Root() {
   }, [])
 
   return (
-    <AuthGate onUserAuthenticated={handleUserAuthenticated}>
+    <AuthGate onUserAuthenticated={handleUserAuthenticated} onLogout={() => setUserId(null)}>
       {userId && (
         <UserProvider userId={userId}>
           <SignalRProvider>
