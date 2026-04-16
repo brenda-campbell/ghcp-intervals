@@ -73,12 +73,26 @@ async function setCategory(
     return { status: 400, jsonBody: { error: "Category is inactive" } };
   }
 
+  // Read current game state to preserve isStarted
+  let currentIsStarted = false;
+  try {
+    const { resource: existing } = await gameStateContainer
+      .item("current", "current")
+      .read<GameState>();
+    if (existing) {
+      currentIsStarted = existing.isStarted ?? false;
+    }
+  } catch {
+    // No existing state — default isStarted to false
+  }
+
   // Upsert game state
   const gameState: GameState = {
     id: "current",
     activeCategoryId: category.id,
     activeCategoryName: category.name,
     activeQuestionFormat: category.questionFormat,
+    isStarted: currentIsStarted,
     updatedAt: new Date().toISOString(),
     updatedBy: admin.userId,
   };

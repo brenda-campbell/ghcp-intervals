@@ -103,6 +103,7 @@ export interface GameState {
   activeCategoryId: string;
   activeCategoryName: string;
   activeQuestionFormat: QuestionType;
+  isStarted: boolean;
   updatedAt: string;
   updatedBy: string;   // userId of admin who changed it
 }

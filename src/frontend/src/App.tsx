@@ -4,26 +4,50 @@ import { UserBadge } from "@/components/UserBadge"
 import { ConnectionStatus } from "@/components/ConnectionStatus"
 import { useUser } from "@/contexts/UserContext"
 import { useLogout } from "@/contexts/LogoutContext"
+import { useSignalRContext } from "@/contexts/SignalRContext"
 import { Skeleton } from "@/components/ui/skeleton"
 import { LeaderboardPage } from "@/components/LeaderboardPage"
 import { QuestionPage } from "@/components/QuestionPage"
 import { AdminPanel } from "@/components/AdminPanel"
+import { WaitingScreen } from "@/components/WaitingScreen"
 import { cn } from "@/lib/utils"
-import { sendHeartbeat } from "@/services/api"
+import { sendHeartbeat, getGameState } from "@/services/api"
 
 type View = "quiz" | "leaderboard" | "admin"
 
 function App() {
   const { user, isLoading } = useUser()
   const logout = useLogout()
+  const { quizStarted: quizStartedSignal } = useSignalRContext()
   const [view, setView] = useState<View>("quiz")
   const [onlineCount, setOnlineCount] = useState(0)
+  const [isQuizStarted, setIsQuizStarted] = useState<boolean | null>(null)
+  const [activeCategoryName, setActiveCategoryName] = useState<string | null>(null)
   const quizTabRef = useRef<HTMLButtonElement>(null)
   const leaderboardTabRef = useRef<HTMLButtonElement>(null)
   const adminTabRef = useRef<HTMLButtonElement>(null)
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 })
 
   const showAdmin = user?.isAdmin === true
+
+  // Fetch initial game state to check isStarted
+  useEffect(() => {
+    let cancelled = false
+    getGameState()
+      .then((gs) => {
+        if (!cancelled) {
+          setIsQuizStarted(gs.isStarted ?? false)
+          setActiveCategoryName(gs.activeCategoryName ?? null)
+        }
+      })
+      .catch(() => { if (!cancelled) setIsQuizStarted(false) })
+    return () => { cancelled = true }
+  }, [])
+
+  // Keep in sync with SignalR quiz events
+  useEffect(() => {
+    if (quizStartedSignal !== null) setIsQuizStarted(quizStartedSignal)
+  }, [quizStartedSignal])
 
   useEffect(() => {
     const refMap: Record<View, React.RefObject<HTMLButtonElement | null>> = {
@@ -142,7 +166,11 @@ function App() {
             key={view}
             className="animate-page-enter will-change-[opacity,transform]"
           >
-            {view === "quiz" && <QuestionPage onNavigateToLeaderboard={() => setView("leaderboard")} />}
+            {view === "quiz" && (
+              isQuizStarted
+                ? <QuestionPage onNavigateToLeaderboard={() => setView("leaderboard")} />
+                : <WaitingScreen categoryName={activeCategoryName} onlineCount={onlineCount} />
+            )}
             {view === "leaderboard" && (
               <LeaderboardPage userId={user?.userId} />
             )}

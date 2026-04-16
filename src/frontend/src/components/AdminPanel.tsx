@@ -12,6 +12,8 @@ import {
   Plus,
   PencilSimple,
   Broadcast,
+  Play,
+  Stop,
 } from "@phosphor-icons/react";
 import {
   Table,
@@ -26,6 +28,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { useUser } from "@/contexts/UserContext";
+import { useSignalRContext } from "@/contexts/SignalRContext";
 import {
   listUsers,
   toggleUserStatus,
@@ -37,6 +40,8 @@ import {
   getGameState,
   setActiveCategory,
   getOnlinePlayers,
+  startQuiz,
+  stopQuiz,
   type User,
   type Category,
   type GameState,
@@ -44,6 +49,101 @@ import {
   type OnlinePlayersResponse,
 } from "@/services/api";
 import { cn } from "@/lib/utils";
+
+/* ------------------------------------------------------------------ */
+/*  Quiz Control (Start / Stop)                                       */
+/* ------------------------------------------------------------------ */
+
+function QuizControlSection({ adminUserId }: { adminUserId: string }) {
+  const [isStarted, setIsStarted] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const { quizStarted } = useSignalRContext();
+
+  // Fetch initial state
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const gs = await getGameState();
+        if (!cancelled) setIsStarted(gs.isStarted ?? false);
+      } catch {
+        /* silent */
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    };
+    void load();
+    return () => { cancelled = true; };
+  }, []);
+
+  // Keep in sync with SignalR events
+  useEffect(() => {
+    if (quizStarted !== null) setIsStarted(quizStarted);
+  }, [quizStarted]);
+
+  const handleToggle = async () => {
+    setIsSaving(true);
+    try {
+      const gs = isStarted
+        ? await stopQuiz(adminUserId)
+        : await startQuiz(adminUserId);
+      setIsStarted(gs.isStarted ?? false);
+    } catch {
+      /* error handled silently — button re-enables */
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center gap-3 rounded-lg border border-border bg-card px-4 py-3">
+        <Skeleton className="h-5 w-5 rounded-full" />
+        <Skeleton className="h-4 w-40" />
+        <Skeleton className="ml-auto h-9 w-28 rounded-md" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-wrap items-center gap-3 rounded-lg border border-border bg-card px-4 py-2.5">
+      <div
+        className={cn(
+          "h-3 w-3 rounded-full",
+          isStarted ? "bg-green-500 animate-pulse" : "bg-red-500",
+        )}
+      />
+      <span className="text-sm font-medium">
+        Quiz is{" "}
+        <span className={cn("font-semibold", isStarted ? "text-green-400" : "text-red-400")}>
+          {isStarted ? "LIVE" : "STOPPED"}
+        </span>
+      </span>
+
+      <Button
+        size="sm"
+        onClick={() => void handleToggle()}
+        disabled={isSaving}
+        className={cn(
+          "ml-auto min-h-[36px] font-semibold transition-transform duration-150 hover:scale-[1.03] active:scale-[0.97]",
+          isStarted
+            ? "bg-red-500 hover:bg-red-600 text-white"
+            : "bg-green-500 hover:bg-green-600 text-white",
+        )}
+      >
+        {isSaving ? (
+          <SpinnerGap className="mr-1.5 size-4 animate-spin" />
+        ) : isStarted ? (
+          <Stop weight="fill" className="mr-1.5 size-4" />
+        ) : (
+          <Play weight="fill" className="mr-1.5 size-4" />
+        )}
+        {isStarted ? "Stop Quiz" : "Start Quiz"}
+      </Button>
+    </div>
+  );
+}
 
 /* ------------------------------------------------------------------ */
 /*  Online Players (auto-refresh)                                     */
@@ -797,6 +897,9 @@ export function AdminPanel() {
 
   return (
     <div className="space-y-4">
+      {/* 0. Quiz Control */}
+      {currentUser && <QuizControlSection adminUserId={currentUser.userId} />}
+
       {/* 1. Online Players */}
       {currentUser && <OnlinePlayersSection adminUserId={currentUser.userId} />}
 

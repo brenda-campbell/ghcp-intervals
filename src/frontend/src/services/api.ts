@@ -16,6 +16,7 @@ export interface GameState {
   activeCategoryId: string | null;
   activeCategoryName: string | null;
   activeQuestionFormat: QuestionType;
+  isStarted: boolean;
   updatedAt?: string;
 }
 
@@ -244,6 +245,22 @@ export async function deleteCategory(
 
 export async function getGameState(): Promise<GameState> {
   const response = await fetch("/api/game/state");
+  return handleResponse<GameState>(response);
+}
+
+export async function startQuiz(adminUserId: string): Promise<GameState> {
+  const response = await fetch("/api/game/start-quiz", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "x-user-id": adminUserId },
+  });
+  return handleResponse<GameState>(response);
+}
+
+export async function stopQuiz(adminUserId: string): Promise<GameState> {
+  const response = await fetch("/api/game/stop-quiz", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "x-user-id": adminUserId },
+  });
   return handleResponse<GameState>(response);
 }
 

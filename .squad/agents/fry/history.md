@@ -160,3 +160,12 @@
 - **LeaderboardPage** (`components/LeaderboardPage.tsx`): Added category filter dropdown. Fetches active categories on mount. `selectedCategoryId` passed to `getLeaderboard`. Dark-theme styled select element.
 - **App.tsx**: Added online presence indicator — sends heartbeat every 30s via `sendHeartbeat`, displays green pulsing dot + count next to ConnectionStatus.
 - **Verification:** TypeScript compiles clean (`npx tsc --noEmit` — 0 errors).
+
+### fe-quiz-launch (2026-04-16)
+- **Waiting room gate:** Quiz tab now shows `WaitingScreen` component when `isStarted === false`. Fetches `GameState.isStarted` on mount via `getGameState()`, keeps in sync via SignalR `quizStarted`/`quizStopped` events.
+- **WaitingScreen** (`components/WaitingScreen.tsx`): Centered pulsing Lightning bolt, "Waiting for quiz to start…" text, shows active category name badge and online player count. Uses existing animate-page-enter + animate-pulse patterns.
+- **QuizControlSection** in AdminPanel: New sub-component at top of admin panel. Green "Start Quiz" / red "Stop Quiz" toggle button with LIVE/STOPPED status indicator. Fetches initial state + listens to SignalR events.
+- **api.ts:** Added `isStarted: boolean` to `GameState` interface. New `startQuiz(adminUserId)` and `stopQuiz(adminUserId)` functions calling `/api/game/start-quiz` and `/api/game/stop-quiz`.
+- **useSignalR.ts:** Added `quizStarted` and `quizStopped` event handlers. New `quizStarted: boolean | null` in return state. New `QuizStartedEvent` / `QuizStoppedEvent` interfaces.
+- **App.tsx:** Imports `useSignalRContext` and `getGameState`. On mount fetches game state for `isStarted` + `activeCategoryName`. Quiz tab renders `<WaitingScreen>` when stopped, `<QuestionPage>` when live. Both admin and non-admin see waiting screen; admin uses Admin tab to start quiz.
+- **Verification:** TypeScript compiles clean (`npx tsc --noEmit` — 0 errors).

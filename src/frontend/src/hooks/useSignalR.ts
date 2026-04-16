@@ -20,12 +20,23 @@ export interface CategoryChangedEvent {
   questionFormat: string;
 }
 
+export interface QuizStartedEvent {
+  startedAt: string;
+  startedBy: string;
+}
+
+export interface QuizStoppedEvent {
+  stoppedAt: string;
+  stoppedBy: string;
+}
+
 export interface UseSignalRReturn {
   connection: signalR.HubConnection | null;
   connectionState: ConnectionState;
   leaderboardData: LeaderboardEntry[] | null;
   playerActivity: PlayerActivity | null;
   categoryChanged: CategoryChangedEvent | null;
+  quizStarted: boolean | null;
 }
 
 export function useSignalR(): UseSignalRReturn {
@@ -38,6 +49,7 @@ export function useSignalR(): UseSignalRReturn {
     null,
   );
   const [categoryChanged, setCategoryChanged] = useState<CategoryChangedEvent | null>(null);
+  const [quizStarted, setQuizStarted] = useState<boolean | null>(null);
 
   const connectionRef = useRef<signalR.HubConnection | null>(null);
   const mountedRef = useRef(true);
@@ -80,6 +92,14 @@ export function useSignalR(): UseSignalRReturn {
       if (mountedRef.current) setCategoryChanged(data);
     });
 
+    conn.on("quizStarted", (_data: QuizStartedEvent) => {
+      if (mountedRef.current) setQuizStarted(true);
+    });
+
+    conn.on("quizStopped", (_data: QuizStoppedEvent) => {
+      if (mountedRef.current) setQuizStarted(false);
+    });
+
     try {
       setConnectionState("connecting");
       await conn.start();
@@ -110,5 +130,6 @@ export function useSignalR(): UseSignalRReturn {
     leaderboardData,
     playerActivity,
     categoryChanged,
+    quizStarted,
   };
 }

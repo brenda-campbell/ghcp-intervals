@@ -24,7 +24,7 @@ async function getGameState(
 
     return {
       status: 200,
-      jsonBody: { activeCategoryId: null, activeCategoryName: null },
+      jsonBody: { activeCategoryId: null, activeCategoryName: null, isStarted: false },
     };
   } catch (err: unknown) {
     // 404 from Cosmos means no game state set yet
@@ -36,7 +36,7 @@ async function getGameState(
     ) {
       return {
         status: 200,
-        jsonBody: { activeCategoryId: null, activeCategoryName: null },
+        jsonBody: { activeCategoryId: null, activeCategoryName: null, isStarted: false },
       };
     }
 

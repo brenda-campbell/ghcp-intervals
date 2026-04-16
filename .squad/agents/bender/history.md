@@ -128,3 +128,14 @@
   6. `getGameState.ts` — `GET /api/game/state` (public). Point-reads `gameState` container for id="current". Returns state or `{ activeCategoryId: null, activeCategoryName: null }` if none set.
 - **Patterns followed:** All use v4 `app.http()` registration, `authLevel: "anonymous"`, same `requireAdmin()` error handling shape as existing endpoints. SignalR binding matches `submitAnswer.ts` pattern.
 - **TypeScript compiles clean** — verified via `npx tsc --noEmit`.
+
+### be-quiz-launch — Quiz Start/Stop Backend (2026-04-16)
+- **GameState extended** with `isStarted: boolean` in `src/api/src/models/index.ts`. Defaults to `false`. Controls whether players see questions or a waiting room.
+- **POST /api/game/start-quiz** (`startQuiz.ts`) — Admin-only. Reads current game state, sets `isStarted = true`, upserts, broadcasts `quizStarted` via SignalR with `{ startedAt, startedBy }`. Returns 400 if no game state exists (category must be set first).
+- **POST /api/game/stop-quiz** (`stopQuiz.ts`) — Admin-only. Same pattern, sets `isStarted = false`, broadcasts `quizStopped` with `{ stoppedAt, stoppedBy }`.
+- **getGameState.ts** updated — default fallback (no state in Cosmos) now returns `isStarted: false` alongside null category fields.
+- **setCategory.ts** updated — reads existing game state before upsert and preserves `isStarted` value. Category change no longer resets quiz started status.
+- **seedQuestions.ts** updated — seed game state now includes `isStarted: false`.
+- **Pattern:** Both new endpoints follow the same SignalR output binding + admin auth pattern as `setCategory.ts`.
+- **Frontend contract:** Clients should listen for `"quizStarted"` and `"quizStopped"` events on their SignalR connection.
+- **TypeScript compiles clean, all 100 tests pass.**

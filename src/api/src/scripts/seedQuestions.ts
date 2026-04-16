@@ -79,6 +79,7 @@ async function seedGameState(): Promise<void> {
     activeCategoryId: "technical",
     activeCategoryName: "Technical",
     activeQuestionFormat: "multiple-choice",
+    isStarted: false,
     updatedAt: new Date().toISOString(),
     updatedBy: "seed-script",
   };
