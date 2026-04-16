@@ -1,0 +1,317 @@
+[
+  {
+    "id": "geography-001",
+    "category": "geography",
+    "type": "multiple-choice",
+    "questionText": "What is the capital of Australia?",
+    "options": ["Sydney", "Melbourne", "Canberra", "Brisbane"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "geography-002",
+    "category": "geography",
+    "type": "multiple-choice",
+    "questionText": "Which continent has the most countries?",
+    "options": ["Asia", "Europe", "Africa", "South America"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "geography-003",
+    "category": "geography",
+    "type": "multiple-choice",
+    "questionText": "What is the smallest country in the world by area?",
+    "options": ["Monaco", "San Marino", "Vatican City", "Liechtenstein"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "geography-004",
+    "category": "geography",
+    "type": "multiple-choice",
+    "questionText": "Which ocean is the largest by area?",
+    "options": ["Atlantic Ocean", "Indian Ocean", "Arctic Ocean", "Pacific Ocean"],
+    "correctIndex": 3,
+    "difficulty": "easy"
+  },
+  {
+    "id": "geography-005",
+    "category": "geography",
+    "type": "multiple-choice",
+    "questionText": "What is the capital of Canada?",
+    "options": ["Toronto", "Vancouver", "Ottawa", "Montreal"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "geography-006",
+    "category": "geography",
+    "type": "multiple-choice",
+    "questionText": "In which country would you find the ancient citadel of Machu Picchu?",
+    "options": ["Colombia", "Bolivia", "Peru", "Ecuador"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "geography-007",
+    "category": "geography",
+    "type": "multiple-choice",
+    "questionText": "What is the tallest mountain in the world above sea level?",
+    "options": ["K2", "Kangchenjunga", "Mount Everest", "Lhotse"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "geography-008",
+    "category": "geography",
+    "type": "multiple-choice",
+    "questionText": "Which country has the longest coastline in the world?",
+    "options": ["Australia", "Russia", "Indonesia", "Canada"],
+    "correctIndex": 3,
+    "difficulty": "hard"
+  },
+  {
+    "id": "geography-009",
+    "category": "geography",
+    "type": "multiple-choice",
+    "questionText": "What is the driest continent on Earth based on average annual precipitation?",
+    "options": ["Africa", "Australia", "Antarctica", "Asia"],
+    "correctIndex": 2,
+    "difficulty": "hard"
+  },
+  {
+    "id": "geography-010",
+    "category": "geography",
+    "type": "multiple-choice",
+    "questionText": "Which river flows through Paris?",
+    "options": ["Rhine", "Thames", "Danube", "Seine"],
+    "correctIndex": 3,
+    "difficulty": "easy"
+  },
+  {
+    "id": "geography-011",
+    "category": "geography",
+    "type": "multiple-choice",
+    "questionText": "What is the capital of Brazil?",
+    "options": ["Rio de Janeiro", "São Paulo", "Brasília", "Salvador"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "geography-012",
+    "category": "geography",
+    "type": "multiple-choice",
+    "questionText": "Which country spans both Europe and Asia and has Istanbul as its largest city?",
+    "options": ["Greece", "Turkey", "Georgia", "Russia"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "geography-013",
+    "category": "geography",
+    "type": "multiple-choice",
+    "questionText": "What is the largest hot desert in the world?",
+    "options": ["Arabian Desert", "Gobi Desert", "Kalahari Desert", "Sahara Desert"],
+    "correctIndex": 3,
+    "difficulty": "medium"
+  },
+  {
+    "id": "geography-014",
+    "category": "geography",
+    "type": "multiple-choice",
+    "questionText": "Which US state is the largest by area?",
+    "options": ["Texas", "California", "Montana", "Alaska"],
+    "correctIndex": 3,
+    "difficulty": "easy"
+  },
+  {
+    "id": "geography-015",
+    "category": "geography",
+    "type": "multiple-choice",
+    "questionText": "What body of water separates Europe from Africa at its narrowest point?",
+    "options": ["Suez Canal", "Strait of Gibraltar", "Strait of Messina", "English Channel"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "geography-016",
+    "category": "geography",
+    "type": "multiple-choice",
+    "questionText": "What is the capital of New Zealand?",
+    "options": ["Auckland", "Christchurch", "Wellington", "Queenstown"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "geography-017",
+    "category": "geography",
+    "type": "multiple-choice",
+    "questionText": "Which mountain range forms a natural border between Europe and Asia?",
+    "options": ["Alps", "Himalayas", "Ural Mountains", "Caucasus Mountains"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "geography-018",
+    "category": "geography",
+    "type": "multiple-choice",
+    "questionText": "What is the most populous country in Africa?",
+    "options": ["Ethiopia", "Egypt", "South Africa", "Nigeria"],
+    "correctIndex": 3,
+    "difficulty": "hard"
+  },
+  {
+    "id": "geography-019",
+    "category": "geography",
+    "type": "multiple-choice",
+    "questionText": "Which European country is shaped like a boot?",
+    "options": ["Spain", "Greece", "Italy", "Portugal"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "geography-020",
+    "category": "geography",
+    "type": "multiple-choice",
+    "questionText": "What is the deepest known ocean trench?",
+    "options": ["Tonga Trench", "Philippine Trench", "Mariana Trench", "Java Trench"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "geography-021",
+    "category": "geography",
+    "type": "multiple-choice",
+    "questionText": "Which two countries share the longest international land border?",
+    "options": ["USA and Mexico", "Russia and China", "Canada and the United States", "Argentina and Chile"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "geography-022",
+    "category": "geography",
+    "type": "multiple-choice",
+    "questionText": "Which African country was formerly known as Abyssinia?",
+    "options": ["Somalia", "Sudan", "Ethiopia", "Eritrea"],
+    "correctIndex": 2,
+    "difficulty": "hard"
+  },
+  {
+    "id": "geography-023",
+    "category": "geography",
+    "type": "multiple-choice",
+    "questionText": "What is the largest island in the world (not counting continents)?",
+    "options": ["Borneo", "Madagascar", "Greenland", "New Guinea"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "geography-024",
+    "category": "geography",
+    "type": "multiple-choice",
+    "questionText": "Through which city does the Prime Meridian (0° longitude) pass?",
+    "options": ["Paris", "London", "Berlin", "Madrid"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "geography-025",
+    "category": "geography",
+    "type": "multiple-choice",
+    "questionText": "Which country is home to the most active volcanoes?",
+    "options": ["Japan", "Iceland", "Indonesia", "Philippines"],
+    "correctIndex": 2,
+    "difficulty": "hard"
+  },
+  {
+    "id": "geography-tf-001",
+    "category": "geography",
+    "type": "true-false",
+    "questionText": "Mount Kilimanjaro is located in Kenya.",
+    "options": ["True", "False"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "geography-tf-002",
+    "category": "geography",
+    "type": "true-false",
+    "questionText": "The Amazon River is located in South America.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "geography-tf-003",
+    "category": "geography",
+    "type": "true-false",
+    "questionText": "Despite its name, Iceland's climate is relatively mild compared to Greenland's.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "geography-tf-004",
+    "category": "geography",
+    "type": "true-false",
+    "questionText": "Russia is the largest country in the world by total area.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "geography-tf-005",
+    "category": "geography",
+    "type": "true-false",
+    "questionText": "The Great Barrier Reef is located off the coast of Australia.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "geography-tf-006",
+    "category": "geography",
+    "type": "true-false",
+    "questionText": "The Sahara Desert is located in South America.",
+    "options": ["True", "False"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "geography-tf-007",
+    "category": "geography",
+    "type": "true-false",
+    "questionText": "Lake Baikal in Russia is the deepest freshwater lake in the world.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "hard"
+  },
+  {
+    "id": "geography-tf-008",
+    "category": "geography",
+    "type": "true-false",
+    "questionText": "Egypt is located entirely on the African continent.",
+    "options": ["True", "False"],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "geography-tf-009",
+    "category": "geography",
+    "type": "true-false",
+    "questionText": "The Panama Canal connects the Atlantic Ocean and the Pacific Ocean.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "geography-tf-010",
+    "category": "geography",
+    "type": "true-false",
+    "questionText": "The Danube is the longest river in Europe.",
+    "options": ["True", "False"],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  }
+]

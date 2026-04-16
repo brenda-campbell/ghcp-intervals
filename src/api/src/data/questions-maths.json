@@ -1,0 +1,317 @@
+[
+  {
+    "id": "maths-001",
+    "category": "maths",
+    "type": "multiple-choice",
+    "questionText": "What is the value of pi (π) to two decimal places?",
+    "options": ["3.12", "3.14", "3.16", "3.18"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "maths-002",
+    "category": "maths",
+    "type": "multiple-choice",
+    "questionText": "What is the square root of 144?",
+    "options": ["10", "11", "12", "14"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "maths-003",
+    "category": "maths",
+    "type": "multiple-choice",
+    "questionText": "What is the next prime number after 7?",
+    "options": ["8", "9", "10", "11"],
+    "correctIndex": 3,
+    "difficulty": "easy"
+  },
+  {
+    "id": "maths-004",
+    "category": "maths",
+    "type": "multiple-choice",
+    "questionText": "How many sides does a hexagon have?",
+    "options": ["5", "6", "7", "8"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "maths-005",
+    "category": "maths",
+    "type": "multiple-choice",
+    "questionText": "What is 15% of 200?",
+    "options": ["20", "25", "30", "35"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "maths-006",
+    "category": "maths",
+    "type": "multiple-choice",
+    "questionText": "What is the formula for the area of a circle?",
+    "options": ["2πr", "πr²", "πd", "2πr²"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "maths-007",
+    "category": "maths",
+    "type": "multiple-choice",
+    "questionText": "In a right triangle, the Pythagorean theorem states that:",
+    "options": ["a + b = c", "a² + b² = c²", "a² − b² = c²", "a × b = c²"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "maths-008",
+    "category": "maths",
+    "type": "multiple-choice",
+    "questionText": "What is the value of 2¹⁰?",
+    "options": ["512", "1024", "2048", "4096"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "maths-009",
+    "category": "maths",
+    "type": "multiple-choice",
+    "questionText": "What is the derivative of x² with respect to x?",
+    "options": ["x", "2x", "x²", "2x²"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "maths-010",
+    "category": "maths",
+    "type": "multiple-choice",
+    "questionText": "What is the sum of the interior angles of a triangle?",
+    "options": ["90°", "180°", "270°", "360°"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "maths-011",
+    "category": "maths",
+    "type": "multiple-choice",
+    "questionText": "What is the factorial of 5 (written as 5!)?",
+    "options": ["60", "100", "120", "150"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "maths-012",
+    "category": "maths",
+    "type": "multiple-choice",
+    "questionText": "What is the name for a polynomial with exactly three terms?",
+    "options": ["Monomial", "Binomial", "Trinomial", "Quadrinomial"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "maths-013",
+    "category": "maths",
+    "type": "multiple-choice",
+    "questionText": "What is the approximate value of the golden ratio (φ)?",
+    "options": ["1.414", "1.518", "1.618", "1.718"],
+    "correctIndex": 2,
+    "difficulty": "hard"
+  },
+  {
+    "id": "maths-014",
+    "category": "maths",
+    "type": "multiple-choice",
+    "questionText": "How many faces does a regular dodecahedron have?",
+    "options": ["8", "10", "12", "20"],
+    "correctIndex": 2,
+    "difficulty": "hard"
+  },
+  {
+    "id": "maths-015",
+    "category": "maths",
+    "type": "multiple-choice",
+    "questionText": "What is the integral of 1/x with respect to x?",
+    "options": ["x + C", "1/x² + C", "ln|x| + C", "e^x + C"],
+    "correctIndex": 2,
+    "difficulty": "hard"
+  },
+  {
+    "id": "maths-016",
+    "category": "maths",
+    "type": "multiple-choice",
+    "questionText": "What is the smallest perfect number?",
+    "options": ["4", "6", "8", "12"],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "maths-017",
+    "category": "maths",
+    "type": "multiple-choice",
+    "questionText": "In statistics, what is the name for the middle value of a sorted dataset?",
+    "options": ["Mean", "Mode", "Median", "Range"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "maths-018",
+    "category": "maths",
+    "type": "multiple-choice",
+    "questionText": "What is Euler's number (e) approximately equal to?",
+    "options": ["1.618", "2.303", "2.718", "3.142"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "maths-019",
+    "category": "maths",
+    "type": "multiple-choice",
+    "questionText": "How many edges does a cube have?",
+    "options": ["6", "8", "10", "12"],
+    "correctIndex": 3,
+    "difficulty": "medium"
+  },
+  {
+    "id": "maths-020",
+    "category": "maths",
+    "type": "multiple-choice",
+    "questionText": "What is the binary representation of the decimal number 10?",
+    "options": ["1001", "1010", "1100", "1110"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "maths-021",
+    "category": "maths",
+    "type": "multiple-choice",
+    "questionText": "What type of number cannot be expressed as a ratio of two integers?",
+    "options": ["Integer", "Rational", "Irrational", "Natural"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "maths-022",
+    "category": "maths",
+    "type": "multiple-choice",
+    "questionText": "What is the sum of the first 10 positive integers (1 + 2 + ... + 10)?",
+    "options": ["45", "50", "55", "60"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "maths-023",
+    "category": "maths",
+    "type": "multiple-choice",
+    "questionText": "What is the limit of (1 + 1/n)^n as n approaches infinity?",
+    "options": ["1", "π", "e", "∞"],
+    "correctIndex": 2,
+    "difficulty": "hard"
+  },
+  {
+    "id": "maths-024",
+    "category": "maths",
+    "type": "multiple-choice",
+    "questionText": "In a standard 52-card deck, how many cards of each suit are there?",
+    "options": ["10", "12", "13", "14"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "maths-025",
+    "category": "maths",
+    "type": "multiple-choice",
+    "questionText": "What is the name of the longest side of a right triangle?",
+    "options": ["Adjacent", "Opposite", "Hypotenuse", "Base"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "maths-tf-001",
+    "category": "maths",
+    "type": "true-false",
+    "questionText": "Every square is a rectangle.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "maths-tf-002",
+    "category": "maths",
+    "type": "true-false",
+    "questionText": "The sum of the interior angles of any quadrilateral is 360 degrees.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "maths-tf-003",
+    "category": "maths",
+    "type": "true-false",
+    "questionText": "Pi (π) is a rational number.",
+    "options": ["True", "False"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "maths-tf-004",
+    "category": "maths",
+    "type": "true-false",
+    "questionText": "A prime number can only be divided evenly by 1 and itself.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "maths-tf-005",
+    "category": "maths",
+    "type": "true-false",
+    "questionText": "The square root of 2 is a rational number.",
+    "options": ["True", "False"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "maths-tf-006",
+    "category": "maths",
+    "type": "true-false",
+    "questionText": "Zero factorial (0!) equals 0.",
+    "options": ["True", "False"],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "maths-tf-007",
+    "category": "maths",
+    "type": "true-false",
+    "questionText": "A rhombus has four sides of equal length.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "maths-tf-008",
+    "category": "maths",
+    "type": "true-false",
+    "questionText": "The number 1 is considered a prime number.",
+    "options": ["True", "False"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "maths-tf-009",
+    "category": "maths",
+    "type": "true-false",
+    "questionText": "Parallel lines can intersect in Euclidean geometry.",
+    "options": ["True", "False"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "maths-tf-010",
+    "category": "maths",
+    "type": "true-false",
+    "questionText": "The Fibonacci sequence starts with 0 and 1.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  }
+]

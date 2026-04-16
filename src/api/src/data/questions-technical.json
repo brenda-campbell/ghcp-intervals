@@ -1,0 +1,540 @@
+[
+  {
+    "id": "technical-001",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "What is an Azure region?",
+    "options": [
+      "A set of datacenters deployed within a latency-defined perimeter",
+      "A single datacenter in a specific country",
+      "A virtual network boundary inside a subscription",
+      "A billing boundary for Azure resources"
+    ],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "technical-002",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "What is the primary purpose of an Azure Resource Group?",
+    "options": [
+      "To define billing alerts for a team",
+      "To act as a logical container for resources that share the same lifecycle",
+      "To create an isolated network for virtual machines",
+      "To replicate resources across multiple regions"
+    ],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "technical-003",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "Which Azure service is used to define and deploy infrastructure using declarative templates?",
+    "options": [
+      "Azure DevOps",
+      "Azure Monitor",
+      "Azure Resource Manager (ARM)",
+      "Azure Active Directory"
+    ],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "technical-004",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "What is the relationship between Azure subscriptions and resource groups?",
+    "options": [
+      "A resource group can span multiple subscriptions",
+      "A subscription can contain multiple resource groups",
+      "Each resource group must be in its own subscription",
+      "Subscriptions and resource groups are the same thing"
+    ],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "technical-005",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "Which command-line tool is the cross-platform CLI for managing Azure resources?",
+    "options": [
+      "az",
+      "azcli",
+      "azure-manage",
+      "arm-cli"
+    ],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "technical-006",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "What does Azure Availability Zones protect against?",
+    "options": [
+      "Unauthorized access to resources",
+      "Single datacenter failures within a region",
+      "Accidental deletion of resource groups",
+      "DNS resolution failures"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "technical-007",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "Which Azure feature allows you to apply rules and effects to resources at scale, such as enforcing naming conventions?",
+    "options": [
+      "Azure Blueprints",
+      "Azure Policy",
+      "Azure Advisor",
+      "Management Groups"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "technical-008",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "What scope sits above subscriptions in the Azure management hierarchy?",
+    "options": [
+      "Resource Groups",
+      "Tenants only — there is no intermediate scope",
+      "Management Groups",
+      "Azure Regions"
+    ],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "technical-009",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "Which Azure service lets you run code in response to events without managing servers?",
+    "options": [
+      "Azure App Service",
+      "Azure Kubernetes Service",
+      "Azure Functions",
+      "Azure Batch"
+    ],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "technical-010",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "What type of database is Azure Cosmos DB?",
+    "options": [
+      "Relational (SQL Server compatible)",
+      "Graph-only database",
+      "Globally distributed, multi-model NoSQL database",
+      "In-memory cache database"
+    ],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "technical-011",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "Which Azure Storage service is optimized for storing massive amounts of unstructured data like images and videos?",
+    "options": [
+      "Azure Table Storage",
+      "Azure Queue Storage",
+      "Azure Blob Storage",
+      "Azure File Storage"
+    ],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "technical-012",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "What is Azure Key Vault primarily used for?",
+    "options": [
+      "Storing virtual machine disk images",
+      "Managing secrets, encryption keys, and certificates",
+      "Hosting static websites",
+      "Running containerized applications"
+    ],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "technical-013",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "What does Azure SignalR Service provide?",
+    "options": [
+      "Batch processing for large datasets",
+      "Real-time messaging and bi-directional communication",
+      "DNS management for custom domains",
+      "Container orchestration"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "technical-014",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "Which hosting option in Azure App Service is designed for running background tasks and scheduled jobs?",
+    "options": [
+      "Deployment Slots",
+      "WebJobs",
+      "Custom Domains",
+      "Hybrid Connections"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "technical-015",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "Azure Static Web Apps natively integrates with which backend compute service?",
+    "options": [
+      "Azure Kubernetes Service",
+      "Azure Container Instances",
+      "Azure Functions",
+      "Azure Logic Apps"
+    ],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "technical-016",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "In Cosmos DB, what determines the physical partition where a document is stored?",
+    "options": [
+      "The document's id field",
+      "The container's throughput setting",
+      "The partition key value",
+      "The database's consistency level"
+    ],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "technical-017",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "What is the maximum execution timeout for an Azure Functions Consumption plan by default?",
+    "options": [
+      "30 seconds",
+      "5 minutes",
+      "10 minutes",
+      "30 minutes"
+    ],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "technical-018",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "What AI model family powers GitHub Copilot's code suggestions?",
+    "options": [
+      "Google Gemini",
+      "OpenAI models (Codex / GPT family)",
+      "Meta LLaMA",
+      "Anthropic Claude"
+    ],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "technical-019",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "In which of these IDEs is GitHub Copilot available as an extension?",
+    "options": [
+      "Visual Studio Code only",
+      "Visual Studio Code, Visual Studio, JetBrains IDEs, and Neovim",
+      "Only JetBrains IDEs and Visual Studio",
+      "Eclipse and NetBeans only"
+    ],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "technical-020",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "What is the primary way GitHub Copilot receives context to generate suggestions?",
+    "options": [
+      "It searches the internet for relevant code",
+      "It analyzes the current file content and open tabs as context",
+      "It reads your entire Git history",
+      "It only uses the function name you typed"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "technical-021",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "What is a best practice for getting better suggestions from GitHub Copilot?",
+    "options": [
+      "Write minimal comments so Copilot figures it out",
+      "Use very long variable names to add context",
+      "Provide clear, descriptive comments and function signatures",
+      "Always accept the first suggestion without review"
+    ],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "technical-022",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "What does GitHub Copilot Chat allow developers to do?",
+    "options": [
+      "Deploy code directly to production",
+      "Ask questions about code, get explanations, and request refactors in natural language",
+      "Automatically merge pull requests",
+      "Run unit tests inside the chat window"
+    ],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "technical-023",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "Which keyboard shortcut cycles through alternative Copilot suggestions in VS Code?",
+    "options": [
+      "Ctrl+Enter",
+      "Alt+] (next) and Alt+[ (previous)",
+      "Ctrl+Shift+Space",
+      "Tab to cycle through options"
+    ],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "technical-024",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "GitHub Copilot for Business includes a feature that filters out suggestions matching public code. What is it called?",
+    "options": [
+      "Code Scanning",
+      "Duplicate detection filter",
+      "Public code filter",
+      "License compliance checker"
+    ],
+    "correctIndex": 2,
+    "difficulty": "hard"
+  },
+  {
+    "id": "technical-025",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "Which scalability pattern automatically adjusts the number of compute instances based on demand?",
+    "options": [
+      "Circuit Breaker",
+      "Autoscaling",
+      "Event Sourcing",
+      "CQRS"
+    ],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "technical-026",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "What is a key benefit of serverless architecture?",
+    "options": [
+      "You have full control over the underlying operating system",
+      "You only pay for the actual compute time consumed",
+      "It guarantees sub-millisecond response times",
+      "It eliminates the need for any monitoring"
+    ],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "technical-027",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "What does a CDN (Content Delivery Network) primarily improve?",
+    "options": [
+      "Database query performance",
+      "Content delivery latency by caching at edge locations",
+      "Server-side code compilation speed",
+      "Authentication token generation time"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "technical-028",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "In microservices architecture, what pattern prevents a single failing service from cascading failures to others?",
+    "options": [
+      "Load Balancer",
+      "API Gateway",
+      "Circuit Breaker",
+      "Service Mesh"
+    ],
+    "correctIndex": 2,
+    "difficulty": "hard"
+  },
+  {
+    "id": "technical-029",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "What does the HTTP status code 429 indicate?",
+    "options": [
+      "Internal Server Error",
+      "Not Found",
+      "Too Many Requests",
+      "Unauthorized"
+    ],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "technical-030",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "Which Git command combines divergent branches by creating a new merge commit?",
+    "options": [
+      "git rebase",
+      "git merge",
+      "git cherry-pick",
+      "git stash"
+    ],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "technical-031",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "What is the primary difference between a Docker container and a virtual machine?",
+    "options": [
+      "Containers include a full guest operating system",
+      "Virtual machines share the host OS kernel",
+      "Containers share the host OS kernel making them more lightweight",
+      "There is no meaningful difference"
+    ],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "technical-032",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "In OAuth 2.0, which grant type is recommended for single-page applications?",
+    "options": [
+      "Client Credentials",
+      "Resource Owner Password",
+      "Authorization Code with PKCE",
+      "Implicit Grant"
+    ],
+    "correctIndex": 2,
+    "difficulty": "hard"
+  },
+  {
+    "id": "technical-tf-001",
+    "category": "technical",
+    "type": "true-false",
+    "questionText": "Azure Functions can be written in Python.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "technical-tf-002",
+    "category": "technical",
+    "type": "true-false",
+    "questionText": "Cosmos DB guarantees ACID transactions across all partitions by default.",
+    "options": ["True", "False"],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "technical-tf-003",
+    "category": "technical",
+    "type": "true-false",
+    "questionText": "GitHub Copilot uses your private code to retrain its AI models by default.",
+    "options": ["True", "False"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "technical-tf-004",
+    "category": "technical",
+    "type": "true-false",
+    "questionText": "REST stands for Representational State Transfer.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "technical-tf-005",
+    "category": "technical",
+    "type": "true-false",
+    "questionText": "In Azure, a resource group can contain resources from multiple different regions.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "technical-tf-006",
+    "category": "technical",
+    "type": "true-false",
+    "questionText": "Kubernetes was originally developed by Amazon Web Services.",
+    "options": ["True", "False"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "technical-tf-007",
+    "category": "technical",
+    "type": "true-false",
+    "questionText": "HTTP is a stateful protocol that remembers previous requests.",
+    "options": ["True", "False"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "technical-tf-008",
+    "category": "technical",
+    "type": "true-false",
+    "questionText": "Azure Functions supports both Consumption and Premium hosting plans.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "technical-tf-009",
+    "category": "technical",
+    "type": "true-false",
+    "questionText": "In Git, a fast-forward merge creates a new merge commit.",
+    "options": ["True", "False"],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "technical-tf-010",
+    "category": "technical",
+    "type": "true-false",
+    "questionText": "JSON stands for JavaScript Object Notation.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  }
+]

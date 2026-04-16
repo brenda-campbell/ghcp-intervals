@@ -1,0 +1,380 @@
+[
+  {
+    "id": "movies-001",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Which movie won the Academy Award for Best Picture in 2020?",
+    "options": ["1917", "Joker", "Parasite", "Once Upon a Time in Hollywood"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "movies-002",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Who directed the 1993 film 'Jurassic Park'?",
+    "options": ["James Cameron", "Steven Spielberg", "Ridley Scott", "George Lucas"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "movies-003",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "In what year was the original 'Star Wars' film released?",
+    "options": ["1975", "1977", "1979", "1980"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "movies-004",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Which actor played the Joker in 'The Dark Knight' (2008)?",
+    "options": ["Jack Nicholson", "Jared Leto", "Joaquin Phoenix", "Heath Ledger"],
+    "correctIndex": 3,
+    "difficulty": "easy"
+  },
+  {
+    "id": "movies-005",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "What is the highest-grossing film of all time (not adjusted for inflation)?",
+    "options": ["Avengers: Endgame", "Avatar", "Titanic", "Star Wars: The Force Awakens"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "movies-006",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "In 'The Matrix', what color pill does Neo take to see the truth?",
+    "options": ["Blue", "Red", "Green", "White"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "movies-007",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Which classic film features the quote 'Here's looking at you, kid'?",
+    "options": ["Gone with the Wind", "Casablanca", "Citizen Kane", "The Maltese Falcon"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "movies-008",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Who played the title character in the 1994 film 'Forrest Gump'?",
+    "options": ["Robin Williams", "Tom Hanks", "Jim Carrey", "Kevin Costner"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "movies-009",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "What is the fictional country in Marvel's 'Black Panther'?",
+    "options": ["Sokovia", "Wakanda", "Madripoor", "Genosha"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "movies-010",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Which HBO TV series features the Iron Throne?",
+    "options": ["Westworld", "The Witcher", "Game of Thrones", "The Lord of the Rings: The Rings of Power"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "movies-011",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "In what year did the first episode of 'Friends' air?",
+    "options": ["1992", "1994", "1996", "1998"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "movies-012",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Who directed the 2010 film 'Inception'?",
+    "options": ["David Fincher", "Christopher Nolan", "Denis Villeneuve", "Ridley Scott"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "movies-013",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "In which film does the character Jack Dawson appear?",
+    "options": ["The Great Gatsby", "Titanic", "Catch Me If You Can", "The Departed"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "movies-014",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "What is the name of the parallel dimension in 'Stranger Things'?",
+    "options": ["The Shadow Realm", "The Upside Down", "The Other Side", "The Dark World"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "movies-015",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Which actor has portrayed James Bond in the most official EON Productions films?",
+    "options": ["Sean Connery", "Daniel Craig", "Roger Moore", "Pierce Brosnan"],
+    "correctIndex": 2,
+    "difficulty": "hard"
+  },
+  {
+    "id": "movies-016",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "What was the first fully computer-animated feature film?",
+    "options": ["Shrek", "Toy Story", "A Bug's Life", "Finding Nemo"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "movies-017",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Which TV show follows a high school chemistry teacher who turns to manufacturing methamphetamine?",
+    "options": ["Ozark", "Breaking Bad", "Narcos", "Better Call Saul"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "movies-018",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "In 'The Lord of the Rings', what is the name of Gandalf's sword?",
+    "options": ["Sting", "Andúril", "Glamdring", "Orcrist"],
+    "correctIndex": 2,
+    "difficulty": "hard"
+  },
+  {
+    "id": "movies-019",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Which Alfred Hitchcock film features the Bates Motel?",
+    "options": ["Vertigo", "Rear Window", "Psycho", "The Birds"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "movies-020",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Who composed the iconic musical scores for 'Star Wars', 'Jaws', and 'Indiana Jones'?",
+    "options": ["Hans Zimmer", "John Williams", "Ennio Morricone", "Howard Shore"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "movies-021",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "What is the name of the sentient computer in '2001: A Space Odyssey'?",
+    "options": ["WOPR", "Skynet", "HAL 9000", "Deep Thought"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "movies-022",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Which Studio Ghibli film features a girl working in a bathhouse for spirits?",
+    "options": ["My Neighbor Totoro", "Princess Mononoke", "Spirited Away", "Howl's Moving Castle"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "movies-023",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Which 1994 film is set in Shawshank State Penitentiary?",
+    "options": ["The Green Mile", "The Shawshank Redemption", "Cool Hand Luke", "Escape from Alcatraz"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "movies-024",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "In the TV series 'The Mandalorian', what species is Grogu (Baby Yoda)?",
+    "options": ["Ewok", "Jawa", "Unknown (same species as Yoda)", "Wookiee"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "movies-025",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Which film features the line 'I see dead people'?",
+    "options": ["The Others", "The Sixth Sense", "Ghost", "Poltergeist"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "movies-026",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "What is the name of the fictional metal in the Marvel Cinematic Universe that Captain America's shield is made of?",
+    "options": ["Adamantium", "Vibranium", "Uru", "Carbonadium"],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "movies-027",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Which Quentin Tarantino film takes place largely in a single cabin during a blizzard?",
+    "options": ["Kill Bill: Volume 1", "Django Unchained", "The Hateful Eight", "Reservoir Dogs"],
+    "correctIndex": 2,
+    "difficulty": "hard"
+  },
+  {
+    "id": "movies-028",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Who played Hermione Granger in the Harry Potter film series?",
+    "options": ["Emma Stone", "Emma Watson", "Emma Thompson", "Emma Roberts"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "movies-029",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Which animated film features the song 'Let It Go'?",
+    "options": ["Tangled", "Moana", "Frozen", "Brave"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "movies-030",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Which filmmaker directed 'Schindler's List' and 'Saving Private Ryan'?",
+    "options": ["Martin Scorsese", "Francis Ford Coppola", "Stanley Kubrick", "Steven Spielberg"],
+    "correctIndex": 3,
+    "difficulty": "medium"
+  },
+  {
+    "id": "movies-031",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "In the TV series 'The Office' (US), what company do the main characters work for?",
+    "options": ["Initech", "Dunder Mifflin", "Pied Piper", "Sterling Cooper"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "movies-032",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "What year was the first 'The Godfather' film released?",
+    "options": ["1969", "1972", "1975", "1978"],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "movies-tf-001",
+    "category": "movies",
+    "type": "true-false",
+    "questionText": "'The Shawshank Redemption' was released in 1994.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "movies-tf-002",
+    "category": "movies",
+    "type": "true-false",
+    "questionText": "Leonardo DiCaprio won his first Academy Award for Best Actor for his role in 'Titanic'.",
+    "options": ["True", "False"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "movies-tf-003",
+    "category": "movies",
+    "type": "true-false",
+    "questionText": "The TV series 'The Office' (US version) is set in Scranton, Pennsylvania.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "movies-tf-004",
+    "category": "movies",
+    "type": "true-false",
+    "questionText": "Quentin Tarantino directed 'The Godfather'.",
+    "options": ["True", "False"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "movies-tf-005",
+    "category": "movies",
+    "type": "true-false",
+    "questionText": "The Marvel Cinematic Universe's first film was 'Iron Man', released in 2008.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "movies-tf-006",
+    "category": "movies",
+    "type": "true-false",
+    "questionText": "The character of Indiana Jones was played by Harrison Ford.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "movies-tf-007",
+    "category": "movies",
+    "type": "true-false",
+    "questionText": "The film 'Jaws' was directed by James Cameron.",
+    "options": ["True", "False"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "movies-tf-008",
+    "category": "movies",
+    "type": "true-false",
+    "questionText": "'The Simpsons' first aired as its own TV series in 1989.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "movies-tf-009",
+    "category": "movies",
+    "type": "true-false",
+    "questionText": "In L. Frank Baum's original book 'The Wonderful Wizard of Oz', Dorothy's slippers were silver, not ruby.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "hard"
+  },
+  {
+    "id": "movies-tf-010",
+    "category": "movies",
+    "type": "true-false",
+    "questionText": "The movie 'Gladiator' (2000) starring Russell Crowe is set during the Roman Republic era.",
+    "options": ["True", "False"],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  }
+]

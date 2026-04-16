@@ -1,0 +1,50 @@
+[
+  {
+    "id": "technical",
+    "name": "Technical",
+    "description": "Coding, cloud, and software engineering questions",
+    "isActive": true,
+    "questionFormat": "multiple-choice",
+    "createdAt": "2026-04-16T00:00:00Z"
+  },
+  {
+    "id": "movies",
+    "name": "Movies & TV",
+    "description": "Film, television, and entertainment trivia",
+    "isActive": true,
+    "questionFormat": "multiple-choice",
+    "createdAt": "2026-04-16T00:00:00Z"
+  },
+  {
+    "id": "general-knowledge",
+    "name": "General Knowledge",
+    "description": "A mix of everything — history, culture, science, and more",
+    "isActive": true,
+    "questionFormat": "multiple-choice",
+    "createdAt": "2026-04-16T00:00:00Z"
+  },
+  {
+    "id": "geography",
+    "name": "Geography",
+    "description": "Countries, capitals, landmarks, and physical geography",
+    "isActive": true,
+    "questionFormat": "multiple-choice",
+    "createdAt": "2026-04-16T00:00:00Z"
+  },
+  {
+    "id": "physics",
+    "name": "Physics",
+    "description": "Forces, energy, matter, and the laws of the universe",
+    "isActive": true,
+    "questionFormat": "multiple-choice",
+    "createdAt": "2026-04-16T00:00:00Z"
+  },
+  {
+    "id": "maths",
+    "name": "Maths",
+    "description": "Numbers, equations, geometry, and mathematical puzzles",
+    "isActive": true,
+    "questionFormat": "multiple-choice",
+    "createdAt": "2026-04-16T00:00:00Z"
+  }
+]
