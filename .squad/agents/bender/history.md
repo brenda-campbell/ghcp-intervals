@@ -66,3 +66,19 @@
 - **host.json:** Extension bundle `[4.*, 5.0.0)` already includes SignalR binding extension. No changes needed.
 - **Best-effort broadcast:** SignalR messages are set via `context.extraOutputs.set()`. If the leaderboard query fails, the `playerAnswered` event still fires and the answer response is unaffected. Broadcasting never blocks the user's answer result.
 - **Frontend contract:** Clients should listen for `"leaderboardUpdate"` (payload: `{ leaderboard: LeaderboardEntry[] }`) and `"playerAnswered"` (payload: `{ usersAnswered: number }`) on their SignalR connection.
+
+### be-admin-model — User Model Update + Admin Helper (Phase 1A+1B)
+- **User model extended** in both `src/api/src/models/index.ts` and `src/frontend/src/services/api.ts` with three new optional fields: `email?: string`, `isActive?: boolean` (default true when missing, ADR-012), `isAdmin?: boolean` (default false when missing, ADR-012). All optional so legacy user docs remain valid.
+- **Admin auth helper** created at `src/api/src/services/adminAuth.ts` with two functions:
+  - `isAdminUser(userId, container)` — point-reads user doc, returns `user.isAdmin === true`. Returns false for missing users or Cosmos errors.
+  - `requireAdmin(request, container)` — extracts `x-user-id` header (ADR-010), reads user, throws structured `{ status, message }` error if not admin (401 for missing header, 403 for non-admin/missing user). Returns admin `User` object on success.
+- **Pattern followed:** Uses `Container` type from `@azure/cosmos` and the same point-read pattern (`container.item(userId, userId).read<User>()`) as existing functions like `getUser.ts`.
+- **TypeScript compiles clean** — no errors introduced.
+
+### be-phase2-endpoints — New API Endpoints (Phase 2A-2D)
+- **POST /api/users/login-or-create** (`loginOrCreate.ts`) — Email-based login with auto-create. Validates email (regex) and displayName (2-30 chars). Queries Cosmos by email; returns existing active user (200), rejects inactive (403), or creates new user (201). Supports legacy user linking via `x-legacy-user-id` header per ADR-012 — if a legacy userId doc exists and email isn't claimed, updates that doc with email/displayName and returns 200. New users get `isActive: true`, `isAdmin: false`, `fastestTimeMs: 0`.
+- **GET /api/users/{userId}** — Route migrated from `user/{userId}` to `users/{userId}` in `getUser.ts`. No logic changes, just the route string.
+- **GET /api/users** (`listUsers.ts`) — Admin-only. Uses `requireAdmin()` from `adminAuth.ts`. Returns all users ordered by `createdAt DESC` in `{ users: [...] }` wrapper.
+- **PATCH /api/users/{userId}/status** (`toggleUserStatus.ts`) — Admin-only. Accepts `{ isActive: boolean }`. Point-reads target user, prevents self-deactivation (400), replaces doc with updated `isActive` and `updatedAt`. Standard 404 handling for missing users.
+- **Pattern consistency:** All four endpoints follow existing v4 `app.http()` registration, same error-handling shape, same Cosmos SDK usage as `getUser.ts`/`getQuestions.ts`.
+- **TypeScript compiles clean** — verified via `npx tsc --noEmit`.

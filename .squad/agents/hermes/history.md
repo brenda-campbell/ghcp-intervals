@@ -27,3 +27,9 @@
 - **SWA action paths:** `app_location: src/frontend`, `api_location: src/api`, `output_location: dist` — matches actual project directory structure.
 - **npm cache:** `actions/setup-node@v4` caches both `src/frontend/package-lock.json` and `src/api/package-lock.json` for faster CI.
 - **Prod note:** Workflow comments document that production deployments should use GitHub Environment protection rules with required reviewers.
+
+### 2026-04-15 — Cosmos DB Email Indexing for loginOrCreate (phase-1d-indexing)
+- **What:** Verified that the `users` container's `/*` included path already indexes `/email` automatically — no redundant explicit path added.
+- **Composite index added:** `[/email ASC, /isActive DESC]` to support the ADR-008 `loginOrCreate` query (`WHERE email = @email AND isActive = true`).
+- **No breaking changes:** Existing leaderboard composite index (`/totalScore DESC, /fastestTimeMs ASC`) untouched.
+- **Bicep validation:** Template compiles cleanly; only pre-existing `outputs-should-not-contain-secrets` warning remains.

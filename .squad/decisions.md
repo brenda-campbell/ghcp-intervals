@@ -69,6 +69,52 @@ Questions are selected server-side (random from pool, no duplicates within a rou
 
 **Rationale:** Sending the correct answer to the client would allow cheating via browser DevTools. Server-side answer validation is mandatory for competitive integrity.
 
+---
+
+### ADR-008: Email Uniqueness via Query-Before-Create
+
+Enforce email uniqueness using a query-then-create pattern with `_etag` conflict detection. Partition key remains `/userId` (no change). Cross-partition email queries are acceptable at quiz game scale.
+
+**Rationale:** Changing the partition key would break all existing queries. A separate uniqueness-index document is over-engineering. Simple query-before-create is correct and maintainable.
+
+---
+
+### ADR-009: Replace createUser, Don't Maintain Backward Compat
+
+Old `POST /api/user` and `GET /api/user/{userId}` endpoints are removed. New endpoints:
+- `POST /api/users/login-or-create` — query by email, create if missing
+- `GET /api/users/{userId}` — fetch user profile
+- `GET /api/users` — list all users (admin only)
+- `PATCH /api/users/{userId}/status` — update user status (admin only)
+
+The frontend is the only consumer of the old API. No external contract to preserve.
+
+**Rationale:** Clean break is simpler than maintaining two versions. New names clarify intent (login vs. registration).
+
+---
+
+### ADR-010: Admin Gating via x-user-id Header Check
+
+Admin endpoints read the `x-user-id` header to identify the requester. A shared helper `requireAdmin(request, container)` reads the user doc and checks `isAdmin === true`. Returns 401 for missing header, 403 for non-admin or missing user.
+
+**Rationale:** Lightweight access control for a quiz game. No OAuth/tokens needed. Risk of header spoofing accepted — not a production security system.
+
+---
+
+### ADR-011: AuthGate Pattern for Login Flow
+
+New `AuthGate` component wraps the app. Checks localStorage for stored email/userId → calls `login-or-create` → gates rendering. Shows `EmailEntry` if no stored email, blocked screen if user is inactive.
+
+**Rationale:** Clean separation of auth state from app rendering. `UserProvider` no longer auto-creates users; auth state is explicit in the gate.
+
+---
+
+### ADR-012: No Cosmos Migration, Graceful Defaults
+
+Add `email`, `isActive`, `isAdmin` to User interface. Treat missing `isActive` as `true`, missing `isAdmin` as `false`. No schema migration script — Cosmos DB is schemaless and defensive code handles missing fields.
+
+**Rationale:** Cosmos doesn't need migrations. Legacy users keep scores when prompted for email on next visit.
+
 ## Governance
 
 - All meaningful changes require team consensus

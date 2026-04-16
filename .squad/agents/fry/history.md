@@ -100,3 +100,28 @@
 - **main.tsx:** `SignalRProvider` wraps `<App />` inside `UserProvider`.
 - **Pre-existing fix:** `Leaderboard.tsx` had swapped `TableHeader`/`TableRow` nesting causing 5 TS errors — fixed as part of this work.
 - **Build:** Clean `tsc -b && vite build` — 0 errors, 0 warnings.
+
+### blank-screen-fix (2026-04-15)
+- **Root cause 1 (crash):** `QuestionResponse` API model was missing `difficulty` field. `QuestionCard.tsx` called `difficulty.toLowerCase()` on `undefined` → TypeError → blank screen.
+- **Root cause 2 (answer mismatch):** API `AnswerResult` returned `correctAnswer`/`elapsedTimeMs` but frontend expected `correctIndex`/`timeTaken`. Both sides now return all four fields for full compatibility.
+- **Key files:** `src/api/src/models/index.ts` (shared types), `src/api/src/functions/getQuestions.ts` (question mapping), `src/api/src/functions/submitAnswer.ts` (answer result), `src/frontend/src/components/QuestionCard.tsx` (defensive guard), `src/frontend/src/services/api.ts` (frontend types).
+- **Pattern:** When API and frontend define the same interface independently, mismatches are silent until runtime. Both sides should be kept in sync or share types.
+- **Pre-existing:** `integration-quiz-flow.test.tsx` has a `requestAnimationFrame` infinite loop in its mock — unrelated to this fix.
+
+### fe-email-entry (2026-04-16)
+- **EmailEntry** (`src/components/EmailEntry.tsx`): Standalone email + display name login gate component. Props-driven (no direct API calls) — parent passes `onLogin`, `isLoading`, `error`.
+- **Validation:** Client-side email regex (`/^[^\s@]+@[^\s@]+\.[^\s@]+$/`), display name 2–30 chars. Errors shown on blur (touched state pattern). "Enter the Game" button disabled until both fields valid.
+- **Loading state:** SpinnerGap icon with `animate-spin` + "Entering…" text. All inputs disabled during loading.
+- **Error handling:** Styled error banner with WarningCircle icon. Detects inactive/deactivated users and shows specific "Contact an admin" message.
+- **Styling:** Matches existing card pattern (`border-accent/30 bg-card shadow-lg`), Lightning bolt branding, `animate-fade-slide-in` entrance, centered vertically with `min-h-[100dvh]`. Mobile-friendly with `min-h-[44px]` submit button, `w-full max-w-md` card.
+- **Reuses:** shadcn Card, Button; Phosphor icons (Lightning, SpinnerGap, WarningCircle); `cn()` utility; existing typography classes (h2, caption, ui-label).
+- **Build:** Clean (`tsc -b && vite build` — 0 errors, 0 warnings).
+
+### fe-auth-gate (2026-04-16)
+- **api.ts updates (Task 2F):** Added `loginOrCreate(email, displayName, legacyUserId?)`, `listUsers(adminUserId)`, `toggleUserStatus(targetUserId, isActive, adminUserId)`. Updated `getUser` URL from `/api/user/` to `/api/users/`. Deprecated `createUser` (kept for UserContext compat — remove in Phase 3).
+- **AuthGate** (`src/components/AuthGate.tsx`, Task 2E): Wraps app, gates on authentication. On mount checks localStorage for `ff_userId` + `ff_email`. Returning users auto-verified via `loginOrCreate`. Legacy users (userId only, no email) shown EmailEntry with linking flow. New users see EmailEntry for registration.
+- **States:** Loading (spinner), deactivated (403 → ShieldSlash card with "sign in as different account" escape hatch), error (retry via page reload), EmailEntry (new/legacy), authenticated (renders children).
+- **Props:** `children: ReactNode`, `onUserAuthenticated: (user: User) => void` — callback passes authenticated user to parent for UserProvider integration.
+- **localStorage keys:** `ff_userId`, `ff_email`, `ff_displayName` — all three persisted on successful login.
+- **Phase 3 notes:** `UserContext.tsx` still imports deprecated `createUser` and uses old `/api/user` endpoint via `getUser`. Test mocks in `edge-cases.test.tsx`, `fixtures.ts`, `integration-user-session.test.tsx` reference `createUser`. All need updating when AuthGate replaces the old flow.
+- **Build:** Clean (`tsc -b` — 0 errors).

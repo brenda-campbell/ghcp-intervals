@@ -12,6 +12,7 @@ Scribe initialized. Team cast from Futurama universe: Leela (Lead), Fry (Fronten
 ## Recent Updates
 
 📌 Team initialized on 2026-04-15 — full roster hired
+📌 Phase 1A–1D completed on 2026-04-16 — user system infrastructure (ADR-008 through ADR-012)
 
 ## Learnings
 
