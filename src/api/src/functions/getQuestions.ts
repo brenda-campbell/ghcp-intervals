@@ -83,10 +83,11 @@ async function getQuestions(
       },
     };
   } catch (err) {
-    context.error("Failed to fetch questions from Cosmos DB", err);
+    const msg = err instanceof Error ? err.message : String(err);
+    context.error("Failed to fetch questions from Cosmos DB", msg);
     return {
       status: 500,
-      jsonBody: { error: "Internal server error." },
+      jsonBody: { error: "Internal server error.", detail: msg },
     };
   }
 }

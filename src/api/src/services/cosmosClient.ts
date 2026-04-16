@@ -1,12 +1,22 @@
 import { CosmosClient, Database, Container } from "@azure/cosmos";
-import { DefaultAzureCredential } from "@azure/identity";
+import { DefaultAzureCredential, ManagedIdentityCredential } from "@azure/identity";
 
 const connectionString = process.env.CosmosDBConnectionString ?? "";
 const cosmosEndpoint = process.env.COSMOS_ENDPOINT ?? "";
 
-const client = connectionString
-  ? new CosmosClient(connectionString)
-  : new CosmosClient({ endpoint: cosmosEndpoint, aadCredentials: new DefaultAzureCredential() });
+function createClient(): CosmosClient {
+  if (connectionString) {
+    return new CosmosClient(connectionString);
+  }
+  // In Azure (SWA managed functions), prefer ManagedIdentityCredential for speed.
+  // Locally, fall back to DefaultAzureCredential (picks up az login).
+  const credential = process.env.WEBSITE_INSTANCE_ID
+    ? new ManagedIdentityCredential()
+    : new DefaultAzureCredential();
+  return new CosmosClient({ endpoint: cosmosEndpoint, aadCredentials: credential });
+}
+
+const client = createClient();
 
 const DATABASE_NAME = "fastestfinger";
 const USERS_CONTAINER = "users";
