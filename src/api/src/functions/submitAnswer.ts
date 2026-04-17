@@ -5,14 +5,15 @@ import {
   InvocationContext,
   output,
 } from "@azure/functions";
-import { questionsContainer, categoryScoresContainer, usersContainer, gameStateContainer } from "../services/cosmosClient.js";
+import { questionsContainer, categoryScoresContainer, usersContainer } from "../services/cosmosClient.js";
 import {
   getDeliveryTimestamp,
   clearDelivery,
 } from "../services/questionDeliveryTracker.js";
 import { updateUserScore } from "../services/scoringService.js";
 import { getTopLeaderboard } from "../services/leaderboardService.js";
-import type { AnswerSubmission, AnswerResult, Question, LeaderboardEntry, CategoryScore, GameState } from "../models/index.js";
+import { recordCorrectAnswer, getFastestCorrectMs, _resetFastestTracker } from "../services/fastestAnswerTracker.js";
+import type { AnswerSubmission, AnswerResult, Question, LeaderboardEntry, CategoryScore } from "../models/index.js";
 
 // Module-level question cache (questions don't change during gameplay)
 const questionCache = new Map<string, Question>();
@@ -22,34 +23,12 @@ let lastLeaderboardBroadcast = 0;
 let cachedLeaderboard: LeaderboardEntry[] | null = null;
 const LEADERBOARD_THROTTLE_MS = 1000;
 
-// Cache for configurable timer from GameState (avoids Cosmos read on every answer)
-let cachedTimerSeconds: number | null = null;
-let timerCacheTimestamp = 0;
-const TIMER_CACHE_TTL_MS = 30_000;
-
-async function getTimerSeconds(): Promise<number> {
-  const now = Date.now();
-  if (cachedTimerSeconds !== null && (now - timerCacheTimestamp) < TIMER_CACHE_TTL_MS) {
-    return cachedTimerSeconds;
-  }
-  try {
-    const { resource } = await gameStateContainer.item("current", "current").read<GameState>();
-    cachedTimerSeconds = resource?.timerSeconds ?? 10;
-    timerCacheTimestamp = now;
-  } catch {
-    cachedTimerSeconds = 10;
-    timerCacheTimestamp = now;
-  }
-  return cachedTimerSeconds;
-}
-
 /** Reset module-level caches (for testing) */
 export function _resetSubmitAnswerCaches(): void {
   questionCache.clear();
   lastLeaderboardBroadcast = 0;
   cachedLeaderboard = null;
-  cachedTimerSeconds = null;
-  timerCacheTimestamp = 0;
+  _resetFastestTracker();
 }
 
 interface SignalRMessage {
@@ -65,13 +44,23 @@ const signalROutput = output.generic({
 });
 
 const MAX_POINTS = 200;
+const MIN_POINTS = 1;
 
-function calculatePoints(correct: boolean, elapsedTimeMs: number, timeoutMs: number = 10_000): number {
+function calculatePoints(correct: boolean, elapsedTimeMs: number, questionId: string): number {
   if (!correct) return 0;
-  const clampedElapsed = Math.min(Math.max(elapsedTimeMs, 0), timeoutMs);
-  // Fastest correct answer (0ms) gets MAX_POINTS (200).
-  // Points reduce progressively — answering at the deadline gets ~0.
-  return Math.round(MAX_POINTS * (1 - clampedElapsed / timeoutMs));
+
+  // Ensure elapsedTimeMs is at least 1ms to avoid division by zero
+  const playerMs = Math.max(elapsedTimeMs, 1);
+
+  // Record this correct answer and potentially update the fastest time
+  recordCorrectAnswer(questionId, playerMs);
+
+  // Get the fastest correct answer for this question
+  const fastestMs = getFastestCorrectMs(questionId)!;
+
+  // score = round(200 × (fastestMs / playerMs)), capped 1-200
+  const raw = Math.round(MAX_POINTS * (fastestMs / playerMs));
+  return Math.min(MAX_POINTS, Math.max(MIN_POINTS, raw));
 }
 
 async function submitAnswer(
@@ -155,10 +144,7 @@ async function submitAnswer(
   }
   elapsedTimeMs = Math.max(elapsedTimeMs, 0);
 
-  // Use configurable timer from GameState for speed bonus calculation
-  const timerSeconds = await getTimerSeconds();
-  const timeoutMs = timerSeconds * 1000;
-  const pointsAwarded = calculatePoints(correct, elapsedTimeMs, timeoutMs);
+  const pointsAwarded = calculatePoints(correct, elapsedTimeMs, questionId);
 
   context.log(
     `Answer: user=${userId} q=${questionId} option=${selectedOption} ` +

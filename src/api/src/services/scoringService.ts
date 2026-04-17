@@ -27,7 +27,7 @@ export async function updateUserScore(
   const now = new Date().toISOString();
   const currentFastest = user.fastestTimeMs as number | null;
   const newFastest =
-    currentFastest === null || currentFastest === undefined || elapsedTimeMs < currentFastest
+    currentFastest === null || currentFastest === undefined || currentFastest === 0 || elapsedTimeMs < currentFastest
       ? elapsedTimeMs
       : currentFastest;
 

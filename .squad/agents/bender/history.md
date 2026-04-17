@@ -205,3 +205,12 @@
 - **Issue 3 — elapsedTimeMs in response:** Verified — `AnswerResult` already includes both `elapsedTimeMs` and `timeTaken` set from the server-calculated value. Fallback path (no delivery record) uses `serverReceiptTimestamp - clientTimestamp` which produces reasonable non-zero values.
 - **`_resetSubmitAnswerCaches()`** updated to also clear the new timer cache (`cachedTimerSeconds` and `timerCacheTimestamp`).
 - **Tests:** Updated `scoringService.test.ts` — renamed test to verify gamesPlayed is NOT in patch ops. Added 2 new tests for `incrementGamesPlayed()`. Updated `submitAnswer.test.ts` mock to include `gameStateContainer`. All 145 tests pass (was 143).
+
+### be-relative-scoring — Relative Speed-Based Scoring (2026-04-17)
+- **New scoring formula:** Replaced timer-based `200 × (1 - elapsed/timer)` with relative scoring: `round(200 × (fastestCorrectMs / playerMs))`, capped 1–200. Incorrect answers still get 0. The fastest correct answer per question always gets 200; slower correct answers get proportionally less.
+- **New service:** Created `src/api/src/services/fastestAnswerTracker.ts` — in-memory `Map<questionId, number>` tracking the fastest correct response time per question. Exports `recordCorrectAnswer()`, `getFastestCorrectMs()`, `clearFastestForQuestion()`, `_resetFastestTracker()`.
+- **submitAnswer.ts changes:** `calculatePoints()` now takes `questionId` instead of `timeoutMs`. Calls `recordCorrectAnswer()` before scoring. Removed the GameState timer cache (`getTimerSeconds`, `cachedTimerSeconds`, `TIMER_CACHE_TTL_MS`) — no longer needed for scoring. Removed `gameStateContainer` import.
+- **stopQuiz.ts changes:** Calls `_resetFastestTracker()` when quiz stops so next round starts with fresh fastest-time tracking.
+- **`_resetSubmitAnswerCaches()`** now calls `_resetFastestTracker()` to clear fastest-time state in tests.
+- **Tests:** Rewrote 3 submitAnswer scoring tests for relative formula (first-correct-gets-200, proportional-slower, min-cap-1). Added 7 new tests for `fastestAnswerTracker.test.ts`. Removed `gameStateContainer` mock from submitAnswer tests. All 152 tests pass (was 145).
+- **Trade-off accepted:** First correct answer gets 200 even if a later answer is faster. Since questions are synchronized (ADR-027) and all players start at the same time, the first server-received answer is likely the fastest. Minor unfairness is acceptable for simplicity.
