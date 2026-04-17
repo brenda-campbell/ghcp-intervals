@@ -452,7 +452,10 @@
     "category": "technical",
     "type": "true-false",
     "questionText": "Azure Functions can be written in Python.",
-    "options": ["True", "False"],
+    "options": [
+      "True",
+      "False"
+    ],
     "correctIndex": 0,
     "difficulty": "easy"
   },
@@ -461,7 +464,10 @@
     "category": "technical",
     "type": "true-false",
     "questionText": "Cosmos DB guarantees ACID transactions across all partitions by default.",
-    "options": ["True", "False"],
+    "options": [
+      "True",
+      "False"
+    ],
     "correctIndex": 1,
     "difficulty": "hard"
   },
@@ -470,7 +476,10 @@
     "category": "technical",
     "type": "true-false",
     "questionText": "GitHub Copilot uses your private code to retrain its AI models by default.",
-    "options": ["True", "False"],
+    "options": [
+      "True",
+      "False"
+    ],
     "correctIndex": 1,
     "difficulty": "medium"
   },
@@ -479,7 +488,10 @@
     "category": "technical",
     "type": "true-false",
     "questionText": "REST stands for Representational State Transfer.",
-    "options": ["True", "False"],
+    "options": [
+      "True",
+      "False"
+    ],
     "correctIndex": 0,
     "difficulty": "easy"
   },
@@ -488,7 +500,10 @@
     "category": "technical",
     "type": "true-false",
     "questionText": "In Azure, a resource group can contain resources from multiple different regions.",
-    "options": ["True", "False"],
+    "options": [
+      "True",
+      "False"
+    ],
     "correctIndex": 0,
     "difficulty": "medium"
   },
@@ -497,7 +512,10 @@
     "category": "technical",
     "type": "true-false",
     "questionText": "Kubernetes was originally developed by Amazon Web Services.",
-    "options": ["True", "False"],
+    "options": [
+      "True",
+      "False"
+    ],
     "correctIndex": 1,
     "difficulty": "easy"
   },
@@ -506,7 +524,10 @@
     "category": "technical",
     "type": "true-false",
     "questionText": "HTTP is a stateful protocol that remembers previous requests.",
-    "options": ["True", "False"],
+    "options": [
+      "True",
+      "False"
+    ],
     "correctIndex": 1,
     "difficulty": "easy"
   },
@@ -515,7 +536,10 @@
     "category": "technical",
     "type": "true-false",
     "questionText": "Azure Functions supports both Consumption and Premium hosting plans.",
-    "options": ["True", "False"],
+    "options": [
+      "True",
+      "False"
+    ],
     "correctIndex": 0,
     "difficulty": "medium"
   },
@@ -524,7 +548,10 @@
     "category": "technical",
     "type": "true-false",
     "questionText": "In Git, a fast-forward merge creates a new merge commit.",
-    "options": ["True", "False"],
+    "options": [
+      "True",
+      "False"
+    ],
     "correctIndex": 1,
     "difficulty": "hard"
   },
@@ -533,8 +560,663 @@
     "category": "technical",
     "type": "true-false",
     "questionText": "JSON stands for JavaScript Object Notation.",
-    "options": ["True", "False"],
+    "options": [
+      "True",
+      "False"
+    ],
     "correctIndex": 0,
     "difficulty": "easy"
+  },
+  {
+    "id": "technical-033",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "Which cloud service model provides the highest level of abstraction, where the provider manages everything except the data and user access?",
+    "options": [
+      "Infrastructure as a Service (IaaS)",
+      "Platform as a Service (PaaS)",
+      "Software as a Service (SaaS)",
+      "Function as a Service (FaaS)"
+    ],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "technical-034",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "In a Dockerfile, which instruction sets the base image for the build?",
+    "options": [
+      "BASE",
+      "FROM",
+      "IMAGE",
+      "PULL"
+    ],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "technical-035",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "What is the smallest deployable unit in Kubernetes?",
+    "options": [
+      "Container",
+      "Pod",
+      "Node",
+      "Deployment"
+    ],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "technical-036",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "What is the primary function of DNS (Domain Name System)?",
+    "options": [
+      "Encrypting web traffic",
+      "Translating domain names to IP addresses",
+      "Balancing traffic across servers",
+      "Storing website content"
+    ],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "technical-037",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "Which HTTP method is typically used to retrieve data without modifying server state?",
+    "options": [
+      "POST",
+      "GET",
+      "PUT",
+      "PATCH"
+    ],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "technical-038",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "What is GraphQL?",
+    "options": [
+      "A graph database engine",
+      "A query language for APIs developed by Facebook",
+      "A JavaScript testing framework",
+      "A CSS preprocessor"
+    ],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "technical-039",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "What does TLS (Transport Layer Security) provide?",
+    "options": [
+      "File compression for faster downloads",
+      "Encrypted communication between client and server",
+      "Database replication across regions",
+      "Automated load balancing"
+    ],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "technical-040",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "What is an Azure Virtual Network (VNet) used for?",
+    "options": [
+      "Running serverless functions",
+      "Isolating and connecting Azure resources in a private network",
+      "Managing DNS records for custom domains",
+      "Storing encrypted secrets and keys"
+    ],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "technical-041",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "GitHub Actions workflows are defined in files using which format?",
+    "options": [
+      "JSON",
+      "XML",
+      "YAML",
+      "TOML"
+    ],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "technical-042",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "What is HashiCorp Terraform primarily used for?",
+    "options": [
+      "Container orchestration",
+      "Infrastructure as Code provisioning",
+      "Application performance monitoring",
+      "Source code version control"
+    ],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "technical-043",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "In Kubernetes, which Service type exposes the service on each node's IP at a static port?",
+    "options": [
+      "ClusterIP",
+      "NodePort",
+      "LoadBalancer",
+      "ExternalName"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "technical-044",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "What is the primary benefit of Docker multi-stage builds?",
+    "options": [
+      "Running multiple containers in a single pod",
+      "Reducing final image size by separating build and runtime dependencies",
+      "Enabling horizontal scaling of containers",
+      "Allowing containers to run on multiple operating systems"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "technical-045",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "What does CORS (Cross-Origin Resource Sharing) control?",
+    "options": [
+      "Which encryption protocols a server supports",
+      "Which domains can make requests to a web API from a browser",
+      "How many concurrent connections a server can handle",
+      "Which IP addresses are allowed to access a database"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "technical-046",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "According to the CAP theorem, a distributed data store can guarantee at most how many of the three properties (Consistency, Availability, Partition tolerance) simultaneously?",
+    "options": [
+      "One",
+      "Two",
+      "All three",
+      "It depends on the network topology"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "technical-047",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "What is a blue-green deployment strategy?",
+    "options": [
+      "Deploying to two different cloud providers simultaneously",
+      "Running two identical production environments and switching traffic between them",
+      "Gradually rolling out changes to a small percentage of users first",
+      "Using separate environments for frontend and backend services"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "technical-048",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "Azure Service Bus is best described as which type of service?",
+    "options": [
+      "A real-time analytics engine",
+      "An enterprise message broker with queues and publish-subscribe topics",
+      "A managed container registry",
+      "A continuous integration pipeline runner"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "technical-049",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "What is the primary benefit of adding an index to a database column?",
+    "options": [
+      "It encrypts the column data at rest",
+      "It speeds up query lookups at the cost of additional storage and slower writes",
+      "It enforces unique constraints on the column values",
+      "It compresses the column data to save disk space"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "technical-050",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "What does 'git rebase' do?",
+    "options": [
+      "Creates a new branch from the current HEAD",
+      "Replays commits on top of another base commit, creating a linear history",
+      "Deletes a remote branch and re-creates it",
+      "Squashes all commits into a single commit"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "technical-051",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "In Kubernetes, what is the primary purpose of namespaces?",
+    "options": [
+      "To define network encryption policies",
+      "To provide logical isolation and resource organization within a cluster",
+      "To specify which container images can be pulled",
+      "To set CPU and memory limits for individual pods"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "technical-052",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "OpenTelemetry defines three primary categories of observability data. Which are they?",
+    "options": [
+      "Alerts, dashboards, and reports",
+      "Traces, metrics, and logs",
+      "Events, streams, and batches",
+      "Profiles, heap dumps, and threads"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "technical-053",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "Which of the following HTTP methods is NOT idempotent?",
+    "options": [
+      "GET",
+      "PUT",
+      "DELETE",
+      "POST"
+    ],
+    "correctIndex": 3,
+    "difficulty": "medium"
+  },
+  {
+    "id": "technical-054",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "What does Azure Managed Identity eliminate the need for?",
+    "options": [
+      "Azure subscriptions",
+      "Storing credentials in application code or configuration",
+      "Using HTTPS for API communication",
+      "Configuring network security groups"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "technical-055",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "In a microservices architecture, what is the primary role of an API Gateway?",
+    "options": [
+      "Storing shared session state across services",
+      "Providing a single entry point that handles routing, authentication, and rate limiting",
+      "Replacing service-to-service communication with database joins",
+      "Compiling microservices into a monolithic deployment"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "technical-056",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "Azure Container Apps is a serverless container platform built on top of which orchestration technology?",
+    "options": [
+      "Docker Swarm",
+      "Kubernetes",
+      "Apache Mesos",
+      "HashiCorp Nomad"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "technical-057",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "What is the primary benefit of using feature flags in software development?",
+    "options": [
+      "Automatically fixing bugs in production",
+      "Decoupling code deployments from feature releases",
+      "Eliminating the need for version control",
+      "Reducing the number of test cases needed"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "technical-058",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "What does 'shift-left testing' mean in DevOps?",
+    "options": [
+      "Testing only on the left side of a deployment pipeline",
+      "Moving testing activities earlier in the development lifecycle",
+      "Shifting test responsibility from QA to operations",
+      "Running tests exclusively in local development environments"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "technical-059",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "What is a Service Level Objective (SLO)?",
+    "options": [
+      "A contractual guarantee with financial penalties for downtime",
+      "A target value or range for a service level measured by a Service Level Indicator",
+      "A real-time alerting threshold that triggers on-call notifications",
+      "A monthly uptime report shared with stakeholders"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "technical-060",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "In the SOLID principles, what does the Single Responsibility Principle state?",
+    "options": [
+      "A class should inherit from only one base class",
+      "A class should have only one reason to change",
+      "A module should only export a single function",
+      "An interface should define only one method"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "technical-061",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "What is the primary purpose of Terraform state?",
+    "options": [
+      "To cache provider plugins for offline use",
+      "To map real-world resources to your configuration and track metadata",
+      "To store encrypted versions of input variables",
+      "To record the execution order of provisioning scripts"
+    ],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "technical-062",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "In Kubernetes, what does an Ingress resource manage?",
+    "options": [
+      "Inter-pod communication within a namespace",
+      "External HTTP and HTTPS access to services within the cluster",
+      "Persistent storage allocation for stateful workloads",
+      "Automatic horizontal scaling of deployments"
+    ],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "technical-063",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "In the event sourcing pattern, how is application state represented?",
+    "options": [
+      "As a single mutable row in a relational database",
+      "As a sequence of immutable events that are replayed to reconstruct current state",
+      "As a cached snapshot stored in a CDN edge node",
+      "As a real-time materialized view updated via triggers"
+    ],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "technical-064",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "Which web vulnerability involves tricking a user's browser into making an unwanted request to a site where they are already authenticated?",
+    "options": [
+      "Cross-Site Scripting (XSS)",
+      "Cross-Site Request Forgery (CSRF)",
+      "SQL Injection",
+      "Server-Side Request Forgery (SSRF)"
+    ],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "technical-065",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "In Azure networking, Network Security Group (NSG) rules are evaluated in what order?",
+    "options": [
+      "Alphabetically by rule name",
+      "By priority number, with lower numbers processed first",
+      "In the order they were created",
+      "Randomly for even load distribution"
+    ],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "technical-066",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "A relational database table is in Third Normal Form (3NF) when it satisfies 2NF and which additional condition?",
+    "options": [
+      "All columns contain only atomic (indivisible) values",
+      "Every non-key column is fully dependent on the entire primary key",
+      "No non-key column is transitively dependent on the primary key",
+      "All foreign keys reference a unique index in the parent table"
+    ],
+    "correctIndex": 2,
+    "difficulty": "hard"
+  },
+  {
+    "id": "technical-067",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "In microservices, the Saga pattern is primarily used to manage what?",
+    "options": [
+      "Service discovery and registration",
+      "Distributed transactions across multiple services without two-phase commit",
+      "Load balancing between service replicas",
+      "Schema versioning for shared databases"
+    ],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "technical-068",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "In CIDR notation, how many usable host IP addresses are available in a /24 subnet?",
+    "options": [
+      "256",
+      "255",
+      "254",
+      "252"
+    ],
+    "correctIndex": 2,
+    "difficulty": "hard"
+  },
+  {
+    "id": "technical-069",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "What is a Helm chart in Kubernetes?",
+    "options": [
+      "A graphical dashboard for monitoring cluster metrics",
+      "A package of pre-configured Kubernetes resource definitions for templated deployments",
+      "A network policy that controls traffic between pods",
+      "A built-in Kubernetes tool for rolling back failed deployments"
+    ],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "technical-070",
+    "category": "technical",
+    "type": "multiple-choice",
+    "questionText": "In GitHub Actions, what does a matrix strategy allow you to do?",
+    "options": [
+      "Define approval gates between deployment stages",
+      "Run a job multiple times with different combinations of variables",
+      "Encrypt secrets for use across multiple repositories",
+      "Merge multiple workflow files into a single pipeline"
+    ],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "technical-tf-011",
+    "category": "technical",
+    "type": "true-false",
+    "questionText": "TCP is a connection-oriented protocol that establishes a connection before transmitting data.",
+    "options": [
+      "True",
+      "False"
+    ],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "technical-tf-012",
+    "category": "technical",
+    "type": "true-false",
+    "questionText": "Terraform uses an imperative approach to define infrastructure, specifying step-by-step commands.",
+    "options": [
+      "True",
+      "False"
+    ],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "technical-tf-013",
+    "category": "technical",
+    "type": "true-false",
+    "questionText": "YAML uses indentation with spaces to define the hierarchical structure of data.",
+    "options": [
+      "True",
+      "False"
+    ],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "technical-tf-014",
+    "category": "technical",
+    "type": "true-false",
+    "questionText": "In Git, a tag is a reference that points to a specific commit in the repository history.",
+    "options": [
+      "True",
+      "False"
+    ],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "technical-tf-015",
+    "category": "technical",
+    "type": "true-false",
+    "questionText": "In a microservices architecture, each service should ideally own and manage its own database.",
+    "options": [
+      "True",
+      "False"
+    ],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "technical-tf-016",
+    "category": "technical",
+    "type": "true-false",
+    "questionText": "Azure Managed Identities eliminate the need to store credentials in application code or configuration files.",
+    "options": [
+      "True",
+      "False"
+    ],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "technical-tf-017",
+    "category": "technical",
+    "type": "true-false",
+    "questionText": "GraphQL allows clients to request exactly the fields they need, helping to avoid over-fetching data.",
+    "options": [
+      "True",
+      "False"
+    ],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "technical-tf-018",
+    "category": "technical",
+    "type": "true-false",
+    "questionText": "Continuous Deployment automatically releases every change that passes the automated pipeline to production.",
+    "options": [
+      "True",
+      "False"
+    ],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "technical-tf-019",
+    "category": "technical",
+    "type": "true-false",
+    "questionText": "CORS (Cross-Origin Resource Sharing) policies are enforced by the web server, not by the browser.",
+    "options": [
+      "True",
+      "False"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "technical-tf-020",
+    "category": "technical",
+    "type": "true-false",
+    "questionText": "The 'git cherry-pick' command applies the changes from a specific commit onto the current branch.",
+    "options": [
+      "True",
+      "False"
+    ],
+    "correctIndex": 0,
+    "difficulty": "medium"
   }
 ]

@@ -4,7 +4,12 @@
     "category": "general-knowledge",
     "type": "multiple-choice",
     "questionText": "What is the chemical symbol for gold?",
-    "options": ["Ag", "Au", "Go", "Gd"],
+    "options": [
+      "Ag",
+      "Au",
+      "Go",
+      "Gd"
+    ],
     "correctIndex": 1,
     "difficulty": "easy"
   },
@@ -13,7 +18,12 @@
     "category": "general-knowledge",
     "type": "multiple-choice",
     "questionText": "Who painted the Mona Lisa?",
-    "options": ["Michelangelo", "Raphael", "Leonardo da Vinci", "Donatello"],
+    "options": [
+      "Michelangelo",
+      "Raphael",
+      "Leonardo da Vinci",
+      "Donatello"
+    ],
     "correctIndex": 2,
     "difficulty": "easy"
   },
@@ -22,7 +32,12 @@
     "category": "general-knowledge",
     "type": "multiple-choice",
     "questionText": "In what year did World War II end?",
-    "options": ["1943", "1944", "1945", "1946"],
+    "options": [
+      "1943",
+      "1944",
+      "1945",
+      "1946"
+    ],
     "correctIndex": 2,
     "difficulty": "easy"
   },
@@ -31,7 +46,12 @@
     "category": "general-knowledge",
     "type": "multiple-choice",
     "questionText": "Which planet in our solar system is known as the Red Planet?",
-    "options": ["Venus", "Mars", "Jupiter", "Saturn"],
+    "options": [
+      "Venus",
+      "Mars",
+      "Jupiter",
+      "Saturn"
+    ],
     "correctIndex": 1,
     "difficulty": "easy"
   },
@@ -40,7 +60,12 @@
     "category": "general-knowledge",
     "type": "multiple-choice",
     "questionText": "How many strings does a standard acoustic guitar have?",
-    "options": ["4", "5", "6", "8"],
+    "options": [
+      "4",
+      "5",
+      "6",
+      "8"
+    ],
     "correctIndex": 2,
     "difficulty": "easy"
   },
@@ -49,7 +74,12 @@
     "category": "general-knowledge",
     "type": "multiple-choice",
     "questionText": "What is the hardest natural substance on Earth?",
-    "options": ["Quartz", "Topaz", "Diamond", "Sapphire"],
+    "options": [
+      "Quartz",
+      "Topaz",
+      "Diamond",
+      "Sapphire"
+    ],
     "correctIndex": 2,
     "difficulty": "easy"
   },
@@ -58,7 +88,12 @@
     "category": "general-knowledge",
     "type": "multiple-choice",
     "questionText": "In which year did the RMS Titanic sink on its maiden voyage?",
-    "options": ["1905", "1912", "1918", "1923"],
+    "options": [
+      "1905",
+      "1912",
+      "1918",
+      "1923"
+    ],
     "correctIndex": 1,
     "difficulty": "medium"
   },
@@ -67,7 +102,12 @@
     "category": "general-knowledge",
     "type": "multiple-choice",
     "questionText": "What is the most widely spoken language in the world by number of native speakers?",
-    "options": ["English", "Spanish", "Mandarin Chinese", "Hindi"],
+    "options": [
+      "English",
+      "Spanish",
+      "Mandarin Chinese",
+      "Hindi"
+    ],
     "correctIndex": 2,
     "difficulty": "medium"
   },
@@ -76,7 +116,12 @@
     "category": "general-knowledge",
     "type": "multiple-choice",
     "questionText": "Who wrote the play 'Romeo and Juliet'?",
-    "options": ["Charles Dickens", "William Shakespeare", "Jane Austen", "Oscar Wilde"],
+    "options": [
+      "Charles Dickens",
+      "William Shakespeare",
+      "Jane Austen",
+      "Oscar Wilde"
+    ],
     "correctIndex": 1,
     "difficulty": "easy"
   },
@@ -85,7 +130,12 @@
     "category": "general-knowledge",
     "type": "multiple-choice",
     "questionText": "Which element has the atomic number 1?",
-    "options": ["Helium", "Lithium", "Hydrogen", "Oxygen"],
+    "options": [
+      "Helium",
+      "Lithium",
+      "Hydrogen",
+      "Oxygen"
+    ],
     "correctIndex": 2,
     "difficulty": "easy"
   },
@@ -94,7 +144,12 @@
     "category": "general-knowledge",
     "type": "multiple-choice",
     "questionText": "What currency is used in Japan?",
-    "options": ["Yuan", "Won", "Yen", "Ringgit"],
+    "options": [
+      "Yuan",
+      "Won",
+      "Yen",
+      "Ringgit"
+    ],
     "correctIndex": 2,
     "difficulty": "easy"
   },
@@ -103,7 +158,12 @@
     "category": "general-knowledge",
     "type": "multiple-choice",
     "questionText": "Who was the first person to walk on the Moon?",
-    "options": ["Buzz Aldrin", "Yuri Gagarin", "Neil Armstrong", "John Glenn"],
+    "options": [
+      "Buzz Aldrin",
+      "Yuri Gagarin",
+      "Neil Armstrong",
+      "John Glenn"
+    ],
     "correctIndex": 2,
     "difficulty": "easy"
   },
@@ -112,7 +172,12 @@
     "category": "general-knowledge",
     "type": "multiple-choice",
     "questionText": "What is the largest organ in the human body?",
-    "options": ["Liver", "Brain", "Lungs", "Skin"],
+    "options": [
+      "Liver",
+      "Brain",
+      "Lungs",
+      "Skin"
+    ],
     "correctIndex": 3,
     "difficulty": "medium"
   },
@@ -121,7 +186,12 @@
     "category": "general-knowledge",
     "type": "multiple-choice",
     "questionText": "In which ancient civilization did the Olympic Games originate?",
-    "options": ["Roman", "Egyptian", "Greek", "Persian"],
+    "options": [
+      "Roman",
+      "Egyptian",
+      "Greek",
+      "Persian"
+    ],
     "correctIndex": 2,
     "difficulty": "medium"
   },
@@ -130,7 +200,12 @@
     "category": "general-knowledge",
     "type": "multiple-choice",
     "questionText": "Who is credited with discovering penicillin?",
-    "options": ["Louis Pasteur", "Alexander Fleming", "Joseph Lister", "Robert Koch"],
+    "options": [
+      "Louis Pasteur",
+      "Alexander Fleming",
+      "Joseph Lister",
+      "Robert Koch"
+    ],
     "correctIndex": 1,
     "difficulty": "medium"
   },
@@ -139,7 +214,12 @@
     "category": "general-knowledge",
     "type": "multiple-choice",
     "questionText": "Which blood type is known as the universal donor?",
-    "options": ["A positive", "B negative", "AB positive", "O negative"],
+    "options": [
+      "A positive",
+      "B negative",
+      "AB positive",
+      "O negative"
+    ],
     "correctIndex": 3,
     "difficulty": "medium"
   },
@@ -148,7 +228,12 @@
     "category": "general-knowledge",
     "type": "multiple-choice",
     "questionText": "How many bones are in the adult human body?",
-    "options": ["186", "196", "206", "216"],
+    "options": [
+      "186",
+      "196",
+      "206",
+      "216"
+    ],
     "correctIndex": 2,
     "difficulty": "medium"
   },
@@ -157,7 +242,12 @@
     "category": "general-knowledge",
     "type": "multiple-choice",
     "questionText": "What ancient wonder of the world was located in Alexandria, Egypt?",
-    "options": ["The Colossus of Rhodes", "The Hanging Gardens", "The Lighthouse of Alexandria", "The Temple of Artemis"],
+    "options": [
+      "The Colossus of Rhodes",
+      "The Hanging Gardens",
+      "The Lighthouse of Alexandria",
+      "The Temple of Artemis"
+    ],
     "correctIndex": 2,
     "difficulty": "hard"
   },
@@ -166,7 +256,12 @@
     "category": "general-knowledge",
     "type": "multiple-choice",
     "questionText": "Which musical instrument typically has 88 keys?",
-    "options": ["Organ", "Accordion", "Piano", "Harpsichord"],
+    "options": [
+      "Organ",
+      "Accordion",
+      "Piano",
+      "Harpsichord"
+    ],
     "correctIndex": 2,
     "difficulty": "easy"
   },
@@ -175,7 +270,12 @@
     "category": "general-knowledge",
     "type": "multiple-choice",
     "questionText": "What is the main ingredient in traditional guacamole?",
-    "options": ["Tomato", "Avocado", "Lime", "Cilantro"],
+    "options": [
+      "Tomato",
+      "Avocado",
+      "Lime",
+      "Cilantro"
+    ],
     "correctIndex": 1,
     "difficulty": "easy"
   },
@@ -184,7 +284,12 @@
     "category": "general-knowledge",
     "type": "multiple-choice",
     "questionText": "Which empire was ruled by Genghis Khan?",
-    "options": ["Ottoman Empire", "Roman Empire", "Mongol Empire", "Persian Empire"],
+    "options": [
+      "Ottoman Empire",
+      "Roman Empire",
+      "Mongol Empire",
+      "Persian Empire"
+    ],
     "correctIndex": 2,
     "difficulty": "medium"
   },
@@ -193,7 +298,12 @@
     "category": "general-knowledge",
     "type": "multiple-choice",
     "questionText": "What is the tallest animal in the world?",
-    "options": ["African Elephant", "Giraffe", "Ostrich", "Brown Bear"],
+    "options": [
+      "African Elephant",
+      "Giraffe",
+      "Ostrich",
+      "Brown Bear"
+    ],
     "correctIndex": 1,
     "difficulty": "easy"
   },
@@ -202,7 +312,12 @@
     "category": "general-knowledge",
     "type": "multiple-choice",
     "questionText": "Which famous scientist developed the theory of general relativity?",
-    "options": ["Isaac Newton", "Niels Bohr", "Albert Einstein", "Max Planck"],
+    "options": [
+      "Isaac Newton",
+      "Niels Bohr",
+      "Albert Einstein",
+      "Max Planck"
+    ],
     "correctIndex": 2,
     "difficulty": "medium"
   },
@@ -211,7 +326,12 @@
     "category": "general-knowledge",
     "type": "multiple-choice",
     "questionText": "What gas do plants absorb from the atmosphere during photosynthesis?",
-    "options": ["Oxygen", "Nitrogen", "Carbon dioxide", "Hydrogen"],
+    "options": [
+      "Oxygen",
+      "Nitrogen",
+      "Carbon dioxide",
+      "Hydrogen"
+    ],
     "correctIndex": 2,
     "difficulty": "easy"
   },
@@ -220,7 +340,12 @@
     "category": "general-knowledge",
     "type": "multiple-choice",
     "questionText": "Which country gifted the Statue of Liberty to the United States?",
-    "options": ["United Kingdom", "Spain", "France", "Netherlands"],
+    "options": [
+      "United Kingdom",
+      "Spain",
+      "France",
+      "Netherlands"
+    ],
     "correctIndex": 2,
     "difficulty": "medium"
   },
@@ -229,7 +354,12 @@
     "category": "general-knowledge",
     "type": "multiple-choice",
     "questionText": "What is the rarest blood type among humans?",
-    "options": ["O negative", "A negative", "B negative", "AB negative"],
+    "options": [
+      "O negative",
+      "A negative",
+      "B negative",
+      "AB negative"
+    ],
     "correctIndex": 3,
     "difficulty": "hard"
   },
@@ -238,7 +368,12 @@
     "category": "general-knowledge",
     "type": "multiple-choice",
     "questionText": "Who wrote the novel '1984'?",
-    "options": ["Aldous Huxley", "George Orwell", "Ray Bradbury", "H.G. Wells"],
+    "options": [
+      "Aldous Huxley",
+      "George Orwell",
+      "Ray Bradbury",
+      "H.G. Wells"
+    ],
     "correctIndex": 1,
     "difficulty": "medium"
   },
@@ -247,7 +382,12 @@
     "category": "general-knowledge",
     "type": "multiple-choice",
     "questionText": "What is the largest species of shark?",
-    "options": ["Great White Shark", "Hammerhead Shark", "Tiger Shark", "Whale Shark"],
+    "options": [
+      "Great White Shark",
+      "Hammerhead Shark",
+      "Tiger Shark",
+      "Whale Shark"
+    ],
     "correctIndex": 3,
     "difficulty": "medium"
   },
@@ -256,7 +396,10 @@
     "category": "general-knowledge",
     "type": "true-false",
     "questionText": "The Great Wall of China is visible from space with the naked eye.",
-    "options": ["True", "False"],
+    "options": [
+      "True",
+      "False"
+    ],
     "correctIndex": 1,
     "difficulty": "medium"
   },
@@ -265,7 +408,10 @@
     "category": "general-knowledge",
     "type": "true-false",
     "questionText": "Humans share approximately 60% of their DNA with bananas.",
-    "options": ["True", "False"],
+    "options": [
+      "True",
+      "False"
+    ],
     "correctIndex": 0,
     "difficulty": "hard"
   },
@@ -274,7 +420,10 @@
     "category": "general-knowledge",
     "type": "true-false",
     "questionText": "An octopus has three hearts.",
-    "options": ["True", "False"],
+    "options": [
+      "True",
+      "False"
+    ],
     "correctIndex": 0,
     "difficulty": "medium"
   },
@@ -283,7 +432,10 @@
     "category": "general-knowledge",
     "type": "true-false",
     "questionText": "The currency of the United Kingdom is the Euro.",
-    "options": ["True", "False"],
+    "options": [
+      "True",
+      "False"
+    ],
     "correctIndex": 1,
     "difficulty": "easy"
   },
@@ -292,7 +444,10 @@
     "category": "general-knowledge",
     "type": "true-false",
     "questionText": "Sound travels faster in water than in air.",
-    "options": ["True", "False"],
+    "options": [
+      "True",
+      "False"
+    ],
     "correctIndex": 0,
     "difficulty": "medium"
   },
@@ -301,7 +456,10 @@
     "category": "general-knowledge",
     "type": "true-false",
     "questionText": "Vincent van Gogh sold only one painting during his lifetime.",
-    "options": ["True", "False"],
+    "options": [
+      "True",
+      "False"
+    ],
     "correctIndex": 0,
     "difficulty": "hard"
   },
@@ -310,7 +468,10 @@
     "category": "general-knowledge",
     "type": "true-false",
     "questionText": "The human body contains more bacterial cells than human cells.",
-    "options": ["True", "False"],
+    "options": [
+      "True",
+      "False"
+    ],
     "correctIndex": 0,
     "difficulty": "hard"
   },
@@ -319,7 +480,10 @@
     "category": "general-knowledge",
     "type": "true-false",
     "questionText": "Mount Rushmore features the faces of five US presidents.",
-    "options": ["True", "False"],
+    "options": [
+      "True",
+      "False"
+    ],
     "correctIndex": 1,
     "difficulty": "easy"
   },
@@ -328,7 +492,10 @@
     "category": "general-knowledge",
     "type": "true-false",
     "questionText": "Honey, when stored properly, essentially never spoils.",
-    "options": ["True", "False"],
+    "options": [
+      "True",
+      "False"
+    ],
     "correctIndex": 0,
     "difficulty": "medium"
   },
@@ -337,8 +504,719 @@
     "category": "general-knowledge",
     "type": "true-false",
     "questionText": "A group of flamingos is called a 'flamboyance'.",
-    "options": ["True", "False"],
+    "options": [
+      "True",
+      "False"
+    ],
     "correctIndex": 0,
     "difficulty": "hard"
+  },
+  {
+    "id": "general-knowledge-029",
+    "category": "general-knowledge",
+    "type": "multiple-choice",
+    "questionText": "Which Italian city is famous for its leaning tower?",
+    "options": [
+      "Rome",
+      "Florence",
+      "Pisa",
+      "Venice"
+    ],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "general-knowledge-030",
+    "category": "general-knowledge",
+    "type": "multiple-choice",
+    "questionText": "What is sushi traditionally wrapped in?",
+    "options": [
+      "Rice paper",
+      "Banana leaf",
+      "Seaweed",
+      "Lettuce"
+    ],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "general-knowledge-031",
+    "category": "general-knowledge",
+    "type": "multiple-choice",
+    "questionText": "Which planet is the largest in our solar system?",
+    "options": [
+      "Saturn",
+      "Neptune",
+      "Jupiter",
+      "Uranus"
+    ],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "general-knowledge-032",
+    "category": "general-knowledge",
+    "type": "multiple-choice",
+    "questionText": "What sport is played at Wimbledon?",
+    "options": [
+      "Cricket",
+      "Tennis",
+      "Golf",
+      "Polo"
+    ],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "general-knowledge-033",
+    "category": "general-knowledge",
+    "type": "multiple-choice",
+    "questionText": "In Greek mythology, who is the king of the gods?",
+    "options": [
+      "Poseidon",
+      "Hades",
+      "Apollo",
+      "Zeus"
+    ],
+    "correctIndex": 3,
+    "difficulty": "easy"
+  },
+  {
+    "id": "general-knowledge-034",
+    "category": "general-knowledge",
+    "type": "multiple-choice",
+    "questionText": "What is the primary language spoken in Brazil?",
+    "options": [
+      "Spanish",
+      "Portuguese",
+      "French",
+      "Italian"
+    ],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "general-knowledge-035",
+    "category": "general-knowledge",
+    "type": "multiple-choice",
+    "questionText": "Which classic novel begins with the line 'Call me Ishmael'?",
+    "options": [
+      "The Great Gatsby",
+      "Moby-Dick",
+      "Pride and Prejudice",
+      "Jane Eyre"
+    ],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "general-knowledge-036",
+    "category": "general-knowledge",
+    "type": "multiple-choice",
+    "questionText": "What does the '__(www)__' stand for in a website address?",
+    "options": [
+      "Wide Web World",
+      "World Wide Web",
+      "Web World Wide",
+      "World Web Wide"
+    ],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "general-knowledge-037",
+    "category": "general-knowledge",
+    "type": "multiple-choice",
+    "questionText": "Which country is famous for the cultural tradition of Carnival in Rio de Janeiro?",
+    "options": [
+      "Argentina",
+      "Mexico",
+      "Brazil",
+      "Colombia"
+    ],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "general-knowledge-038",
+    "category": "general-knowledge",
+    "type": "multiple-choice",
+    "questionText": "How many chambers does a human heart have?",
+    "options": [
+      "2",
+      "3",
+      "4",
+      "5"
+    ],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "general-knowledge-039",
+    "category": "general-knowledge",
+    "type": "multiple-choice",
+    "questionText": "Who is known as the 'King of Pop'?",
+    "options": [
+      "Elvis Presley",
+      "Prince",
+      "Michael Jackson",
+      "Freddie Mercury"
+    ],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "general-knowledge-040",
+    "category": "general-knowledge",
+    "type": "multiple-choice",
+    "questionText": "Which famous landmark is located in Agra, India?",
+    "options": [
+      "The Colosseum",
+      "Angkor Wat",
+      "Taj Mahal",
+      "Machu Picchu"
+    ],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "general-knowledge-041",
+    "category": "general-knowledge",
+    "type": "multiple-choice",
+    "questionText": "What is the name of the galaxy that contains our solar system?",
+    "options": [
+      "Andromeda",
+      "Milky Way",
+      "Triangulum",
+      "Whirlpool"
+    ],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "general-knowledge-042",
+    "category": "general-knowledge",
+    "type": "multiple-choice",
+    "questionText": "Which country invented paper?",
+    "options": [
+      "Egypt",
+      "India",
+      "China",
+      "Greece"
+    ],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "general-knowledge-043",
+    "category": "general-knowledge",
+    "type": "multiple-choice",
+    "questionText": "Who was the first woman to win a Nobel Prize?",
+    "options": [
+      "Rosalind Franklin",
+      "Marie Curie",
+      "Dorothy Hodgkin",
+      "Irène Joliot-Curie"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "general-knowledge-044",
+    "category": "general-knowledge",
+    "type": "multiple-choice",
+    "questionText": "In which year did the Berlin Wall fall?",
+    "options": [
+      "1987",
+      "1989",
+      "1991",
+      "1993"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "general-knowledge-045",
+    "category": "general-knowledge",
+    "type": "multiple-choice",
+    "questionText": "Which art movement is Salvador Dalí most associated with?",
+    "options": [
+      "Impressionism",
+      "Cubism",
+      "Surrealism",
+      "Expressionism"
+    ],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "general-knowledge-046",
+    "category": "general-knowledge",
+    "type": "multiple-choice",
+    "questionText": "What is the world record for the most Olympic gold medals won by a single athlete?",
+    "options": [
+      "18",
+      "23",
+      "26",
+      "28"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "general-knowledge-047",
+    "category": "general-knowledge",
+    "type": "multiple-choice",
+    "questionText": "Which scientist is credited with developing the first successful polio vaccine?",
+    "options": [
+      "Jonas Salk",
+      "Louis Pasteur",
+      "Edward Jenner",
+      "Robert Koch"
+    ],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "general-knowledge-048",
+    "category": "general-knowledge",
+    "type": "multiple-choice",
+    "questionText": "What spice gives curry its distinctive yellow color?",
+    "options": [
+      "Paprika",
+      "Saffron",
+      "Turmeric",
+      "Cumin"
+    ],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "general-knowledge-049",
+    "category": "general-knowledge",
+    "type": "multiple-choice",
+    "questionText": "Who composed the famous 'Moonlight Sonata'?",
+    "options": [
+      "Wolfgang Amadeus Mozart",
+      "Ludwig van Beethoven",
+      "Frédéric Chopin",
+      "Johann Sebastian Bach"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "general-knowledge-050",
+    "category": "general-knowledge",
+    "type": "multiple-choice",
+    "questionText": "Which Norse god wields the hammer Mjölnir?",
+    "options": [
+      "Odin",
+      "Loki",
+      "Thor",
+      "Freya"
+    ],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "general-knowledge-051",
+    "category": "general-knowledge",
+    "type": "multiple-choice",
+    "questionText": "In what year was the first iPhone released?",
+    "options": [
+      "2005",
+      "2006",
+      "2007",
+      "2008"
+    ],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "general-knowledge-052",
+    "category": "general-knowledge",
+    "type": "multiple-choice",
+    "questionText": "Which river flows through the Grand Canyon?",
+    "options": [
+      "Mississippi River",
+      "Rio Grande",
+      "Colorado River",
+      "Columbia River"
+    ],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "general-knowledge-053",
+    "category": "general-knowledge",
+    "type": "multiple-choice",
+    "questionText": "What was the first manned spacecraft to land on the Moon?",
+    "options": [
+      "Gemini 12",
+      "Apollo 11",
+      "Vostok 1",
+      "Mercury 7"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "general-knowledge-054",
+    "category": "general-knowledge",
+    "type": "multiple-choice",
+    "questionText": "Which language has the most words in its dictionary?",
+    "options": [
+      "French",
+      "Mandarin Chinese",
+      "English",
+      "Spanish"
+    ],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "general-knowledge-055",
+    "category": "general-knowledge",
+    "type": "multiple-choice",
+    "questionText": "Who wrote the novel 'Don Quixote'?",
+    "options": [
+      "Gabriel García Márquez",
+      "Miguel de Cervantes",
+      "Jorge Luis Borges",
+      "Pablo Neruda"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "general-knowledge-056",
+    "category": "general-knowledge",
+    "type": "multiple-choice",
+    "questionText": "Which ancient civilization built Machu Picchu?",
+    "options": [
+      "Maya",
+      "Aztec",
+      "Inca",
+      "Olmec"
+    ],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "general-knowledge-057",
+    "category": "general-knowledge",
+    "type": "multiple-choice",
+    "questionText": "In which sport would you perform a 'slam dunk'?",
+    "options": [
+      "Volleyball",
+      "Basketball",
+      "Tennis",
+      "Handball"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "general-knowledge-058",
+    "category": "general-knowledge",
+    "type": "multiple-choice",
+    "questionText": "What year did the Hubble Space Telescope launch into orbit?",
+    "options": [
+      "1986",
+      "1988",
+      "1990",
+      "1993"
+    ],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "general-knowledge-059",
+    "category": "general-knowledge",
+    "type": "multiple-choice",
+    "questionText": "Which pop artist is famous for paintings of Campbell's Soup cans?",
+    "options": [
+      "Roy Lichtenstein",
+      "Andy Warhol",
+      "Jasper Johns",
+      "Keith Haring"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "general-knowledge-060",
+    "category": "general-knowledge",
+    "type": "multiple-choice",
+    "questionText": "What is the traditional Japanese art of paper folding called?",
+    "options": [
+      "Ikebana",
+      "Origami",
+      "Bonsai",
+      "Kintsugi"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "general-knowledge-061",
+    "category": "general-knowledge",
+    "type": "multiple-choice",
+    "questionText": "Who won the Nobel Prize in Literature in 1954 and wrote 'The Old Man and the Sea'?",
+    "options": [
+      "William Faulkner",
+      "John Steinbeck",
+      "Ernest Hemingway",
+      "F. Scott Fitzgerald"
+    ],
+    "correctIndex": 2,
+    "difficulty": "hard"
+  },
+  {
+    "id": "general-knowledge-062",
+    "category": "general-knowledge",
+    "type": "multiple-choice",
+    "questionText": "What is the approximate speed of light in a vacuum?",
+    "options": [
+      "150,000 km/s",
+      "200,000 km/s",
+      "300,000 km/s",
+      "400,000 km/s"
+    ],
+    "correctIndex": 2,
+    "difficulty": "hard"
+  },
+  {
+    "id": "general-knowledge-063",
+    "category": "general-knowledge",
+    "type": "multiple-choice",
+    "questionText": "Which technology company was originally named 'Blue Ribbon Sports'?",
+    "options": [
+      "Adidas",
+      "Reebok",
+      "Nike",
+      "Puma"
+    ],
+    "correctIndex": 2,
+    "difficulty": "hard"
+  },
+  {
+    "id": "general-knowledge-064",
+    "category": "general-knowledge",
+    "type": "multiple-choice",
+    "questionText": "In which year did the Gutenberg printing press produce its first Bible?",
+    "options": [
+      "1340",
+      "1405",
+      "1455",
+      "1502"
+    ],
+    "correctIndex": 2,
+    "difficulty": "hard"
+  },
+  {
+    "id": "general-knowledge-065",
+    "category": "general-knowledge",
+    "type": "multiple-choice",
+    "questionText": "What is the smallest bone in the human body?",
+    "options": [
+      "Stapes",
+      "Incus",
+      "Malleus",
+      "Hyoid"
+    ],
+    "correctIndex": 0,
+    "difficulty": "hard"
+  },
+  {
+    "id": "general-knowledge-066",
+    "category": "general-knowledge",
+    "type": "multiple-choice",
+    "questionText": "Which Greek hero is known for his 'Twelve Labors'?",
+    "options": [
+      "Achilles",
+      "Perseus",
+      "Heracles",
+      "Theseus"
+    ],
+    "correctIndex": 2,
+    "difficulty": "hard"
+  },
+  {
+    "id": "general-knowledge-067",
+    "category": "general-knowledge",
+    "type": "multiple-choice",
+    "questionText": "What was the first feature-length animated film ever released?",
+    "options": [
+      "Fantasia",
+      "Snow White and the Seven Dwarfs",
+      "Bambi",
+      "El Apóstol"
+    ],
+    "correctIndex": 3,
+    "difficulty": "hard"
+  },
+  {
+    "id": "general-knowledge-068",
+    "category": "general-knowledge",
+    "type": "multiple-choice",
+    "questionText": "Who holds the world record for the fastest 100-meter sprint as of 2024?",
+    "options": [
+      "Tyson Gay",
+      "Yohan Blake",
+      "Usain Bolt",
+      "Justin Gatlin"
+    ],
+    "correctIndex": 2,
+    "difficulty": "hard"
+  },
+  {
+    "id": "general-knowledge-069",
+    "category": "general-knowledge",
+    "type": "multiple-choice",
+    "questionText": "Which country has the most UNESCO World Heritage Sites?",
+    "options": [
+      "China",
+      "Italy",
+      "Spain",
+      "France"
+    ],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "general-knowledge-070",
+    "category": "general-knowledge",
+    "type": "multiple-choice",
+    "questionText": "The Rosetta Stone helped scholars decipher which ancient writing system?",
+    "options": [
+      "Cuneiform",
+      "Egyptian hieroglyphs",
+      "Linear B",
+      "Sanskrit"
+    ],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "general-knowledge-tf-011",
+    "category": "general-knowledge",
+    "type": "true-false",
+    "questionText": "The Amazon is the longest river in the world.",
+    "options": [
+      "True",
+      "False"
+    ],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "general-knowledge-tf-012",
+    "category": "general-knowledge",
+    "type": "true-false",
+    "questionText": "A marathon race is 26.2 miles long.",
+    "options": [
+      "True",
+      "False"
+    ],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "general-knowledge-tf-013",
+    "category": "general-knowledge",
+    "type": "true-false",
+    "questionText": "The Nobel Peace Prize is awarded in Stockholm, Sweden.",
+    "options": [
+      "True",
+      "False"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "general-knowledge-tf-014",
+    "category": "general-knowledge",
+    "type": "true-false",
+    "questionText": "The Mona Lisa is housed in the Louvre Museum in Paris.",
+    "options": [
+      "True",
+      "False"
+    ],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "general-knowledge-tf-015",
+    "category": "general-knowledge",
+    "type": "true-false",
+    "questionText": "Venus is the hottest planet in our solar system.",
+    "options": [
+      "True",
+      "False"
+    ],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "general-knowledge-tf-016",
+    "category": "general-knowledge",
+    "type": "true-false",
+    "questionText": "Cleopatra lived closer in time to the Moon landing than to the construction of the Great Pyramid.",
+    "options": [
+      "True",
+      "False"
+    ],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "general-knowledge-tf-017",
+    "category": "general-knowledge",
+    "type": "true-false",
+    "questionText": "Bats are blind.",
+    "options": [
+      "True",
+      "False"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "general-knowledge-tf-018",
+    "category": "general-knowledge",
+    "type": "true-false",
+    "questionText": "The unicorn is the national animal of Scotland.",
+    "options": [
+      "True",
+      "False"
+    ],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "general-knowledge-tf-019",
+    "category": "general-knowledge",
+    "type": "true-false",
+    "questionText": "Thomas Edison invented the first practical telephone.",
+    "options": [
+      "True",
+      "False"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "general-knowledge-tf-020",
+    "category": "general-knowledge",
+    "type": "true-false",
+    "questionText": "The human nose can detect over 1 trillion different scents.",
+    "options": [
+      "True",
+      "False"
+    ],
+    "correctIndex": 0,
+    "difficulty": "medium"
   }
 ]

@@ -4,7 +4,12 @@
     "category": "physics",
     "type": "multiple-choice",
     "questionText": "What is the SI unit of force?",
-    "options": ["Joule", "Watt", "Newton", "Pascal"],
+    "options": [
+      "Joule",
+      "Watt",
+      "Newton",
+      "Pascal"
+    ],
     "correctIndex": 2,
     "difficulty": "easy"
   },
@@ -27,7 +32,12 @@
     "category": "physics",
     "type": "multiple-choice",
     "questionText": "What is the approximate speed of light in a vacuum?",
-    "options": ["3 × 10⁶ m/s", "3 × 10⁷ m/s", "3 × 10⁸ m/s", "3 × 10⁹ m/s"],
+    "options": [
+      "3 × 10⁶ m/s",
+      "3 × 10⁷ m/s",
+      "3 × 10⁸ m/s",
+      "3 × 10⁹ m/s"
+    ],
     "correctIndex": 2,
     "difficulty": "easy"
   },
@@ -36,7 +46,12 @@
     "category": "physics",
     "type": "multiple-choice",
     "questionText": "Which fundamental force is responsible for keeping planets in orbit around the Sun?",
-    "options": ["Electromagnetic force", "Strong nuclear force", "Weak nuclear force", "Gravitational force"],
+    "options": [
+      "Electromagnetic force",
+      "Strong nuclear force",
+      "Weak nuclear force",
+      "Gravitational force"
+    ],
     "correctIndex": 3,
     "difficulty": "easy"
   },
@@ -45,7 +60,12 @@
     "category": "physics",
     "type": "multiple-choice",
     "questionText": "What subatomic particle carries a negative electric charge?",
-    "options": ["Proton", "Neutron", "Electron", "Positron"],
+    "options": [
+      "Proton",
+      "Neutron",
+      "Electron",
+      "Positron"
+    ],
     "correctIndex": 2,
     "difficulty": "easy"
   },
@@ -54,7 +74,12 @@
     "category": "physics",
     "type": "multiple-choice",
     "questionText": "What is the unit of electrical resistance?",
-    "options": ["Volt", "Ampere", "Ohm", "Farad"],
+    "options": [
+      "Volt",
+      "Ampere",
+      "Ohm",
+      "Farad"
+    ],
     "correctIndex": 2,
     "difficulty": "easy"
   },
@@ -63,7 +88,12 @@
     "category": "physics",
     "type": "multiple-choice",
     "questionText": "What optical phenomenon explains why a straw appears bent when placed in a glass of water?",
-    "options": ["Reflection", "Diffraction", "Refraction", "Dispersion"],
+    "options": [
+      "Reflection",
+      "Diffraction",
+      "Refraction",
+      "Dispersion"
+    ],
     "correctIndex": 2,
     "difficulty": "medium"
   },
@@ -72,7 +102,12 @@
     "category": "physics",
     "type": "multiple-choice",
     "questionText": "The first law of thermodynamics is essentially a statement of what principle?",
-    "options": ["Conservation of momentum", "Conservation of energy", "Conservation of charge", "Conservation of mass"],
+    "options": [
+      "Conservation of momentum",
+      "Conservation of energy",
+      "Conservation of charge",
+      "Conservation of mass"
+    ],
     "correctIndex": 1,
     "difficulty": "medium"
   },
@@ -81,7 +116,12 @@
     "category": "physics",
     "type": "multiple-choice",
     "questionText": "Which particle is the carrier of the electromagnetic force?",
-    "options": ["Gluon", "W boson", "Photon", "Graviton"],
+    "options": [
+      "Gluon",
+      "W boson",
+      "Photon",
+      "Graviton"
+    ],
     "correctIndex": 2,
     "difficulty": "medium"
   },
@@ -90,7 +130,12 @@
     "category": "physics",
     "type": "multiple-choice",
     "questionText": "What is the approximate value of gravitational acceleration at Earth's surface?",
-    "options": ["5.8 m/s²", "9.8 m/s²", "12.8 m/s²", "15.8 m/s²"],
+    "options": [
+      "5.8 m/s²",
+      "9.8 m/s²",
+      "12.8 m/s²",
+      "15.8 m/s²"
+    ],
     "correctIndex": 1,
     "difficulty": "easy"
   },
@@ -99,7 +144,12 @@
     "category": "physics",
     "type": "multiple-choice",
     "questionText": "Which scientist formulated the three classical laws of motion?",
-    "options": ["Albert Einstein", "Galileo Galilei", "Isaac Newton", "Nikola Tesla"],
+    "options": [
+      "Albert Einstein",
+      "Galileo Galilei",
+      "Isaac Newton",
+      "Nikola Tesla"
+    ],
     "correctIndex": 2,
     "difficulty": "easy"
   },
@@ -108,7 +158,12 @@
     "category": "physics",
     "type": "multiple-choice",
     "questionText": "What type of wave is a sound wave?",
-    "options": ["Transverse", "Longitudinal", "Electromagnetic", "Surface"],
+    "options": [
+      "Transverse",
+      "Longitudinal",
+      "Electromagnetic",
+      "Surface"
+    ],
     "correctIndex": 1,
     "difficulty": "medium"
   },
@@ -117,7 +172,12 @@
     "category": "physics",
     "type": "multiple-choice",
     "questionText": "What is the process called when a heavy atomic nucleus splits into two or more smaller nuclei?",
-    "options": ["Nuclear fusion", "Nuclear fission", "Radioactive decay", "Ionization"],
+    "options": [
+      "Nuclear fusion",
+      "Nuclear fission",
+      "Radioactive decay",
+      "Ionization"
+    ],
     "correctIndex": 1,
     "difficulty": "medium"
   },
@@ -140,7 +200,12 @@
     "category": "physics",
     "type": "multiple-choice",
     "questionText": "In which medium does light travel the fastest?",
-    "options": ["Water", "Glass", "Diamond", "Vacuum"],
+    "options": [
+      "Water",
+      "Glass",
+      "Diamond",
+      "Vacuum"
+    ],
     "correctIndex": 3,
     "difficulty": "easy"
   },
@@ -149,7 +214,12 @@
     "category": "physics",
     "type": "multiple-choice",
     "questionText": "What happens to the electrical resistance of a superconductor below its critical temperature?",
-    "options": ["It doubles", "It becomes infinite", "It drops to zero", "It fluctuates randomly"],
+    "options": [
+      "It doubles",
+      "It becomes infinite",
+      "It drops to zero",
+      "It fluctuates randomly"
+    ],
     "correctIndex": 2,
     "difficulty": "hard"
   },
@@ -158,7 +228,12 @@
     "category": "physics",
     "type": "multiple-choice",
     "questionText": "What is the name of the theoretical boundary around a black hole beyond which nothing can escape?",
-    "options": ["Schwarzschild limit", "Event horizon", "Singularity", "Photon sphere"],
+    "options": [
+      "Schwarzschild limit",
+      "Event horizon",
+      "Singularity",
+      "Photon sphere"
+    ],
     "correctIndex": 1,
     "difficulty": "hard"
   },
@@ -167,7 +242,12 @@
     "category": "physics",
     "type": "multiple-choice",
     "questionText": "What type of energy does a compressed spring store?",
-    "options": ["Kinetic energy", "Thermal energy", "Elastic potential energy", "Chemical energy"],
+    "options": [
+      "Kinetic energy",
+      "Thermal energy",
+      "Elastic potential energy",
+      "Chemical energy"
+    ],
     "correctIndex": 2,
     "difficulty": "medium"
   },
@@ -176,7 +256,12 @@
     "category": "physics",
     "type": "multiple-choice",
     "questionText": "Which of Newton's laws states that 'for every action, there is an equal and opposite reaction'?",
-    "options": ["First Law", "Second Law", "Third Law", "Law of Universal Gravitation"],
+    "options": [
+      "First Law",
+      "Second Law",
+      "Third Law",
+      "Law of Universal Gravitation"
+    ],
     "correctIndex": 2,
     "difficulty": "easy"
   },
@@ -185,7 +270,12 @@
     "category": "physics",
     "type": "multiple-choice",
     "questionText": "What is the SI unit of electric current?",
-    "options": ["Volt", "Coulomb", "Ampere", "Watt"],
+    "options": [
+      "Volt",
+      "Coulomb",
+      "Ampere",
+      "Watt"
+    ],
     "correctIndex": 2,
     "difficulty": "easy"
   },
@@ -194,7 +284,12 @@
     "category": "physics",
     "type": "multiple-choice",
     "questionText": "What fundamental quantity is Planck's constant (h) central to?",
-    "options": ["Classical mechanics", "Thermodynamics", "Quantum mechanics", "Fluid dynamics"],
+    "options": [
+      "Classical mechanics",
+      "Thermodynamics",
+      "Quantum mechanics",
+      "Fluid dynamics"
+    ],
     "correctIndex": 2,
     "difficulty": "medium"
   },
@@ -203,7 +298,12 @@
     "category": "physics",
     "type": "multiple-choice",
     "questionText": "What is the term for the minimum energy required to remove an electron from a neutral atom?",
-    "options": ["Binding energy", "Activation energy", "Ionization energy", "Kinetic energy"],
+    "options": [
+      "Binding energy",
+      "Activation energy",
+      "Ionization energy",
+      "Kinetic energy"
+    ],
     "correctIndex": 2,
     "difficulty": "hard"
   },
@@ -212,7 +312,12 @@
     "category": "physics",
     "type": "multiple-choice",
     "questionText": "Which physicist is known for his uncertainty principle?",
-    "options": ["Erwin Schrödinger", "Werner Heisenberg", "Paul Dirac", "Richard Feynman"],
+    "options": [
+      "Erwin Schrödinger",
+      "Werner Heisenberg",
+      "Paul Dirac",
+      "Richard Feynman"
+    ],
     "correctIndex": 1,
     "difficulty": "hard"
   },
@@ -221,7 +326,12 @@
     "category": "physics",
     "type": "multiple-choice",
     "questionText": "What colour of visible light has the shortest wavelength?",
-    "options": ["Red", "Green", "Blue", "Violet"],
+    "options": [
+      "Red",
+      "Green",
+      "Blue",
+      "Violet"
+    ],
     "correctIndex": 3,
     "difficulty": "medium"
   },
@@ -230,7 +340,12 @@
     "category": "physics",
     "type": "multiple-choice",
     "questionText": "What is the phenomenon where two light waves combine to produce a brighter or dimmer result?",
-    "options": ["Diffraction", "Interference", "Polarization", "Scattering"],
+    "options": [
+      "Diffraction",
+      "Interference",
+      "Polarization",
+      "Scattering"
+    ],
     "correctIndex": 1,
     "difficulty": "hard"
   },
@@ -239,7 +354,10 @@
     "category": "physics",
     "type": "true-false",
     "questionText": "Light travels faster than sound.",
-    "options": ["True", "False"],
+    "options": [
+      "True",
+      "False"
+    ],
     "correctIndex": 0,
     "difficulty": "easy"
   },
@@ -248,7 +366,10 @@
     "category": "physics",
     "type": "true-false",
     "questionText": "Absolute zero is 0 degrees Celsius.",
-    "options": ["True", "False"],
+    "options": [
+      "True",
+      "False"
+    ],
     "correctIndex": 1,
     "difficulty": "medium"
   },
@@ -257,7 +378,10 @@
     "category": "physics",
     "type": "true-false",
     "questionText": "Electrons are heavier than protons.",
-    "options": ["True", "False"],
+    "options": [
+      "True",
+      "False"
+    ],
     "correctIndex": 1,
     "difficulty": "easy"
   },
@@ -266,7 +390,10 @@
     "category": "physics",
     "type": "true-false",
     "questionText": "In a vacuum, all objects fall at the same rate regardless of their mass.",
-    "options": ["True", "False"],
+    "options": [
+      "True",
+      "False"
+    ],
     "correctIndex": 0,
     "difficulty": "medium"
   },
@@ -275,7 +402,10 @@
     "category": "physics",
     "type": "true-false",
     "questionText": "Energy can be created and destroyed.",
-    "options": ["True", "False"],
+    "options": [
+      "True",
+      "False"
+    ],
     "correctIndex": 1,
     "difficulty": "easy"
   },
@@ -284,7 +414,10 @@
     "category": "physics",
     "type": "true-false",
     "questionText": "The Higgs boson is sometimes referred to as the 'God particle'.",
-    "options": ["True", "False"],
+    "options": [
+      "True",
+      "False"
+    ],
     "correctIndex": 0,
     "difficulty": "medium"
   },
@@ -293,7 +426,10 @@
     "category": "physics",
     "type": "true-false",
     "questionText": "Radio waves travel at the speed of light.",
-    "options": ["True", "False"],
+    "options": [
+      "True",
+      "False"
+    ],
     "correctIndex": 0,
     "difficulty": "medium"
   },
@@ -302,7 +438,10 @@
     "category": "physics",
     "type": "true-false",
     "questionText": "A photon has mass.",
-    "options": ["True", "False"],
+    "options": [
+      "True",
+      "False"
+    ],
     "correctIndex": 1,
     "difficulty": "hard"
   },
@@ -311,7 +450,10 @@
     "category": "physics",
     "type": "true-false",
     "questionText": "Entropy in an isolated system tends to increase over time.",
-    "options": ["True", "False"],
+    "options": [
+      "True",
+      "False"
+    ],
     "correctIndex": 0,
     "difficulty": "hard"
   },
@@ -320,8 +462,691 @@
     "category": "physics",
     "type": "true-false",
     "questionText": "The speed of sound is faster in steel than in air.",
-    "options": ["True", "False"],
+    "options": [
+      "True",
+      "False"
+    ],
     "correctIndex": 0,
+    "difficulty": "hard"
+  },
+  {
+    "id": "physics-026",
+    "category": "physics",
+    "type": "multiple-choice",
+    "questionText": "What is the SI unit of energy?",
+    "options": [
+      "Newton",
+      "Joule",
+      "Watt",
+      "Pascal"
+    ],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "physics-027",
+    "category": "physics",
+    "type": "multiple-choice",
+    "questionText": "What type of energy does a moving object possess due to its motion?",
+    "options": [
+      "Potential energy",
+      "Thermal energy",
+      "Kinetic energy",
+      "Chemical energy"
+    ],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "physics-028",
+    "category": "physics",
+    "type": "multiple-choice",
+    "questionText": "At what temperature does water boil at standard atmospheric pressure?",
+    "options": [
+      "90 °C",
+      "100 °C",
+      "110 °C",
+      "120 °C"
+    ],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "physics-029",
+    "category": "physics",
+    "type": "multiple-choice",
+    "questionText": "Who developed the theory of general relativity?",
+    "options": [
+      "Niels Bohr",
+      "Isaac Newton",
+      "Albert Einstein",
+      "Max Planck"
+    ],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "physics-030",
+    "category": "physics",
+    "type": "multiple-choice",
+    "questionText": "What instrument is used to measure electric potential difference (voltage)?",
+    "options": [
+      "Ammeter",
+      "Ohmmeter",
+      "Voltmeter",
+      "Galvanometer"
+    ],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "physics-031",
+    "category": "physics",
+    "type": "multiple-choice",
+    "questionText": "What is the SI unit of power?",
+    "options": [
+      "Joule",
+      "Newton",
+      "Watt",
+      "Hertz"
+    ],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "physics-032",
+    "category": "physics",
+    "type": "multiple-choice",
+    "questionText": "What force opposes the relative motion of two surfaces in contact?",
+    "options": [
+      "Tension",
+      "Normal force",
+      "Friction",
+      "Drag"
+    ],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "physics-033",
+    "category": "physics",
+    "type": "multiple-choice",
+    "questionText": "What is the SI unit of frequency?",
+    "options": [
+      "Decibel",
+      "Hertz",
+      "Tesla",
+      "Lumen"
+    ],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "physics-034",
+    "category": "physics",
+    "type": "multiple-choice",
+    "questionText": "What primarily causes ocean tides on Earth?",
+    "options": [
+      "Earth's rotation",
+      "Wind patterns over the ocean",
+      "The gravitational pull of the Moon",
+      "Underwater volcanic activity"
+    ],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "physics-035",
+    "category": "physics",
+    "type": "multiple-choice",
+    "questionText": "What is the formula for linear momentum?",
+    "options": [
+      "p = ma",
+      "p = mv",
+      "p = Ft",
+      "p = mgh"
+    ],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "physics-036",
+    "category": "physics",
+    "type": "multiple-choice",
+    "questionText": "What type of lens is thicker at the center and converges parallel light rays to a focal point?",
+    "options": [
+      "Concave lens",
+      "Convex lens",
+      "Planar lens",
+      "Cylindrical lens"
+    ],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "physics-037",
+    "category": "physics",
+    "type": "multiple-choice",
+    "questionText": "Marie Curie was awarded Nobel Prizes in which two scientific fields?",
+    "options": [
+      "Physics and Chemistry",
+      "Physics and Medicine",
+      "Chemistry and Biology",
+      "Physics and Mathematics"
+    ],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "physics-038",
+    "category": "physics",
+    "type": "multiple-choice",
+    "questionText": "According to Ohm's law, what is the relationship between voltage (V), current (I), and resistance (R)?",
+    "options": [
+      "V = I / R",
+      "V = I × R",
+      "V = R / I",
+      "V = I² × R"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "physics-039",
+    "category": "physics",
+    "type": "multiple-choice",
+    "questionText": "Which type of nuclear radiation has the greatest penetrating power?",
+    "options": [
+      "Alpha particles",
+      "Beta particles",
+      "Gamma rays",
+      "Neutron radiation"
+    ],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "physics-040",
+    "category": "physics",
+    "type": "multiple-choice",
+    "questionText": "What is the name of the force experienced by a charged particle moving through a magnetic field?",
+    "options": [
+      "Coulomb force",
+      "Centripetal force",
+      "Lorentz force",
+      "Coriolis force"
+    ],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "physics-041",
+    "category": "physics",
+    "type": "multiple-choice",
+    "questionText": "The pascal is the SI unit of which physical quantity?",
+    "options": [
+      "Force",
+      "Energy",
+      "Pressure",
+      "Viscosity"
+    ],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "physics-042",
+    "category": "physics",
+    "type": "multiple-choice",
+    "questionText": "Which physicist proposed a model of the atom with electrons occupying quantized energy levels?",
+    "options": [
+      "Ernest Rutherford",
+      "Niels Bohr",
+      "J.J. Thomson",
+      "James Chadwick"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "physics-043",
+    "category": "physics",
+    "type": "multiple-choice",
+    "questionText": "What is the bending of a wave around the edges of an obstacle or aperture called?",
+    "options": [
+      "Refraction",
+      "Reflection",
+      "Diffraction",
+      "Absorption"
+    ],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "physics-044",
+    "category": "physics",
+    "type": "multiple-choice",
+    "questionText": "According to special relativity, what happens to an object's relativistic mass as its speed approaches the speed of light?",
+    "options": [
+      "It decreases toward zero",
+      "It remains constant",
+      "It increases without bound",
+      "It oscillates unpredictably"
+    ],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "physics-045",
+    "category": "physics",
+    "type": "multiple-choice",
+    "questionText": "What is the name of the effect in which electrons are ejected from a metal surface when light of sufficient frequency strikes it?",
+    "options": [
+      "Compton effect",
+      "Photoelectric effect",
+      "Zeeman effect",
+      "Stark effect"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "physics-046",
+    "category": "physics",
+    "type": "multiple-choice",
+    "questionText": "What is the approximate value of the universal gravitational constant G?",
+    "options": [
+      "6.674 × 10⁻¹¹ N·m²/kg²",
+      "9.109 × 10⁻³¹ N·m²/kg²",
+      "1.602 × 10⁻¹⁹ N·m²/kg²",
+      "8.854 × 10⁻¹² N·m²/kg²"
+    ],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "physics-047",
+    "category": "physics",
+    "type": "multiple-choice",
+    "questionText": "What is the SI unit of magnetic flux?",
+    "options": [
+      "Tesla",
+      "Weber",
+      "Henry",
+      "Gauss"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "physics-048",
+    "category": "physics",
+    "type": "multiple-choice",
+    "questionText": "Bernoulli's principle states that an increase in the speed of a fluid occurs simultaneously with a decrease in what quantity?",
+    "options": [
+      "Temperature",
+      "Viscosity",
+      "Pressure",
+      "Density"
+    ],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "physics-049",
+    "category": "physics",
+    "type": "multiple-choice",
+    "questionText": "What is the separation of white light into its component colors by a prism called?",
+    "options": [
+      "Diffraction",
+      "Polarization",
+      "Dispersion",
+      "Fluorescence"
+    ],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "physics-050",
+    "category": "physics",
+    "type": "multiple-choice",
+    "questionText": "What is the half-life of a radioactive isotope?",
+    "options": [
+      "The time for all atoms in a sample to decay",
+      "The time for half the atoms in a sample to decay",
+      "The energy released during one decay event",
+      "The average lifetime of a single radioactive atom"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "physics-051",
+    "category": "physics",
+    "type": "multiple-choice",
+    "questionText": "Which physicist is famous for developing the path integral formulation of quantum mechanics and for his work on quantum electrodynamics?",
+    "options": [
+      "Murray Gell-Mann",
+      "Richard Feynman",
+      "Enrico Fermi",
+      "Wolfgang Pauli"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "physics-052",
+    "category": "physics",
+    "type": "multiple-choice",
+    "questionText": "What is the name of the theoretical radiation predicted to be emitted by black holes due to quantum effects near the event horizon?",
+    "options": [
+      "Cherenkov radiation",
+      "Bremsstrahlung",
+      "Hawking radiation",
+      "Synchrotron radiation"
+    ],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "physics-053",
+    "category": "physics",
+    "type": "multiple-choice",
+    "questionText": "What is the SI unit of electrical capacitance?",
+    "options": [
+      "Coulomb",
+      "Farad",
+      "Henry",
+      "Siemens"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "physics-054",
+    "category": "physics",
+    "type": "multiple-choice",
+    "questionText": "Which of the following is NOT one of the four fundamental forces of nature?",
+    "options": [
+      "Gravitational force",
+      "Centrifugal force",
+      "Strong nuclear force",
+      "Weak nuclear force"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "physics-055",
+    "category": "physics",
+    "type": "multiple-choice",
+    "questionText": "What phenomenon occurs when light passes from a denser medium to a less dense medium at an angle greater than the critical angle?",
+    "options": [
+      "Partial reflection",
+      "Diffraction",
+      "Total internal reflection",
+      "Absorption"
+    ],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "physics-056",
+    "category": "physics",
+    "type": "multiple-choice",
+    "questionText": "What is the centripetal acceleration of an object moving in a circle of radius r at speed v?",
+    "options": [
+      "a = v/r",
+      "a = v²/r",
+      "a = vr",
+      "a = v²r"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "physics-057",
+    "category": "physics",
+    "type": "multiple-choice",
+    "questionText": "In the electromagnetic spectrum, which type of radiation has a frequency just below that of visible light?",
+    "options": [
+      "Ultraviolet",
+      "Infrared",
+      "Microwave",
+      "X-ray"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "physics-058",
+    "category": "physics",
+    "type": "multiple-choice",
+    "questionText": "What is the de Broglie wavelength of a particle with momentum p?",
+    "options": [
+      "λ = hp",
+      "λ = h/p",
+      "λ = p/h",
+      "λ = h²/p"
+    ],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "physics-059",
+    "category": "physics",
+    "type": "multiple-choice",
+    "questionText": "The strong nuclear force is mediated by which gauge boson?",
+    "options": [
+      "Photon",
+      "W boson",
+      "Gluon",
+      "Z boson"
+    ],
+    "correctIndex": 2,
+    "difficulty": "hard"
+  },
+  {
+    "id": "physics-060",
+    "category": "physics",
+    "type": "multiple-choice",
+    "questionText": "In general relativity, gravity is best described as what?",
+    "options": [
+      "A force transmitted by gravitons",
+      "The curvature of spacetime caused by mass and energy",
+      "An electromagnetic interaction between massive bodies",
+      "A quantum field effect at large scales"
+    ],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "physics-061",
+    "category": "physics",
+    "type": "multiple-choice",
+    "questionText": "The Chandrasekhar limit is the maximum mass of a stable white dwarf star. What is its approximate value?",
+    "options": [
+      "0.5 solar masses",
+      "1.0 solar masses",
+      "1.4 solar masses",
+      "2.5 solar masses"
+    ],
+    "correctIndex": 2,
+    "difficulty": "hard"
+  },
+  {
+    "id": "physics-062",
+    "category": "physics",
+    "type": "multiple-choice",
+    "questionText": "Lenz's law states that the direction of an induced electric current is such that it:",
+    "options": [
+      "Reinforces the change in magnetic flux that produced it",
+      "Opposes the change in magnetic flux that produced it",
+      "Is always perpendicular to the magnetic field",
+      "Is proportional to the rate of change of flux"
+    ],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "physics-063",
+    "category": "physics",
+    "type": "multiple-choice",
+    "questionText": "A proton is composed of which combination of quarks?",
+    "options": [
+      "Three up quarks",
+      "Two up quarks and one down quark",
+      "One up quark and two down quarks",
+      "Two down quarks and one strange quark"
+    ],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "physics-064",
+    "category": "physics",
+    "type": "multiple-choice",
+    "questionText": "The Pauli exclusion principle states that no two identical fermions can occupy:",
+    "options": [
+      "The same atom simultaneously",
+      "The same quantum state simultaneously",
+      "The same energy level in different atoms",
+      "The same orbital unless they have parallel spins"
+    ],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "physics-065",
+    "category": "physics",
+    "type": "multiple-choice",
+    "questionText": "The Stefan–Boltzmann law states that the total energy radiated per unit surface area of a black body is proportional to what power of its absolute temperature?",
+    "options": [
+      "Second power (T²)",
+      "Third power (T³)",
+      "Fourth power (T⁴)",
+      "Fifth power (T⁵)"
+    ],
+    "correctIndex": 2,
+    "difficulty": "hard"
+  },
+  {
+    "id": "physics-tf-011",
+    "category": "physics",
+    "type": "true-false",
+    "questionText": "The acceleration due to gravity on the Moon is the same as on Earth.",
+    "options": [
+      "True",
+      "False"
+    ],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "physics-tf-012",
+    "category": "physics",
+    "type": "true-false",
+    "questionText": "A permanent magnet always has both a north pole and a south pole.",
+    "options": [
+      "True",
+      "False"
+    ],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "physics-tf-013",
+    "category": "physics",
+    "type": "true-false",
+    "questionText": "Sound cannot travel through a vacuum.",
+    "options": [
+      "True",
+      "False"
+    ],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "physics-tf-014",
+    "category": "physics",
+    "type": "true-false",
+    "questionText": "The total momentum of an isolated system is always conserved, regardless of internal collisions.",
+    "options": [
+      "True",
+      "False"
+    ],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "physics-tf-015",
+    "category": "physics",
+    "type": "true-false",
+    "questionText": "X-rays have a longer wavelength than visible light.",
+    "options": [
+      "True",
+      "False"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "physics-tf-016",
+    "category": "physics",
+    "type": "true-false",
+    "questionText": "According to special relativity, time passes more slowly for an observer moving at high speed relative to a stationary observer.",
+    "options": [
+      "True",
+      "False"
+    ],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "physics-tf-017",
+    "category": "physics",
+    "type": "true-false",
+    "questionText": "An electric current flowing through a wire always produces a magnetic field around it.",
+    "options": [
+      "True",
+      "False"
+    ],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "physics-tf-018",
+    "category": "physics",
+    "type": "true-false",
+    "questionText": "Nuclear fusion releases less energy per unit mass of fuel than nuclear fission.",
+    "options": [
+      "True",
+      "False"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "physics-tf-019",
+    "category": "physics",
+    "type": "true-false",
+    "questionText": "According to the Copenhagen interpretation of quantum mechanics, a particle's wave function collapses into a definite state upon measurement.",
+    "options": [
+      "True",
+      "False"
+    ],
+    "correctIndex": 0,
+    "difficulty": "hard"
+  },
+  {
+    "id": "physics-tf-020",
+    "category": "physics",
+    "type": "true-false",
+    "questionText": "Neutron stars are primarily composed of protons.",
+    "options": [
+      "True",
+      "False"
+    ],
+    "correctIndex": 1,
     "difficulty": "hard"
   }
 ]

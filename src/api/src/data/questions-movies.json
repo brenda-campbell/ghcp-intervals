@@ -4,7 +4,12 @@
     "category": "movies",
     "type": "multiple-choice",
     "questionText": "Which movie won the Academy Award for Best Picture in 2020?",
-    "options": ["1917", "Joker", "Parasite", "Once Upon a Time in Hollywood"],
+    "options": [
+      "1917",
+      "Joker",
+      "Parasite",
+      "Once Upon a Time in Hollywood"
+    ],
     "correctIndex": 2,
     "difficulty": "medium"
   },
@@ -13,7 +18,12 @@
     "category": "movies",
     "type": "multiple-choice",
     "questionText": "Who directed the 1993 film 'Jurassic Park'?",
-    "options": ["James Cameron", "Steven Spielberg", "Ridley Scott", "George Lucas"],
+    "options": [
+      "James Cameron",
+      "Steven Spielberg",
+      "Ridley Scott",
+      "George Lucas"
+    ],
     "correctIndex": 1,
     "difficulty": "easy"
   },
@@ -22,7 +32,12 @@
     "category": "movies",
     "type": "multiple-choice",
     "questionText": "In what year was the original 'Star Wars' film released?",
-    "options": ["1975", "1977", "1979", "1980"],
+    "options": [
+      "1975",
+      "1977",
+      "1979",
+      "1980"
+    ],
     "correctIndex": 1,
     "difficulty": "easy"
   },
@@ -31,7 +46,12 @@
     "category": "movies",
     "type": "multiple-choice",
     "questionText": "Which actor played the Joker in 'The Dark Knight' (2008)?",
-    "options": ["Jack Nicholson", "Jared Leto", "Joaquin Phoenix", "Heath Ledger"],
+    "options": [
+      "Jack Nicholson",
+      "Jared Leto",
+      "Joaquin Phoenix",
+      "Heath Ledger"
+    ],
     "correctIndex": 3,
     "difficulty": "easy"
   },
@@ -40,7 +60,12 @@
     "category": "movies",
     "type": "multiple-choice",
     "questionText": "What is the highest-grossing film of all time (not adjusted for inflation)?",
-    "options": ["Avengers: Endgame", "Avatar", "Titanic", "Star Wars: The Force Awakens"],
+    "options": [
+      "Avengers: Endgame",
+      "Avatar",
+      "Titanic",
+      "Star Wars: The Force Awakens"
+    ],
     "correctIndex": 1,
     "difficulty": "medium"
   },
@@ -49,7 +74,12 @@
     "category": "movies",
     "type": "multiple-choice",
     "questionText": "In 'The Matrix', what color pill does Neo take to see the truth?",
-    "options": ["Blue", "Red", "Green", "White"],
+    "options": [
+      "Blue",
+      "Red",
+      "Green",
+      "White"
+    ],
     "correctIndex": 1,
     "difficulty": "easy"
   },
@@ -58,7 +88,12 @@
     "category": "movies",
     "type": "multiple-choice",
     "questionText": "Which classic film features the quote 'Here's looking at you, kid'?",
-    "options": ["Gone with the Wind", "Casablanca", "Citizen Kane", "The Maltese Falcon"],
+    "options": [
+      "Gone with the Wind",
+      "Casablanca",
+      "Citizen Kane",
+      "The Maltese Falcon"
+    ],
     "correctIndex": 1,
     "difficulty": "medium"
   },
@@ -67,7 +102,12 @@
     "category": "movies",
     "type": "multiple-choice",
     "questionText": "Who played the title character in the 1994 film 'Forrest Gump'?",
-    "options": ["Robin Williams", "Tom Hanks", "Jim Carrey", "Kevin Costner"],
+    "options": [
+      "Robin Williams",
+      "Tom Hanks",
+      "Jim Carrey",
+      "Kevin Costner"
+    ],
     "correctIndex": 1,
     "difficulty": "easy"
   },
@@ -76,7 +116,12 @@
     "category": "movies",
     "type": "multiple-choice",
     "questionText": "What is the fictional country in Marvel's 'Black Panther'?",
-    "options": ["Sokovia", "Wakanda", "Madripoor", "Genosha"],
+    "options": [
+      "Sokovia",
+      "Wakanda",
+      "Madripoor",
+      "Genosha"
+    ],
     "correctIndex": 1,
     "difficulty": "easy"
   },
@@ -85,7 +130,12 @@
     "category": "movies",
     "type": "multiple-choice",
     "questionText": "Which HBO TV series features the Iron Throne?",
-    "options": ["Westworld", "The Witcher", "Game of Thrones", "The Lord of the Rings: The Rings of Power"],
+    "options": [
+      "Westworld",
+      "The Witcher",
+      "Game of Thrones",
+      "The Lord of the Rings: The Rings of Power"
+    ],
     "correctIndex": 2,
     "difficulty": "easy"
   },
@@ -94,7 +144,12 @@
     "category": "movies",
     "type": "multiple-choice",
     "questionText": "In what year did the first episode of 'Friends' air?",
-    "options": ["1992", "1994", "1996", "1998"],
+    "options": [
+      "1992",
+      "1994",
+      "1996",
+      "1998"
+    ],
     "correctIndex": 1,
     "difficulty": "medium"
   },
@@ -103,7 +158,12 @@
     "category": "movies",
     "type": "multiple-choice",
     "questionText": "Who directed the 2010 film 'Inception'?",
-    "options": ["David Fincher", "Christopher Nolan", "Denis Villeneuve", "Ridley Scott"],
+    "options": [
+      "David Fincher",
+      "Christopher Nolan",
+      "Denis Villeneuve",
+      "Ridley Scott"
+    ],
     "correctIndex": 1,
     "difficulty": "easy"
   },
@@ -112,7 +172,12 @@
     "category": "movies",
     "type": "multiple-choice",
     "questionText": "In which film does the character Jack Dawson appear?",
-    "options": ["The Great Gatsby", "Titanic", "Catch Me If You Can", "The Departed"],
+    "options": [
+      "The Great Gatsby",
+      "Titanic",
+      "Catch Me If You Can",
+      "The Departed"
+    ],
     "correctIndex": 1,
     "difficulty": "easy"
   },
@@ -121,7 +186,12 @@
     "category": "movies",
     "type": "multiple-choice",
     "questionText": "What is the name of the parallel dimension in 'Stranger Things'?",
-    "options": ["The Shadow Realm", "The Upside Down", "The Other Side", "The Dark World"],
+    "options": [
+      "The Shadow Realm",
+      "The Upside Down",
+      "The Other Side",
+      "The Dark World"
+    ],
     "correctIndex": 1,
     "difficulty": "medium"
   },
@@ -130,7 +200,12 @@
     "category": "movies",
     "type": "multiple-choice",
     "questionText": "Which actor has portrayed James Bond in the most official EON Productions films?",
-    "options": ["Sean Connery", "Daniel Craig", "Roger Moore", "Pierce Brosnan"],
+    "options": [
+      "Sean Connery",
+      "Daniel Craig",
+      "Roger Moore",
+      "Pierce Brosnan"
+    ],
     "correctIndex": 2,
     "difficulty": "hard"
   },
@@ -139,7 +214,12 @@
     "category": "movies",
     "type": "multiple-choice",
     "questionText": "What was the first fully computer-animated feature film?",
-    "options": ["Shrek", "Toy Story", "A Bug's Life", "Finding Nemo"],
+    "options": [
+      "Shrek",
+      "Toy Story",
+      "A Bug's Life",
+      "Finding Nemo"
+    ],
     "correctIndex": 1,
     "difficulty": "medium"
   },
@@ -148,7 +228,12 @@
     "category": "movies",
     "type": "multiple-choice",
     "questionText": "Which TV show follows a high school chemistry teacher who turns to manufacturing methamphetamine?",
-    "options": ["Ozark", "Breaking Bad", "Narcos", "Better Call Saul"],
+    "options": [
+      "Ozark",
+      "Breaking Bad",
+      "Narcos",
+      "Better Call Saul"
+    ],
     "correctIndex": 1,
     "difficulty": "easy"
   },
@@ -157,7 +242,12 @@
     "category": "movies",
     "type": "multiple-choice",
     "questionText": "In 'The Lord of the Rings', what is the name of Gandalf's sword?",
-    "options": ["Sting", "Andúril", "Glamdring", "Orcrist"],
+    "options": [
+      "Sting",
+      "Andúril",
+      "Glamdring",
+      "Orcrist"
+    ],
     "correctIndex": 2,
     "difficulty": "hard"
   },
@@ -166,7 +256,12 @@
     "category": "movies",
     "type": "multiple-choice",
     "questionText": "Which Alfred Hitchcock film features the Bates Motel?",
-    "options": ["Vertigo", "Rear Window", "Psycho", "The Birds"],
+    "options": [
+      "Vertigo",
+      "Rear Window",
+      "Psycho",
+      "The Birds"
+    ],
     "correctIndex": 2,
     "difficulty": "medium"
   },
@@ -175,7 +270,12 @@
     "category": "movies",
     "type": "multiple-choice",
     "questionText": "Who composed the iconic musical scores for 'Star Wars', 'Jaws', and 'Indiana Jones'?",
-    "options": ["Hans Zimmer", "John Williams", "Ennio Morricone", "Howard Shore"],
+    "options": [
+      "Hans Zimmer",
+      "John Williams",
+      "Ennio Morricone",
+      "Howard Shore"
+    ],
     "correctIndex": 1,
     "difficulty": "medium"
   },
@@ -184,7 +284,12 @@
     "category": "movies",
     "type": "multiple-choice",
     "questionText": "What is the name of the sentient computer in '2001: A Space Odyssey'?",
-    "options": ["WOPR", "Skynet", "HAL 9000", "Deep Thought"],
+    "options": [
+      "WOPR",
+      "Skynet",
+      "HAL 9000",
+      "Deep Thought"
+    ],
     "correctIndex": 2,
     "difficulty": "medium"
   },
@@ -193,7 +298,12 @@
     "category": "movies",
     "type": "multiple-choice",
     "questionText": "Which Studio Ghibli film features a girl working in a bathhouse for spirits?",
-    "options": ["My Neighbor Totoro", "Princess Mononoke", "Spirited Away", "Howl's Moving Castle"],
+    "options": [
+      "My Neighbor Totoro",
+      "Princess Mononoke",
+      "Spirited Away",
+      "Howl's Moving Castle"
+    ],
     "correctIndex": 2,
     "difficulty": "medium"
   },
@@ -202,7 +312,12 @@
     "category": "movies",
     "type": "multiple-choice",
     "questionText": "Which 1994 film is set in Shawshank State Penitentiary?",
-    "options": ["The Green Mile", "The Shawshank Redemption", "Cool Hand Luke", "Escape from Alcatraz"],
+    "options": [
+      "The Green Mile",
+      "The Shawshank Redemption",
+      "Cool Hand Luke",
+      "Escape from Alcatraz"
+    ],
     "correctIndex": 1,
     "difficulty": "easy"
   },
@@ -211,7 +326,12 @@
     "category": "movies",
     "type": "multiple-choice",
     "questionText": "In the TV series 'The Mandalorian', what species is Grogu (Baby Yoda)?",
-    "options": ["Ewok", "Jawa", "Unknown (same species as Yoda)", "Wookiee"],
+    "options": [
+      "Ewok",
+      "Jawa",
+      "Unknown (same species as Yoda)",
+      "Wookiee"
+    ],
     "correctIndex": 2,
     "difficulty": "medium"
   },
@@ -220,7 +340,12 @@
     "category": "movies",
     "type": "multiple-choice",
     "questionText": "Which film features the line 'I see dead people'?",
-    "options": ["The Others", "The Sixth Sense", "Ghost", "Poltergeist"],
+    "options": [
+      "The Others",
+      "The Sixth Sense",
+      "Ghost",
+      "Poltergeist"
+    ],
     "correctIndex": 1,
     "difficulty": "medium"
   },
@@ -229,7 +354,12 @@
     "category": "movies",
     "type": "multiple-choice",
     "questionText": "What is the name of the fictional metal in the Marvel Cinematic Universe that Captain America's shield is made of?",
-    "options": ["Adamantium", "Vibranium", "Uru", "Carbonadium"],
+    "options": [
+      "Adamantium",
+      "Vibranium",
+      "Uru",
+      "Carbonadium"
+    ],
     "correctIndex": 1,
     "difficulty": "hard"
   },
@@ -238,7 +368,12 @@
     "category": "movies",
     "type": "multiple-choice",
     "questionText": "Which Quentin Tarantino film takes place largely in a single cabin during a blizzard?",
-    "options": ["Kill Bill: Volume 1", "Django Unchained", "The Hateful Eight", "Reservoir Dogs"],
+    "options": [
+      "Kill Bill: Volume 1",
+      "Django Unchained",
+      "The Hateful Eight",
+      "Reservoir Dogs"
+    ],
     "correctIndex": 2,
     "difficulty": "hard"
   },
@@ -247,7 +382,12 @@
     "category": "movies",
     "type": "multiple-choice",
     "questionText": "Who played Hermione Granger in the Harry Potter film series?",
-    "options": ["Emma Stone", "Emma Watson", "Emma Thompson", "Emma Roberts"],
+    "options": [
+      "Emma Stone",
+      "Emma Watson",
+      "Emma Thompson",
+      "Emma Roberts"
+    ],
     "correctIndex": 1,
     "difficulty": "easy"
   },
@@ -256,7 +396,12 @@
     "category": "movies",
     "type": "multiple-choice",
     "questionText": "Which animated film features the song 'Let It Go'?",
-    "options": ["Tangled", "Moana", "Frozen", "Brave"],
+    "options": [
+      "Tangled",
+      "Moana",
+      "Frozen",
+      "Brave"
+    ],
     "correctIndex": 2,
     "difficulty": "easy"
   },
@@ -265,7 +410,12 @@
     "category": "movies",
     "type": "multiple-choice",
     "questionText": "Which filmmaker directed 'Schindler's List' and 'Saving Private Ryan'?",
-    "options": ["Martin Scorsese", "Francis Ford Coppola", "Stanley Kubrick", "Steven Spielberg"],
+    "options": [
+      "Martin Scorsese",
+      "Francis Ford Coppola",
+      "Stanley Kubrick",
+      "Steven Spielberg"
+    ],
     "correctIndex": 3,
     "difficulty": "medium"
   },
@@ -274,7 +424,12 @@
     "category": "movies",
     "type": "multiple-choice",
     "questionText": "In the TV series 'The Office' (US), what company do the main characters work for?",
-    "options": ["Initech", "Dunder Mifflin", "Pied Piper", "Sterling Cooper"],
+    "options": [
+      "Initech",
+      "Dunder Mifflin",
+      "Pied Piper",
+      "Sterling Cooper"
+    ],
     "correctIndex": 1,
     "difficulty": "easy"
   },
@@ -283,7 +438,12 @@
     "category": "movies",
     "type": "multiple-choice",
     "questionText": "What year was the first 'The Godfather' film released?",
-    "options": ["1969", "1972", "1975", "1978"],
+    "options": [
+      "1969",
+      "1972",
+      "1975",
+      "1978"
+    ],
     "correctIndex": 1,
     "difficulty": "hard"
   },
@@ -292,7 +452,10 @@
     "category": "movies",
     "type": "true-false",
     "questionText": "'The Shawshank Redemption' was released in 1994.",
-    "options": ["True", "False"],
+    "options": [
+      "True",
+      "False"
+    ],
     "correctIndex": 0,
     "difficulty": "easy"
   },
@@ -301,7 +464,10 @@
     "category": "movies",
     "type": "true-false",
     "questionText": "Leonardo DiCaprio won his first Academy Award for Best Actor for his role in 'Titanic'.",
-    "options": ["True", "False"],
+    "options": [
+      "True",
+      "False"
+    ],
     "correctIndex": 1,
     "difficulty": "medium"
   },
@@ -310,7 +476,10 @@
     "category": "movies",
     "type": "true-false",
     "questionText": "The TV series 'The Office' (US version) is set in Scranton, Pennsylvania.",
-    "options": ["True", "False"],
+    "options": [
+      "True",
+      "False"
+    ],
     "correctIndex": 0,
     "difficulty": "easy"
   },
@@ -319,7 +488,10 @@
     "category": "movies",
     "type": "true-false",
     "questionText": "Quentin Tarantino directed 'The Godfather'.",
-    "options": ["True", "False"],
+    "options": [
+      "True",
+      "False"
+    ],
     "correctIndex": 1,
     "difficulty": "easy"
   },
@@ -328,7 +500,10 @@
     "category": "movies",
     "type": "true-false",
     "questionText": "The Marvel Cinematic Universe's first film was 'Iron Man', released in 2008.",
-    "options": ["True", "False"],
+    "options": [
+      "True",
+      "False"
+    ],
     "correctIndex": 0,
     "difficulty": "easy"
   },
@@ -337,7 +512,10 @@
     "category": "movies",
     "type": "true-false",
     "questionText": "The character of Indiana Jones was played by Harrison Ford.",
-    "options": ["True", "False"],
+    "options": [
+      "True",
+      "False"
+    ],
     "correctIndex": 0,
     "difficulty": "easy"
   },
@@ -346,7 +524,10 @@
     "category": "movies",
     "type": "true-false",
     "questionText": "The film 'Jaws' was directed by James Cameron.",
-    "options": ["True", "False"],
+    "options": [
+      "True",
+      "False"
+    ],
     "correctIndex": 1,
     "difficulty": "medium"
   },
@@ -355,7 +536,10 @@
     "category": "movies",
     "type": "true-false",
     "questionText": "'The Simpsons' first aired as its own TV series in 1989.",
-    "options": ["True", "False"],
+    "options": [
+      "True",
+      "False"
+    ],
     "correctIndex": 0,
     "difficulty": "medium"
   },
@@ -364,7 +548,10 @@
     "category": "movies",
     "type": "true-false",
     "questionText": "In L. Frank Baum's original book 'The Wonderful Wizard of Oz', Dorothy's slippers were silver, not ruby.",
-    "options": ["True", "False"],
+    "options": [
+      "True",
+      "False"
+    ],
     "correctIndex": 0,
     "difficulty": "hard"
   },
@@ -373,8 +560,663 @@
     "category": "movies",
     "type": "true-false",
     "questionText": "The movie 'Gladiator' (2000) starring Russell Crowe is set during the Roman Republic era.",
-    "options": ["True", "False"],
+    "options": [
+      "True",
+      "False"
+    ],
     "correctIndex": 1,
     "difficulty": "hard"
+  },
+  {
+    "id": "movies-033",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Which film won the Academy Award for Best Picture at the 96th Oscars in 2024?",
+    "options": [
+      "The Holdovers",
+      "Oppenheimer",
+      "Killers of the Flower Moon",
+      "Poor Things"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "movies-034",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Who directed the 1994 film 'Pulp Fiction'?",
+    "options": [
+      "Martin Scorsese",
+      "Quentin Tarantino",
+      "Steven Soderbergh",
+      "David Fincher"
+    ],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "movies-035",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "What is the name of Luke Skywalker's home planet in 'Star Wars'?",
+    "options": [
+      "Tatooine",
+      "Naboo",
+      "Coruscant",
+      "Alderaan"
+    ],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "movies-036",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Which actress holds the record for the most Academy Awards for acting, with four wins?",
+    "options": [
+      "Meryl Streep",
+      "Katharine Hepburn",
+      "Ingrid Bergman",
+      "Bette Davis"
+    ],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "movies-037",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "In what year was 'The Wizard of Oz' released?",
+    "options": [
+      "1935",
+      "1939",
+      "1942",
+      "1945"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "movies-038",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Which Christopher Nolan film depicts the World War II evacuation of Allied soldiers from a beach in France?",
+    "options": [
+      "Interstellar",
+      "Dunkirk",
+      "Tenet",
+      "The Dark Knight Rises"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "movies-039",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "What is the name of the alien world in James Cameron's 'Avatar' (2009)?",
+    "options": [
+      "Pandora",
+      "Titan",
+      "Kepler",
+      "Endor"
+    ],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "movies-040",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Who directed the 1968 science fiction film '2001: A Space Odyssey'?",
+    "options": [
+      "Stanley Kubrick",
+      "Ridley Scott",
+      "George Lucas",
+      "Andrei Tarkovsky"
+    ],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "movies-041",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Which actor played Tony Montana in the 1983 film 'Scarface'?",
+    "options": [
+      "Al Pacino",
+      "Robert De Niro",
+      "Jack Nicholson",
+      "Dustin Hoffman"
+    ],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "movies-042",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "In 'The Lion King' (1994), what is the name of Simba's father?",
+    "options": [
+      "Mufasa",
+      "Scar",
+      "Rafiki",
+      "Zazu"
+    ],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "movies-043",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Which Martin Scorsese film stars Leonardo DiCaprio as a fraudulent stockbroker?",
+    "options": [
+      "The Wolf of Wall Street",
+      "Goodfellas",
+      "The Aviator",
+      "Gangs of New York"
+    ],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "movies-044",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "What is the name of the island where the dinosaurs live in 'Jurassic Park'?",
+    "options": [
+      "Isla Nublar",
+      "Isla Sorna",
+      "Isla Muerta",
+      "Isla del Coco"
+    ],
+    "correctIndex": 0,
+    "difficulty": "hard"
+  },
+  {
+    "id": "movies-045",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Which Pixar film features characters named Joy, Sadness, Anger, Fear, and Disgust?",
+    "options": [
+      "Inside Out",
+      "Coco",
+      "Up",
+      "Soul"
+    ],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "movies-046",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Who played Vito Corleone in the original 'The Godfather' (1972)?",
+    "options": [
+      "Marlon Brando",
+      "Al Pacino",
+      "Robert De Niro",
+      "James Caan"
+    ],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "movies-047",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Which horror film franchise features the villain Freddy Krueger?",
+    "options": [
+      "A Nightmare on Elm Street",
+      "Friday the 13th",
+      "Halloween",
+      "The Texas Chain Saw Massacre"
+    ],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "movies-048",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "What is the name of Batman's loyal butler?",
+    "options": [
+      "Alfred",
+      "Jarvis",
+      "Lucius",
+      "Gordon"
+    ],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "movies-049",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Which DreamWorks Animation film features a green ogre living in a swamp?",
+    "options": [
+      "Shrek",
+      "Kung Fu Panda",
+      "Madagascar",
+      "How to Train Your Dragon"
+    ],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "movies-050",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "In 'Back to the Future', what speed must the DeLorean reach to travel through time?",
+    "options": [
+      "65 mph",
+      "77 mph",
+      "88 mph",
+      "100 mph"
+    ],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "movies-051",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Who directed the 2006 crime film 'The Departed'?",
+    "options": [
+      "Martin Scorsese",
+      "Steven Spielberg",
+      "Clint Eastwood",
+      "Ridley Scott"
+    ],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "movies-052",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Which film franchise features the famous quote 'May the Force be with you'?",
+    "options": [
+      "Star Trek",
+      "Star Wars",
+      "Battlestar Galactica",
+      "Dune"
+    ],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "movies-053",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "What is the name of the commercial spacecraft in Ridley Scott's 'Alien' (1979)?",
+    "options": [
+      "Nostromo",
+      "Sulaco",
+      "Prometheus",
+      "Covenant"
+    ],
+    "correctIndex": 0,
+    "difficulty": "hard"
+  },
+  {
+    "id": "movies-054",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Which actress played Katniss Everdeen in 'The Hunger Games' film series?",
+    "options": [
+      "Jennifer Lawrence",
+      "Emma Stone",
+      "Shailene Woodley",
+      "Scarlett Johansson"
+    ],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "movies-055",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Which Ridley Scott film is set in a dystopian Los Angeles in the year 2019?",
+    "options": [
+      "Blade Runner",
+      "Total Recall",
+      "RoboCop",
+      "Minority Report"
+    ],
+    "correctIndex": 0,
+    "difficulty": "hard"
+  },
+  {
+    "id": "movies-056",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "In 'Finding Nemo', what type of fish is Nemo?",
+    "options": [
+      "Clownfish",
+      "Angelfish",
+      "Surgeonfish",
+      "Goldfish"
+    ],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "movies-057",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Which Mexican director directed 'Pan's Labyrinth' (2006) and 'The Shape of Water' (2017)?",
+    "options": [
+      "Alfonso Cuarón",
+      "Alejandro González Iñárritu",
+      "Guillermo del Toro",
+      "Robert Rodriguez"
+    ],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "movies-058",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "What is the name of the artificial intelligence system that becomes self-aware in 'The Terminator' franchise?",
+    "options": [
+      "Skynet",
+      "Ultron",
+      "Nexus",
+      "VIKI"
+    ],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "movies-059",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Which Akira Kurosawa film inspired the 1960 Western 'The Magnificent Seven'?",
+    "options": [
+      "Seven Samurai",
+      "Rashomon",
+      "Yojimbo",
+      "Ikiru"
+    ],
+    "correctIndex": 0,
+    "difficulty": "hard"
+  },
+  {
+    "id": "movies-060",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Who composed the musical score for the film 'Interstellar' (2014)?",
+    "options": [
+      "Hans Zimmer",
+      "Danny Elfman",
+      "Alexandre Desplat",
+      "Ludwig Göransson"
+    ],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "movies-061",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Which Netflix original series is set in a women's prison called Litchfield Penitentiary?",
+    "options": [
+      "Orange Is the New Black",
+      "Wentworth",
+      "Oz",
+      "Prison Break"
+    ],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "movies-062",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "In 'The Silence of the Lambs', what is the name of the cannibalistic serial killer played by Anthony Hopkins?",
+    "options": [
+      "Hannibal Lecter",
+      "Norman Bates",
+      "Patrick Bateman",
+      "John Doe"
+    ],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "movies-063",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Which film won the first-ever Academy Award for Best Picture in 1929?",
+    "options": [
+      "Wings",
+      "Sunrise",
+      "The Broadway Melody",
+      "All Quiet on the Western Front"
+    ],
+    "correctIndex": 0,
+    "difficulty": "hard"
+  },
+  {
+    "id": "movies-064",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "What is the subtitle of the second 'Star Wars' prequel film, released in 2002?",
+    "options": [
+      "Attack of the Clones",
+      "Revenge of the Sith",
+      "The Clone Wars",
+      "Rise of the Empire"
+    ],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "movies-065",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Which director is known for surrealist works such as 'Mulholland Drive' and the TV series 'Twin Peaks'?",
+    "options": [
+      "David Lynch",
+      "Terrence Malick",
+      "Lars von Trier",
+      "Darren Aronofsky"
+    ],
+    "correctIndex": 0,
+    "difficulty": "hard"
+  },
+  {
+    "id": "movies-066",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "In the Marvel Cinematic Universe, what is the name of Thor's enchanted hammer?",
+    "options": [
+      "Mjolnir",
+      "Gungnir",
+      "Stormbreaker",
+      "Hofund"
+    ],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "movies-067",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Which Disney animated film features the sea witch villain Ursula?",
+    "options": [
+      "The Little Mermaid",
+      "Sleeping Beauty",
+      "Cinderella",
+      "The Princess and the Frog"
+    ],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "movies-068",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Who directed the horror films 'Get Out' (2017) and 'Us' (2019)?",
+    "options": [
+      "Jordan Peele",
+      "Ari Aster",
+      "James Wan",
+      "Robert Eggers"
+    ],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "movies-069",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Which 1959 epic film was the first to win 11 Academy Awards?",
+    "options": [
+      "Ben-Hur",
+      "The Godfather",
+      "Schindler's List",
+      "Forrest Gump"
+    ],
+    "correctIndex": 0,
+    "difficulty": "hard"
+  },
+  {
+    "id": "movies-070",
+    "category": "movies",
+    "type": "multiple-choice",
+    "questionText": "Who plays Truman Burbank in the 1998 film 'The Truman Show'?",
+    "options": [
+      "Jim Carrey",
+      "Robin Williams",
+      "Adam Sandler",
+      "Ben Stiller"
+    ],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "movies-tf-011",
+    "category": "movies",
+    "type": "true-false",
+    "questionText": "The Pixar film 'Toy Story 2' was released in 1999.",
+    "options": [
+      "True",
+      "False"
+    ],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "movies-tf-012",
+    "category": "movies",
+    "type": "true-false",
+    "questionText": "Christopher Nolan directed the mystery thriller 'The Prestige' (2006).",
+    "options": [
+      "True",
+      "False"
+    ],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "movies-tf-013",
+    "category": "movies",
+    "type": "true-false",
+    "questionText": "The character Darth Vader was voiced by James Earl Jones in the original 'Star Wars' trilogy.",
+    "options": [
+      "True",
+      "False"
+    ],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "movies-tf-014",
+    "category": "movies",
+    "type": "true-false",
+    "questionText": "Steven Spielberg's 'Schindler's List' (1993) was filmed entirely in color.",
+    "options": [
+      "True",
+      "False"
+    ],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "movies-tf-015",
+    "category": "movies",
+    "type": "true-false",
+    "questionText": "The 'Lord of the Rings' film trilogy was directed by Peter Jackson.",
+    "options": [
+      "True",
+      "False"
+    ],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "movies-tf-016",
+    "category": "movies",
+    "type": "true-false",
+    "questionText": "Walt Disney's first full-length animated feature film was 'Bambi'.",
+    "options": [
+      "True",
+      "False"
+    ],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "movies-tf-017",
+    "category": "movies",
+    "type": "true-false",
+    "questionText": "Brad Pitt and Edward Norton both star in the 1999 film 'Fight Club'.",
+    "options": [
+      "True",
+      "False"
+    ],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "movies-tf-018",
+    "category": "movies",
+    "type": "true-false",
+    "questionText": "The streaming service Disney+ launched in November 2019.",
+    "options": [
+      "True",
+      "False"
+    ],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "movies-tf-019",
+    "category": "movies",
+    "type": "true-false",
+    "questionText": "Alfred Hitchcock won the Academy Award for Best Director for his film 'Psycho'.",
+    "options": [
+      "True",
+      "False"
+    ],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "movies-tf-020",
+    "category": "movies",
+    "type": "true-false",
+    "questionText": "The film 'Slumdog Millionaire' (2008) is set primarily in Mumbai, India.",
+    "options": [
+      "True",
+      "False"
+    ],
+    "correctIndex": 0,
+    "difficulty": "medium"
   }
 ]
