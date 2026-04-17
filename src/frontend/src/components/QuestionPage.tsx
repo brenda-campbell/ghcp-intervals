@@ -30,9 +30,10 @@ const FEEDBACK_DURATION_MS = 2000;
 
 interface QuestionPageProps {
   onNavigateToLeaderboard?: () => void;
+  isQuizStarted?: boolean;
 }
 
-export function QuestionPage({ onNavigateToLeaderboard }: QuestionPageProps) {
+export function QuestionPage({ onNavigateToLeaderboard, isQuizStarted }: QuestionPageProps) {
   const { user } = useUser();
   const { playerActivity, categoryChanged } = useSignalRContext();
 
@@ -231,6 +232,56 @@ export function QuestionPage({ onNavigateToLeaderboard }: QuestionPageProps) {
   }
 
   if (phase === "done") {
+    // Admin-started quiz: show completion + waiting state (no "Play Again")
+    if (isQuizStarted) {
+      const totalCorrect = roundResults.filter((r) => r.result?.correct).length;
+      const totalPoints = roundResults.reduce(
+        (sum, r) => sum + (r.result?.pointsAwarded ?? 0),
+        0,
+      );
+      return (
+        <div className="animate-fade-slide-in">
+          <Card className="border-accent/30 bg-card shadow-lg">
+            <CardContent className="flex flex-col items-center gap-6 pt-6">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-500/10 border border-green-500/30">
+                <span className="text-3xl">✅</span>
+              </div>
+              <h2 className="h2 text-center">Quiz Complete!</h2>
+              <p className="text-sm text-muted-foreground text-center max-w-xs">
+                Waiting for the next round…
+              </p>
+
+              {/* Score summary */}
+              <div className="flex flex-col items-center gap-1">
+                <span className="caption text-muted-foreground">Points Earned</span>
+                <span className="h1 text-accent">{totalPoints}</span>
+                <span className="ui-label text-muted-foreground">
+                  {totalCorrect} / {roundResults.length} Correct
+                </span>
+              </div>
+
+              {/* Pulsing waiting indicator */}
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Clock weight="regular" className="h-4 w-4 animate-pulse" />
+                <span>Waiting for admin to start next round</span>
+              </div>
+
+              <Button
+                onClick={() => onNavigateToLeaderboard?.()}
+                variant="outline"
+                size="lg"
+                className="transition-transform duration-150 hover:scale-[1.03] active:scale-[0.97]"
+              >
+                <UsersThree weight="fill" className="mr-2 h-4 w-4" />
+                View Leaderboard
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      );
+    }
+
+    // Practice/free mode: show full RoundComplete with Play Again
     return (
       <RoundComplete
         results={roundResults}

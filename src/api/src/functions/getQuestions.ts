@@ -8,7 +8,7 @@ import { randomUUID } from "crypto";
 import { questionsContainer, gameStateContainer } from "../services/cosmosClient.js";
 import type { Question, QuestionResponse, GameState } from "../models/index.js";
 
-const MAX_QUESTIONS = 3;
+const MAX_QUESTIONS = 20;
 const DEFAULT_COUNT = 1;
 
 function shuffleArray<T>(arr: T[]): T[] {

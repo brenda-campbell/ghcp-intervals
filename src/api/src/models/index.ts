@@ -105,6 +105,7 @@ export interface GameState {
   activeQuestionFormat: QuestionType;
   isStarted: boolean;
   questionIds?: string[];  // pinned question IDs for synchronized quiz rounds
+  questionCount?: number;  // questions per round (default 3, range 1-20)
   updatedAt: string;
   updatedBy: string;   // userId of admin who changed it
 }

@@ -8,6 +8,7 @@ async function clearAppStorage(page: Page) {
     localStorage.removeItem('ff_userId');
     localStorage.removeItem('ff_email');
     localStorage.removeItem('ff_displayName');
+    localStorage.removeItem('theme');
   });
 }
 
@@ -347,4 +348,225 @@ test('Test 7: Return user auto-login from localStorage', async ({ page }) => {
   // Verify auto-logged in
   await expect(page.locator('h1')).toContainText('Fastest Finger');
   await expect(page.locator('button', { hasText: 'Quiz' })).toBeVisible();
+});
+
+// =============================================================
+// Test 8: Dark/Light Theme Toggle
+// =============================================================
+test('Test 8: Dark/Light theme toggle', async ({ page }) => {
+  await page.goto('/');
+  await clearAppStorage(page);
+  await page.reload();
+  await page.waitForLoadState('networkidle');
+
+  const testEmail = `e2e-theme-${Date.now()}@test.com`;
+  await loginAs(page, testEmail, 'Theme Tester');
+  await waitForAppShell(page);
+
+  // Screenshot: initial theme state
+  await page.screenshot({ path: `${SCREENSHOTS_DIR}/11-default-theme.png`, fullPage: true });
+
+  // Detect current theme from the toggle button title
+  // In dark mode: title="Switch to light mode" (Sun icon shown)
+  // In light mode: title="Switch to dark mode" (Moon icon shown)
+  const switchToLightBtn = page.locator('button[title="Switch to light mode"]');
+  const switchToDarkBtn = page.locator('button[title="Switch to dark mode"]');
+
+  // One of them must be visible
+  const lightBtnVisible = await switchToLightBtn.isVisible({ timeout: 5000 }).catch(() => false);
+  const darkBtnVisible = await switchToDarkBtn.isVisible({ timeout: 2000 }).catch(() => false);
+  expect(lightBtnVisible || darkBtnVisible).toBe(true);
+
+  // Toggle the theme
+  if (lightBtnVisible) {
+    // Currently dark → switch to light
+    await switchToLightBtn.click();
+  } else {
+    // Currently light → switch to dark
+    await switchToDarkBtn.click();
+  }
+  await page.waitForTimeout(500);
+
+  // Screenshot: toggled theme
+  await page.screenshot({ path: `${SCREENSHOTS_DIR}/12-light-theme.png`, fullPage: true });
+
+  // After toggling, the OTHER button should now be visible
+  if (lightBtnVisible) {
+    await expect(switchToDarkBtn).toBeVisible({ timeout: 5000 });
+  } else {
+    await expect(switchToLightBtn).toBeVisible({ timeout: 5000 });
+  }
+
+  // Verify CSS custom property changed (background color changes between themes)
+  const bgColorAfterToggle = await page.evaluate(() =>
+    getComputedStyle(document.documentElement).getPropertyValue('--color-background').trim()
+  );
+
+  // Toggle back to original theme
+  if (lightBtnVisible) {
+    await switchToDarkBtn.click();
+  } else {
+    await switchToLightBtn.click();
+  }
+  await page.waitForTimeout(500);
+
+  // Screenshot: original theme restored
+  await page.screenshot({ path: `${SCREENSHOTS_DIR}/13-dark-theme-restored.png`, fullPage: true });
+
+  // Verify we're back to original state
+  if (lightBtnVisible) {
+    await expect(switchToLightBtn).toBeVisible({ timeout: 5000 });
+  } else {
+    await expect(switchToDarkBtn).toBeVisible({ timeout: 5000 });
+  }
+
+  // Verify background color changed back (different from toggled state)
+  const bgColorRestored = await page.evaluate(() =>
+    getComputedStyle(document.documentElement).getPropertyValue('--color-background').trim()
+  );
+  expect(bgColorRestored).not.toBe(bgColorAfterToggle);
+});
+
+// =============================================================
+// Test 9: Quiz Complete — No Replay (Admin-Started Quiz)
+// =============================================================
+test('Test 9: Quiz complete shows waiting state (no Play Again)', async ({ page }) => {
+  await page.goto('/');
+  await clearAppStorage(page);
+  await page.reload();
+  await page.waitForLoadState('networkidle');
+
+  // Login as admin
+  await loginAs(page, 'brencampbell@microsoft.com', 'Brenda');
+  await waitForAppShell(page);
+
+  // Go to Admin tab
+  const adminTab = page.locator('button', { hasText: 'Admin' });
+  await expect(adminTab).toBeVisible({ timeout: 10000 });
+  await adminTab.click();
+  await page.waitForTimeout(3000);
+
+  // If quiz is already live, stop it first so we have a clean start
+  const stopBtn = page.getByText('Stop Quiz', { exact: false });
+  if (await stopBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
+    await stopBtn.click();
+    await page.waitForTimeout(2000);
+  }
+
+  // Start the quiz
+  const startBtn = page.getByText('Start Quiz', { exact: false });
+  await expect(startBtn).toBeVisible({ timeout: 10000 });
+  await startBtn.click();
+  await page.waitForTimeout(3000);
+
+  // Switch to Quiz tab (exact match to avoid matching "Stop Quiz" button)
+  const quizTab = page.getByRole('button', { name: 'Quiz', exact: true });
+  await quizTab.click();
+  await page.waitForTimeout(3000);
+
+  // Answer all questions — click the first answer option for each question
+  // The quiz presents questions sequentially; answer each one
+  for (let q = 0; q < 10; q++) {
+    // Check if we've reached the done screen
+    const doneHeading = page.getByText('Quiz Complete!');
+    const roundComplete = page.getByText('Round Complete!');
+    if (await doneHeading.isVisible({ timeout: 500 }).catch(() => false)) break;
+    if (await roundComplete.isVisible({ timeout: 500 }).catch(() => false)) break;
+
+    // Try to find an answer button to click
+    const answerButtons = page.locator('[data-testid^="answer-"], .grid button, [class*="answer"]');
+    const firstAnswer = answerButtons.first();
+    if (await firstAnswer.isVisible({ timeout: 3000 }).catch(() => false)) {
+      await firstAnswer.click();
+      // Wait for feedback and auto-advance
+      await page.waitForTimeout(3000);
+    } else {
+      break;
+    }
+  }
+
+  // Wait for done screen to appear
+  await page.waitForTimeout(2000);
+
+  // Screenshot: quiz complete
+  await page.screenshot({ path: `${SCREENSHOTS_DIR}/14-quiz-complete.png`, fullPage: true });
+
+  // Verify "Quiz Complete!" or "Round Complete!" is showing
+  const quizComplete = page.getByText('Quiz Complete!');
+  const roundComplete = page.getByText('Round Complete!');
+  await expect(quizComplete.or(roundComplete)).toBeVisible({ timeout: 10000 });
+
+  // If admin-started quiz, should show waiting message and NO "Play Again"
+  const waitingMsg = page.getByText(/waiting for/i);
+  const playAgainBtn = page.getByText('Play Again');
+
+  // Check for the admin-started quiz done screen features
+  if (await quizComplete.isVisible({ timeout: 1000 }).catch(() => false)) {
+    // Admin-started: "Quiz Complete!" + waiting text, no Play Again
+    await expect(waitingMsg).toBeVisible({ timeout: 5000 });
+    await expect(playAgainBtn).not.toBeVisible({ timeout: 3000 });
+  }
+  // If RoundComplete showed instead (free play), that's still valid but different
+
+  // Go back to Admin and stop the quiz
+  await adminTab.click();
+  await page.waitForTimeout(2000);
+  const stopBtnFinal = page.getByText('Stop Quiz', { exact: false });
+  if (await stopBtnFinal.isVisible({ timeout: 3000 }).catch(() => false)) {
+    await stopBtnFinal.click();
+    await page.waitForTimeout(2000);
+  }
+});
+
+// =============================================================
+// Test 10: Configurable Question Count in Admin
+// =============================================================
+test('Test 10: Configurable question count selector', async ({ page }) => {
+  await page.goto('/');
+  await clearAppStorage(page);
+  await page.reload();
+  await page.waitForLoadState('networkidle');
+
+  // Login as admin
+  await loginAs(page, 'brencampbell@microsoft.com', 'Brenda');
+  await waitForAppShell(page);
+
+  // Go to Admin tab
+  const adminTab = page.locator('button', { hasText: 'Admin' });
+  await expect(adminTab).toBeVisible({ timeout: 10000 });
+  await adminTab.click();
+  await page.waitForTimeout(4000);
+
+  // Wait for quiz status text to confirm Admin panel loaded
+  await expect(page.getByText(/quiz is/i)).toBeVisible({ timeout: 15000 });
+
+  // If quiz is running, stop it — the question count selector only shows when stopped
+  const quizLiveText = page.getByText('LIVE');
+  if (await quizLiveText.isVisible({ timeout: 2000 }).catch(() => false)) {
+    const stopBtn = page.getByRole('button', { name: /stop quiz/i });
+    await stopBtn.click();
+    await page.waitForTimeout(3000);
+    // Wait for "STOPPED" to confirm quiz is stopped
+    await expect(page.getByText('STOPPED')).toBeVisible({ timeout: 10000 });
+  }
+
+  // Now verify the question count selector is visible
+  const questionCountSelect = page.locator('#qcount');
+  await expect(questionCountSelect).toBeVisible({ timeout: 10000 });
+
+  // Verify the "Questions:" label is visible
+  const questionsLabel = page.locator('label[for="qcount"]');
+  await expect(questionsLabel).toBeVisible({ timeout: 5000 });
+
+  // Screenshot: question count selector
+  await page.screenshot({ path: `${SCREENSHOTS_DIR}/15-question-count-selector.png`, fullPage: true });
+
+  // Verify the selector has options (1-20)
+  const options = await questionCountSelect.locator('option').count();
+  expect(options).toBe(20);
+
+  // Verify we can change the value
+  await questionCountSelect.selectOption('5');
+  const selectedValue = await questionCountSelect.inputValue();
+  expect(selectedValue).toBe('5');
 });

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react"
-import { Lightning, Trophy, GearSix, SignOut } from "@phosphor-icons/react"
+import { Lightning, Trophy, GearSix, SignOut, Sun, Moon } from "@phosphor-icons/react"
 import { UserBadge } from "@/components/UserBadge"
 import { ConnectionStatus } from "@/components/ConnectionStatus"
 import { useUser } from "@/contexts/UserContext"
@@ -11,6 +11,7 @@ import { QuestionPage } from "@/components/QuestionPage"
 import { AdminPanel } from "@/components/AdminPanel"
 import { WaitingScreen } from "@/components/WaitingScreen"
 import { cn } from "@/lib/utils"
+import { useTheme } from "@/hooks/useTheme"
 import { sendHeartbeat, getGameState } from "@/services/api"
 
 type View = "quiz" | "leaderboard" | "admin"
@@ -18,6 +19,7 @@ type View = "quiz" | "leaderboard" | "admin"
 function App() {
   const { user, isLoading } = useUser()
   const logout = useLogout()
+  const { isDark, toggle: toggleTheme } = useTheme()
   const { quizStarted: quizStartedSignal } = useSignalRContext()
   const [view, setView] = useState<View>("quiz")
   const [onlineCount, setOnlineCount] = useState(0)
@@ -97,6 +99,13 @@ function App() {
             )}
             <UserBadge />
             <button
+              onClick={toggleTheme}
+              title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+              className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+            >
+              {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </button>
+            <button
               onClick={logout}
               title="Sign out"
               className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
@@ -168,7 +177,7 @@ function App() {
           >
             {view === "quiz" && (
               isQuizStarted
-                ? <QuestionPage onNavigateToLeaderboard={() => setView("leaderboard")} />
+                ? <QuestionPage onNavigateToLeaderboard={() => setView("leaderboard")} isQuizStarted={isQuizStarted ?? false} />
                 : <WaitingScreen categoryName={activeCategoryName} onlineCount={onlineCount} />
             )}
             {view === "leaderboard" && (

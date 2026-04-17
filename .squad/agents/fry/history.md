@@ -204,3 +204,10 @@
 - **AdminPanel — SignalR integration:** `scoresResetSignal` from context triggers automatic user list refresh, keeping table scores current after any reset (even from another admin).
 - **AdminPanel — categories fetch:** `fetchUsers` now parallel-fetches `listCategories` so ScoreResetSection has category data for scope dropdown.
 - **Verification:** TypeScript compiles clean (`npx tsc --noEmit` — 0 errors).
+
+### fe-theme-autostop-qcount (2026-04-17)
+- **Dark/Light theme toggle:** Added `useTheme` hook (`hooks/useTheme.ts`) — reads/writes `localStorage('theme')`, toggles `.dark` class on `<html>`. Default is dark. Inline `<script>` in `index.html` prevents FOUC. CSS approach: `@theme inline` defines Tailwind tokens, `:root` overrides for light mode, `.dark` overrides for dark mode. Sun/Moon Phosphor icons in header between UserBadge and sign-out button.
+- **Light theme colors:** background `#F8F9FC`, foreground `#1B1D23`, card `#FFFFFF`, muted `#E5E7EB`, border `#D1D5DB`, secondary `#F3F4F6`. Primary/accent/destructive unchanged across themes.
+- **Auto-stop quiz (no re-start):** `QuestionPage` accepts new `isQuizStarted` prop. When `phase === "done"` and `isQuizStarted === true`: shows "Quiz Complete! Waiting for next round…" card with score summary and leaderboard link — no "Play Again" button. Free/practice mode retains existing `RoundComplete` with "Play Again".
+- **Configurable question count:** `GameState` extended with `questionCount?: number`. New `setQuestionCount(count, adminUserId)` API function (`PATCH /api/game/question-count`). `startQuiz` updated to accept optional `questionCount` param. `QuizControlSection` in AdminPanel now shows a `<select>` dropdown (1-20) when quiz is stopped, passes count to `startQuiz`. When quiz is live, shows current count as label.
+- **Verification:** TypeScript compiles clean (`npx tsc --noEmit` — 0 errors).

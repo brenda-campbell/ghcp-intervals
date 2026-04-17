@@ -13,7 +13,9 @@ import {
 import { requireAdmin } from "../services/adminAuth.js";
 import type { GameState, Question, User } from "../models/index.js";
 
-const QUESTION_COUNT = 3;
+const DEFAULT_QUESTION_COUNT = 3;
+const MIN_QUESTION_COUNT = 1;
+const MAX_QUESTION_COUNT = 20;
 
 const signalROutput = output.generic({
   type: "signalR",
@@ -63,6 +65,37 @@ async function startQuiz(
       };
     }
 
+    // Resolve question count: body > gameState > default
+    let body: { questionCount?: number } = {};
+    try {
+      const parsed = await request.json();
+      if (parsed && typeof parsed === "object") {
+        body = parsed as typeof body;
+      }
+    } catch {
+      // No body or invalid JSON — use defaults
+    }
+
+    let questionCount: number;
+    if (body.questionCount !== undefined) {
+      if (
+        typeof body.questionCount !== "number" ||
+        !Number.isInteger(body.questionCount) ||
+        body.questionCount < MIN_QUESTION_COUNT ||
+        body.questionCount > MAX_QUESTION_COUNT
+      ) {
+        return {
+          status: 400,
+          jsonBody: {
+            error: `questionCount must be an integer between ${MIN_QUESTION_COUNT} and ${MAX_QUESTION_COUNT}.`,
+          },
+        };
+      }
+      questionCount = body.questionCount;
+    } else {
+      questionCount = gameState.questionCount ?? DEFAULT_QUESTION_COUNT;
+    }
+
     // Select and pin random questions from the active category
     const { resources: pool } = await questionsContainer.items
       .query<Question>({
@@ -78,17 +111,27 @@ async function startQuiz(
       };
     }
 
-    // Fisher-Yates shuffle and pick up to QUESTION_COUNT
+    if (pool.length < questionCount) {
+      return {
+        status: 400,
+        jsonBody: {
+          error: `Not enough questions. Requested ${questionCount}, but only ${pool.length} available.`,
+        },
+      };
+    }
+
+    // Fisher-Yates shuffle and pick questionCount
     const shuffled = [...pool];
     for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
-    const pinned = shuffled.slice(0, Math.min(QUESTION_COUNT, shuffled.length));
+    const pinned = shuffled.slice(0, questionCount);
 
-    // Set isStarted to true and store pinned question IDs
+    // Set isStarted to true and store pinned question IDs + count
     gameState.isStarted = true;
     gameState.questionIds = pinned.map((q) => q.id);
+    gameState.questionCount = questionCount;
     gameState.updatedAt = new Date().toISOString();
     gameState.updatedBy = admin.userId;
 

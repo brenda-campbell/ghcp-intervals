@@ -18,6 +18,7 @@ export interface GameState {
   activeQuestionFormat: QuestionType;
   isStarted: boolean;
   questionIds?: string[];
+  questionCount?: number;
   updatedAt?: string;
 }
 
@@ -249,10 +250,11 @@ export async function getGameState(): Promise<GameState> {
   return handleResponse<GameState>(response);
 }
 
-export async function startQuiz(adminUserId: string): Promise<GameState> {
+export async function startQuiz(adminUserId: string, questionCount?: number): Promise<GameState> {
   const response = await fetch("/api/game/start-quiz", {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-user-id": adminUserId },
+    body: JSON.stringify(questionCount ? { questionCount } : {}),
   });
   return handleResponse<GameState>(response);
 }
@@ -261,6 +263,15 @@ export async function stopQuiz(adminUserId: string): Promise<GameState> {
   const response = await fetch("/api/game/stop-quiz", {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-user-id": adminUserId },
+  });
+  return handleResponse<GameState>(response);
+}
+
+export async function setQuestionCount(count: number, adminUserId: string): Promise<GameState> {
+  const response = await fetch("/api/game/question-count", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", "x-user-id": adminUserId },
+    body: JSON.stringify({ questionCount: count }),
   });
   return handleResponse<GameState>(response);
 }

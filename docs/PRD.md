@@ -61,6 +61,27 @@ This is a focused competitive game with core mechanics (questions, timer, scorin
 - **Progression**: Admin selects scope (all / selected users) → Optional category filter → Confirms action → Server resets scores → SignalR broadcasts `scoresReset` → Leaderboards refresh automatically
 - **Success criteria**: Global reset zeroes all users' totalScore/gamesPlayed/fastestTimeMs and deletes all categoryScores, selected reset only affects chosen users, category-scoped reset only deletes that category's scores without touching global stats, confirmation required before destructive action
 
+### Dark/Light Theme Toggle
+- **Functionality**: Users can toggle between dark and light color themes; preference persists in localStorage across sessions
+- **Purpose**: Improves accessibility and allows comfortable gameplay in different lighting conditions
+- **Trigger**: User clicks theme toggle button in header/settings
+- **Progression**: User clicks toggle → Theme CSS variable switches (oklch colors update) → Preference saved to localStorage → Next session loads saved preference → All components (cards, timer, leaderboard) update instantly
+- **Success criteria**: Theme toggle is always visible and accessible, preference persists across tab refreshes and new sessions, all UI components respect theme (no hard-coded colors), contrast ratios maintained in both themes (WCAG AA minimum 4.5:1)
+
+### Configurable Question Count
+- **Functionality**: Admin can set the number of questions per quiz round (1-20 questions), allowing flexible game session lengths
+- **Purpose**: Enables tournaments, practice rounds, or extended competitions without code changes
+- **Trigger**: Admin uses Settings in the Admin panel
+- **Progression**: Admin navigates to Settings → Adjusts slider or input field (1-20) → Confirms → Server updates GameState.questionCount → All players see updated count in waiting room → Next quiz uses new count
+- **Success criteria**: Slider enforces 1-20 range, changes take effect on next quiz start (current round unaffected), all players see consistent question count, frontend validates input before submission
+
+### Auto-Stop Quiz (No Replay During Admin Rounds)
+- **Functionality**: During admin-started quizzes, players cannot replay questions or answer after the admin stops the round. Quiz state is locked for all players simultaneously.
+- **Purpose**: Prevents unfair advantages from late submissions or replays during competitive synchronized rounds
+- **Trigger**: Admin clicks "Stop Quiz"
+- **Progression**: Admin stops quiz → Server broadcasts `quizStopped` via SignalR → All clients disable answer buttons → Leaderboard shows final standings → Players must wait for next admin-started quiz to continue
+- **Success criteria**: Answer buttons become disabled within 100ms of admin stop, late submissions are rejected server-side with clear error message, players cannot click through to next round until admin starts new quiz
+
 ## Edge Case Handling
 
 - **Network interruption during answer** - Timer freezes, answer queued locally, auto-submits when connection restored with original timestamp

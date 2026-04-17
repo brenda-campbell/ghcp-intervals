@@ -44,6 +44,7 @@ import {
   getOnlinePlayers,
   startQuiz,
   stopQuiz,
+  setQuestionCount,
   type User,
   type Category,
   type GameState,
@@ -60,6 +61,7 @@ function QuizControlSection({ adminUserId }: { adminUserId: string }) {
   const [isStarted, setIsStarted] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [questionCount, setQuestionCountState] = useState<number>(3);
   const { quizStarted } = useSignalRContext();
 
   // Fetch initial state
@@ -68,7 +70,10 @@ function QuizControlSection({ adminUserId }: { adminUserId: string }) {
     const load = async () => {
       try {
         const gs = await getGameState();
-        if (!cancelled) setIsStarted(gs.isStarted ?? false);
+        if (!cancelled) {
+          setIsStarted(gs.isStarted ?? false);
+          if (gs.questionCount) setQuestionCountState(gs.questionCount);
+        }
       } catch {
         /* silent */
       } finally {
@@ -89,12 +94,21 @@ function QuizControlSection({ adminUserId }: { adminUserId: string }) {
     try {
       const gs = isStarted
         ? await stopQuiz(adminUserId)
-        : await startQuiz(adminUserId);
+        : await startQuiz(adminUserId, questionCount);
       setIsStarted(gs.isStarted ?? false);
     } catch {
       /* error handled silently — button re-enables */
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleQuestionCountChange = async (newCount: number) => {
+    setQuestionCountState(newCount);
+    try {
+      await setQuestionCount(newCount, adminUserId);
+    } catch {
+      /* silent — optimistic update, if endpoint doesn't exist yet it's a no-op */
     }
   };
 
@@ -122,6 +136,33 @@ function QuizControlSection({ adminUserId }: { adminUserId: string }) {
           {isStarted ? "LIVE" : "STOPPED"}
         </span>
       </span>
+
+      {/* Question count selector */}
+      {!isStarted && (
+        <div className="flex items-center gap-1.5">
+          <label htmlFor="qcount" className="text-xs text-muted-foreground whitespace-nowrap">
+            Questions:
+          </label>
+          <select
+            id="qcount"
+            value={questionCount}
+            onChange={(e) => void handleQuestionCountChange(Number(e.target.value))}
+            className="h-8 rounded-md border border-border bg-secondary px-2 text-sm text-foreground outline-none focus:ring-1 focus:ring-primary"
+          >
+            {Array.from({ length: 20 }, (_, i) => i + 1).map((n) => (
+              <option key={n} value={n}>
+                {n}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      {isStarted && (
+        <span className="text-xs text-muted-foreground">
+          ({questionCount} questions)
+        </span>
+      )}
 
       <Button
         size="sm"

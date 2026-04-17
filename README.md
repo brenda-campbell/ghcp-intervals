@@ -18,20 +18,37 @@ A competitive speed-trivia game where players race to answer Azure and GitHub Co
 
 ## Architecture
 
-```
-┌─────────────────┐     ┌──────────────────────┐     ┌───────────────┐
-│  Static Web App │────▶│  Azure Functions v4   │────▶│   Cosmos DB   │
-│  React 19 + Vite│     │  (HTTP triggers)      │     │  (Serverless) │
-│  Tailwind CSS v4│     │                       │     │               │
-│  shadcn/ui      │     │  GET  /api/questions   │     │  users        │
-│  SignalR client │     │  POST /api/answer      │     │  questions    │
-│                 │     │  POST /api/user        │     │  categories   │
-│                 │     │  GET  /api/user/:id    │     │  categoryScores│
-│                 │     │  GET  /api/leaderboard │     │  gameState    │
-│                 │     │  POST /api/scores/reset│     └───────────────┘
-│                 │◀───▶│  POST /api/negotiate   │────▶│ SignalR Service│
-│                 │     │                       │     │  (Serverless)  │
-└─────────────────┘     └──────────────────────┘     └───────────────┘
+```mermaid
+graph TB
+  subgraph "Azure Static Web App"
+    FE["React 19 + Vite<br/>Tailwind CSS v4<br/>shadcn/ui<br/>SignalR client"]
+  end
+  
+  subgraph "Azure Functions v4"
+    API["HTTP Triggers<br/>TypeScript"]
+  end
+  
+  subgraph "Azure Cosmos DB"
+    Users[("users")]
+    Questions[("questions")]
+    Categories[("categories")]
+    Scores[("categoryScores")]
+    State[("gameState")]
+  end
+  
+  SR["Azure SignalR Service"]
+  GH["GitHub Actions CI/CD"]
+  
+  FE -->|REST API| API
+  API --> Users
+  API --> Questions
+  API --> Categories
+  API --> Scores
+  API --> State
+  API -->|Broadcast events| SR
+  SR -->|Real-time updates| FE
+  GH -->|Deploy| FE
+  GH -->|Deploy| API
 ```
 
 ## Tech Stack
@@ -45,7 +62,7 @@ A competitive speed-trivia game where players race to answer Azure and GitHub Co
 | **Hosting** | Azure Static Web Apps (Free tier) |
 | **IaC** | Bicep (modular: SWA + Cosmos DB + SignalR) |
 | **CI/CD** | GitHub Actions (OIDC auth, single workflow) |
-| **Testing** | Vitest, Testing Library (162 tests) |
+| **Testing** | Vitest, Testing Library (143 API + 10 E2E tests) |
 
 ## Project Structure
 
@@ -119,11 +136,14 @@ npm run seed
 ### Run Tests
 
 ```bash
-# Backend (76 tests)
+# API tests (143 tests)
 cd src/api && npm test
 
-# Frontend (86 tests)
+# Frontend tests
 cd src/frontend && npm test
+
+# E2E tests (10 tests)
+cd src/frontend && npm run test:e2e
 ```
 
 ## Deployment
@@ -158,25 +178,61 @@ The workflow (`.github/workflows/deploy.yml`) runs on push to `main`:
 | `AZURE_RG` | Resource group name |
 | `AZURE_STATIC_WEB_APPS_API_TOKEN` | SWA deployment token |
 
-#### OIDC Setup
+### OIDC Setup
 
 1. Create an App Registration in Azure AD
 2. Add a Federated Credential (subject: `repo:brenda-campbell/ghcp-intervals:ref:refs/heads/main`)
 3. Grant Contributor role on the resource group
 4. Store IDs as GitHub repository secrets
 
+## API Endpoints
+
+### User Management
+- `POST /api/users/login-or-create` — Create or retrieve user by email
+- `GET /api/users/:id` — Get user profile by ID
+- `GET /api/users` — List all users (admin only)
+- `PATCH /api/users/:id/status` — Update user status (admin only)
+- `DELETE /api/users/:id` — Remove user (admin only)
+
+### Quiz & Questions
+- `GET /api/questions` — Get current round questions (returns pinned questions if quiz active)
+- `POST /api/answer` — Submit answer, receive points and feedback
+- `GET /api/categories` — List all quiz categories
+- `POST /api/categories` — Create new category (admin only)
+- `PATCH /api/categories/:id` — Update category (admin only)
+- `DELETE /api/categories/:id` — Remove category (admin only)
+
+### Leaderboard & Scoring
+- `GET /api/leaderboard` — Get top 10 players with ranks
+- `POST /api/scores/reset` — Reset scores (admin only, supports filters by user/category)
+
+### Game State & Admin Controls
+- `GET /api/game/state` — Get current game state (active question, player count, category)
+- `POST /api/game/set-category` — Set active quiz category (admin only)
+- `POST /api/game/start-quiz` — Start new quiz round, pin questions (admin only)
+- `POST /api/game/stop-quiz` — End current round (admin only)
+- `PATCH /api/game/question-count` — Set questions per round: 1-20 (admin only)
+
+### Real-Time & Presence
+- `POST /api/game/heartbeat` — Keep-alive ping for active players
+- `GET /api/game/online-players` — Get count of connected players
+- `POST /api/negotiate` — SignalR negotiation for WebSocket upgrade
+
 ## Game Features
 
 - **🎯 Quiz Flow** — 1–3 questions per round, 2×2 answer grid, progress tracking
-- **🔒 Synchronized Questions** — Admin-started quizzes pin the same questions for all players, ensuring fairness
+- **🔒 Synchronized Questions** — Same questions for all players, ensuring competitive fairness
+- **⏸️ Admin-Controlled Quiz** — Waiting room + admin start/stop with real-time player sync
 - **⏱️ Precision Timer** — `requestAnimationFrame`-based, color-coded (green → amber → red)
 - **📊 Live Leaderboard** — Top 10 with gold/silver/bronze badges, real-time SignalR updates
 - **🏷️ Multi-Category** — 6+ quiz categories (Technical, Movies, Geography, etc.) with admin switching
-- **⏸️ Waiting Room** — Players see a waiting screen until admin starts the quiz
-- **🔄 Score Reset** — Admin can reset scores for all, selected, or per-category players
+- **🔄 Score Reset** — Admin can reset all/selected/per-category players
+- **🌙 Dark/Light Theme** — Toggle with localStorage persistence
+- **⚙️ Configurable Questions** — Admin sets 1-20 questions per round
 - **🔒 Anti-Cheat** — Server-authoritative timing, correct answers never sent to client
 - **👤 Email Identity** — Email-based login, localStorage persistence, admin panel for user management
 - **✨ Animations** — Answer feedback, page transitions, score counter, confetti on perfect rounds
+- **🎭 E2E Testing** — Playwright browser tests with screenshots
 - **📱 Mobile Responsive** — Touch-optimized, safe areas, fluid typography
 
 ## Design System

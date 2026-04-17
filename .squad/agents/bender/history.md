@@ -179,3 +179,12 @@
 - **SignalR broadcast:** Sends `scoresReset` event with `{ resetAt, resetBy, scope, usersAffected }` so frontends can refresh leaderboards.
 - **Pattern:** Follows same admin auth + SignalR output binding pattern as startQuiz/stopQuiz.
 - **TypeScript compiles clean.**
+
+### be-configurable-question-count — Configurable Questions Per Round (2026-04-17)
+- **GameState extended** with `questionCount?: number` (default 3, range 1–20) in `src/api/src/models/index.ts`.
+- **startQuiz.ts updated** — Accepts optional `{ questionCount }` from request body. Validates 1–20 range. Resolves count via: body → existing gameState.questionCount → default 3. Stores count on GameState. Rejects if pool has fewer questions than requested. Hardcoded `QUESTION_COUNT = 3` removed.
+- **getQuestions.ts updated** — `MAX_QUESTIONS` increased from 3 to 20 to support larger rounds in fallback (non-quiz) mode.
+- **setCategory.ts updated** — Now preserves `questionCount` when switching categories (was previously lost during GameState reconstruction).
+- **New endpoint** `PATCH /api/game/question-count` in `src/api/src/functions/setQuestionCount.ts`. Admin-only. Validates 1–20 range. Updates GameState.questionCount. Broadcasts `questionCountChanged` SignalR event.
+- **Auto-stop quiz:** No backend changes needed. Frontend is the gatekeeper — pinned questions are fixed, backend serves same set on refresh, lifecycle is admin-controlled via start/stop.
+- **TypeScript compiles clean.**

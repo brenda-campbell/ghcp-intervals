@@ -156,8 +156,8 @@ describe("getQuestions", () => {
     expect(res.status).toBe(400);
   });
 
-  it("returns 400 for count exceeding MAX_QUESTIONS (3)", async () => {
-    const req = createMockRequest({ query: { count: "4" } });
+  it("returns 400 for count exceeding MAX_QUESTIONS (20)", async () => {
+    const req = createMockRequest({ query: { count: "21" } });
     const ctx = createMockContext();
 
     const res = await handler(req, ctx);

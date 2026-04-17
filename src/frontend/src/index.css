@@ -4,7 +4,8 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  /* PRD Color Palette */
+  /* Theme colors — these are the dark defaults for Tailwind token generation.
+     Actual runtime values are overridden below via :root (light) and .dark. */
   --color-primary: #4A90E2;
   --color-background: #2A2D3A;
   --color-foreground: #FFFFFF;
@@ -39,8 +40,39 @@
   --radius-xl: 1rem;
 }
 
+/* Light mode — default when .dark is not on <html> */
 :root {
   --radius: 0.75rem;
+  --color-background: #F8F9FC;
+  --color-foreground: #1B1D23;
+  --color-card: #FFFFFF;
+  --color-card-foreground: #1B1D23;
+  --color-muted: #E5E7EB;
+  --color-muted-foreground: #6B7280;
+  --color-border: #D1D5DB;
+  --color-input: #D1D5DB;
+  --color-popover: #FFFFFF;
+  --color-popover-foreground: #1B1D23;
+  --color-secondary: #F3F4F6;
+  --color-secondary-foreground: #1B1D23;
+  --color-accent-foreground: #1B1D23;
+}
+
+/* Dark mode — applied via .dark class on <html> */
+.dark {
+  --color-background: #2A2D3A;
+  --color-foreground: #FFFFFF;
+  --color-card: #353849;
+  --color-card-foreground: #FFFFFF;
+  --color-muted: #3E4255;
+  --color-muted-foreground: #9CA3AF;
+  --color-border: #4A4E63;
+  --color-input: #4A4E63;
+  --color-popover: #353849;
+  --color-popover-foreground: #FFFFFF;
+  --color-secondary: #3E4255;
+  --color-secondary-foreground: #FFFFFF;
+  --color-accent-foreground: #2A2D3A;
 }
 
 html {

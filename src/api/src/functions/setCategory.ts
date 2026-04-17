@@ -73,17 +73,19 @@ async function setCategory(
     return { status: 400, jsonBody: { error: "Category is inactive" } };
   }
 
-  // Read current game state to preserve isStarted
+  // Read current game state to preserve isStarted and questionCount
   let currentIsStarted = false;
+  let currentQuestionCount: number | undefined;
   try {
     const { resource: existing } = await gameStateContainer
       .item("current", "current")
       .read<GameState>();
     if (existing) {
       currentIsStarted = existing.isStarted ?? false;
+      currentQuestionCount = existing.questionCount;
     }
   } catch {
-    // No existing state — default isStarted to false
+    // No existing state — defaults apply
   }
 
   // Upsert game state — clear pinned questions when category changes
@@ -94,6 +96,7 @@ async function setCategory(
     activeQuestionFormat: category.questionFormat,
     isStarted: currentIsStarted,
     questionIds: [],
+    questionCount: currentQuestionCount,
     updatedAt: new Date().toISOString(),
     updatedBy: admin.userId,
   };
