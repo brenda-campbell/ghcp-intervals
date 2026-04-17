@@ -45,6 +45,7 @@ import {
   startQuiz,
   stopQuiz,
   setQuestionCount,
+  setTimer,
   type User,
   type Category,
   type GameState,
@@ -62,6 +63,7 @@ function QuizControlSection({ adminUserId }: { adminUserId: string }) {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [questionCount, setQuestionCountState] = useState<number>(3);
+  const [timerSecs, setTimerSecsState] = useState<number>(10);
   const { quizStarted } = useSignalRContext();
 
   // Fetch initial state
@@ -73,6 +75,7 @@ function QuizControlSection({ adminUserId }: { adminUserId: string }) {
         if (!cancelled) {
           setIsStarted(gs.isStarted ?? false);
           if (gs.questionCount) setQuestionCountState(gs.questionCount);
+          if (gs.timerSeconds) setTimerSecsState(gs.timerSeconds);
         }
       } catch {
         /* silent */
@@ -109,6 +112,15 @@ function QuizControlSection({ adminUserId }: { adminUserId: string }) {
       await setQuestionCount(newCount, adminUserId);
     } catch {
       /* silent — optimistic update, if endpoint doesn't exist yet it's a no-op */
+    }
+  };
+
+  const handleTimerChange = async (newSecs: number) => {
+    setTimerSecsState(newSecs);
+    try {
+      await setTimer(newSecs, adminUserId);
+    } catch {
+      /* silent — optimistic update */
     }
   };
 
@@ -158,9 +170,30 @@ function QuizControlSection({ adminUserId }: { adminUserId: string }) {
         </div>
       )}
 
+      {/* Timer per question selector */}
+      {!isStarted && (
+        <div className="flex items-center gap-1.5">
+          <label htmlFor="qtimer" className="text-xs text-muted-foreground whitespace-nowrap">
+            Timer:
+          </label>
+          <select
+            id="qtimer"
+            value={timerSecs}
+            onChange={(e) => void handleTimerChange(Number(e.target.value))}
+            className="h-8 rounded-md border border-border bg-secondary px-2 text-sm text-foreground outline-none focus:ring-1 focus:ring-primary"
+          >
+            {[5, 10, 15, 20, 30, 45, 60].map((n) => (
+              <option key={n} value={n}>
+                {n}s
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
       {isStarted && (
         <span className="text-xs text-muted-foreground">
-          ({questionCount} questions)
+          ({questionCount} questions, {timerSecs}s timer)
         </span>
       )}
 

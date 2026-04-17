@@ -16,6 +16,9 @@ import type { GameState, Question, User } from "../models/index.js";
 const DEFAULT_QUESTION_COUNT = 3;
 const MIN_QUESTION_COUNT = 1;
 const MAX_QUESTION_COUNT = 20;
+const DEFAULT_TIMER_SECONDS = 10;
+const MIN_TIMER_SECONDS = 5;
+const MAX_TIMER_SECONDS = 60;
 
 const signalROutput = output.generic({
   type: "signalR",
@@ -65,8 +68,8 @@ async function startQuiz(
       };
     }
 
-    // Resolve question count: body > gameState > default
-    let body: { questionCount?: number } = {};
+    // Resolve question count and timer: body > gameState > default
+    let body: { questionCount?: number; timerSeconds?: number } = {};
     try {
       const parsed = await request.json();
       if (parsed && typeof parsed === "object") {
@@ -94,6 +97,27 @@ async function startQuiz(
       questionCount = body.questionCount;
     } else {
       questionCount = gameState.questionCount ?? DEFAULT_QUESTION_COUNT;
+    }
+
+    // Resolve timer seconds: body > gameState > default
+    let timerSeconds: number;
+    if (body.timerSeconds !== undefined) {
+      if (
+        typeof body.timerSeconds !== "number" ||
+        !Number.isInteger(body.timerSeconds) ||
+        body.timerSeconds < MIN_TIMER_SECONDS ||
+        body.timerSeconds > MAX_TIMER_SECONDS
+      ) {
+        return {
+          status: 400,
+          jsonBody: {
+            error: `timerSeconds must be an integer between ${MIN_TIMER_SECONDS} and ${MAX_TIMER_SECONDS}.`,
+          },
+        };
+      }
+      timerSeconds = body.timerSeconds;
+    } else {
+      timerSeconds = gameState.timerSeconds ?? DEFAULT_TIMER_SECONDS;
     }
 
     // Select and pin random questions from the active category
@@ -128,10 +152,11 @@ async function startQuiz(
     }
     const pinned = shuffled.slice(0, questionCount);
 
-    // Set isStarted to true and store pinned question IDs + count
+    // Set isStarted to true and store pinned question IDs + count + timer
     gameState.isStarted = true;
     gameState.questionIds = pinned.map((q) => q.id);
     gameState.questionCount = questionCount;
+    gameState.timerSeconds = timerSeconds;
     gameState.updatedAt = new Date().toISOString();
     gameState.updatedBy = admin.userId;
 
@@ -145,6 +170,7 @@ async function startQuiz(
           {
             startedAt: new Date().toISOString(),
             startedBy: admin.userId,
+            timerSeconds,
           },
         ],
       },

@@ -223,12 +223,13 @@ The workflow (`.github/workflows/deploy.yml`) runs on push to `main`:
 - **🎯 Quiz Flow** — 1–3 questions per round, 2×2 answer grid, progress tracking
 - **🔒 Synchronized Questions** — Same questions for all players, ensuring competitive fairness
 - **⏸️ Admin-Controlled Quiz** — Waiting room + admin start/stop with real-time player sync
-- **⏱️ Precision Timer** — `requestAnimationFrame`-based, color-coded (green → amber → red)
+- **⏱️ Countdown Timer** — Per-question countdown (default 10s, admin-configurable 5-60s) with color-coded progress bar, auto-timeout marks unanswered as incorrect
 - **📊 Live Leaderboard** — Top 10 with gold/silver/bronze badges, real-time SignalR updates
 - **🏷️ Multi-Category** — 6+ quiz categories (Technical, Movies, Geography, etc.) with admin switching
 - **🔄 Score Reset** — Admin can reset all/selected/per-category players
 - **🌙 Dark/Light Theme** — Toggle with localStorage persistence
 - **⚙️ Configurable Questions** — Admin sets 1-20 questions per round
+- **📡 Real-Time Presence** — Online player count via SignalR broadcast, 45s heartbeat
 - **🔒 Anti-Cheat** — Server-authoritative timing, correct answers never sent to client
 - **👤 Email Identity** — Email-based login, localStorage persistence, admin panel for user management
 - **✨ Animations** — Answer feedback, page transitions, score counter, confetti on perfect rounds

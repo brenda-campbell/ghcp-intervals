@@ -20,11 +20,12 @@ function App() {
   const { user, isLoading } = useUser()
   const logout = useLogout()
   const { isDark, toggle: toggleTheme } = useTheme()
-  const { quizStarted: quizStartedSignal } = useSignalRContext()
+  const { quizStarted: quizStartedSignal, presenceCount } = useSignalRContext()
   const [view, setView] = useState<View>("quiz")
   const [onlineCount, setOnlineCount] = useState(0)
   const [isQuizStarted, setIsQuizStarted] = useState<boolean | null>(null)
   const [activeCategoryName, setActiveCategoryName] = useState<string | null>(null)
+  const [timerSeconds, setTimerSeconds] = useState<number>(10)
   const quizTabRef = useRef<HTMLButtonElement>(null)
   const leaderboardTabRef = useRef<HTMLButtonElement>(null)
   const adminTabRef = useRef<HTMLButtonElement>(null)
@@ -40,6 +41,7 @@ function App() {
         if (!cancelled) {
           setIsQuizStarted(gs.isStarted ?? false)
           setActiveCategoryName(gs.activeCategoryName ?? null)
+          setTimerSeconds(gs.timerSeconds ?? 10)
         }
       })
       .catch(() => { if (!cancelled) setIsQuizStarted(false) })
@@ -50,6 +52,11 @@ function App() {
   useEffect(() => {
     if (quizStartedSignal !== null) setIsQuizStarted(quizStartedSignal)
   }, [quizStartedSignal])
+
+  // Use SignalR presence updates for immediate online count
+  useEffect(() => {
+    if (presenceCount !== null) setOnlineCount(presenceCount)
+  }, [presenceCount])
 
   useEffect(() => {
     const refMap: Record<View, React.RefObject<HTMLButtonElement | null>> = {
@@ -177,7 +184,7 @@ function App() {
           >
             {view === "quiz" && (
               isQuizStarted
-                ? <QuestionPage onNavigateToLeaderboard={() => setView("leaderboard")} isQuizStarted={isQuizStarted ?? false} />
+                ? <QuestionPage onNavigateToLeaderboard={() => setView("leaderboard")} isQuizStarted={isQuizStarted ?? false} timerSeconds={timerSeconds} />
                 : <WaitingScreen categoryName={activeCategoryName} onlineCount={onlineCount} />
             )}
             {view === "leaderboard" && (

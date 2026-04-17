@@ -38,6 +38,12 @@ export interface ScoresResetEvent {
   categoryId?: string;
 }
 
+export interface PresenceUpdateEvent {
+  count: number;
+  userId: string;
+  displayName: string;
+}
+
 export interface UseSignalRReturn {
   connection: signalR.HubConnection | null;
   connectionState: ConnectionState;
@@ -46,6 +52,7 @@ export interface UseSignalRReturn {
   categoryChanged: CategoryChangedEvent | null;
   quizStarted: boolean | null;
   scoresResetSignal: ScoresResetEvent | null;
+  presenceCount: number | null;
 }
 
 export function useSignalR(): UseSignalRReturn {
@@ -60,6 +67,7 @@ export function useSignalR(): UseSignalRReturn {
   const [categoryChanged, setCategoryChanged] = useState<CategoryChangedEvent | null>(null);
   const [quizStarted, setQuizStarted] = useState<boolean | null>(null);
   const [scoresResetSignal, setScoresResetSignal] = useState<ScoresResetEvent | null>(null);
+  const [presenceCount, setPresenceCount] = useState<number | null>(null);
 
   const connectionRef = useRef<signalR.HubConnection | null>(null);
   const mountedRef = useRef(true);
@@ -114,6 +122,10 @@ export function useSignalR(): UseSignalRReturn {
       if (mountedRef.current) setScoresResetSignal(data);
     });
 
+    conn.on("presenceUpdate", (data: PresenceUpdateEvent) => {
+      if (mountedRef.current) setPresenceCount(data.count);
+    });
+
     try {
       setConnectionState("connecting");
       await conn.start();
@@ -146,5 +158,6 @@ export function useSignalR(): UseSignalRReturn {
     categoryChanged,
     quizStarted,
     scoresResetSignal,
+    presenceCount,
   };
 }

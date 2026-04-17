@@ -73,9 +73,10 @@ async function setCategory(
     return { status: 400, jsonBody: { error: "Category is inactive" } };
   }
 
-  // Read current game state to preserve isStarted and questionCount
+  // Read current game state to preserve isStarted, questionCount, and timerSeconds
   let currentIsStarted = false;
   let currentQuestionCount: number | undefined;
+  let currentTimerSeconds: number | undefined;
   try {
     const { resource: existing } = await gameStateContainer
       .item("current", "current")
@@ -83,6 +84,7 @@ async function setCategory(
     if (existing) {
       currentIsStarted = existing.isStarted ?? false;
       currentQuestionCount = existing.questionCount;
+      currentTimerSeconds = existing.timerSeconds;
     }
   } catch {
     // No existing state — defaults apply
@@ -97,6 +99,7 @@ async function setCategory(
     isStarted: currentIsStarted,
     questionIds: [],
     questionCount: currentQuestionCount,
+    timerSeconds: currentTimerSeconds,
     updatedAt: new Date().toISOString(),
     updatedBy: admin.userId,
   };

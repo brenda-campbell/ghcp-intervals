@@ -5,7 +5,7 @@ import { AnswerFeedback } from "@/components/FeedbackOverlay";
 import { RoundComplete } from "@/components/RoundComplete";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
-import { Clock, ArrowClockwise, UsersThree } from "@phosphor-icons/react";
+import { Timer, Clock, ArrowClockwise, UsersThree } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/contexts/UserContext";
 import { useSignalRContext } from "@/contexts/SignalRContext";
@@ -31,9 +31,10 @@ const FEEDBACK_DURATION_MS = 2000;
 interface QuestionPageProps {
   onNavigateToLeaderboard?: () => void;
   isQuizStarted?: boolean;
+  timerSeconds?: number;
 }
 
-export function QuestionPage({ onNavigateToLeaderboard, isQuizStarted }: QuestionPageProps) {
+export function QuestionPage({ onNavigateToLeaderboard, isQuizStarted, timerSeconds = 10 }: QuestionPageProps) {
   const { user } = useUser();
   const { playerActivity, categoryChanged } = useSignalRContext();
 
@@ -48,11 +49,13 @@ export function QuestionPage({ onNavigateToLeaderboard, isQuizStarted }: Questio
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<AnswerResult | null>(null);
   const [questionStartTime, setQuestionStartTime] = useState(0);
-  const [elapsed, setElapsed] = useState(0);
+  const [remaining, setRemaining] = useState(timerSeconds);
 
   const [roundResults, setRoundResults] = useState<QuestionResultEntry[]>([]);
   const autoAdvanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const timedOutRef = useRef(false);
   const [categoryNotice, setCategoryNotice] = useState<string | null>(null);
+  const [timeUpNotice, setTimeUpNotice] = useState(false);
 
   const currentQuestion: Question | undefined = questions[currentIndex];
 
@@ -61,10 +64,12 @@ export function QuestionPage({ onNavigateToLeaderboard, isQuizStarted }: Questio
     setError(null);
     setSelectedIndex(null);
     setResult(null);
-    setElapsed(0);
+    setRemaining(timerSeconds);
     setRoundResults([]);
     setTransitioning(false);
     setQuestionAnimKey(0);
+    timedOutRef.current = false;
+    setTimeUpNotice(false);
     try {
       const qs = await fetchQuestions(QUESTION_COUNT);
       setQuestions(qs);
@@ -110,15 +115,6 @@ export function QuestionPage({ onNavigateToLeaderboard, isQuizStarted }: Questio
     }
   }, [categoryChanged]);
 
-  // Elapsed-time display (updates every 100ms while playing)
-  useEffect(() => {
-    if (phase !== "playing" || !questionStartTime) return;
-    const id = setInterval(() => {
-      setElapsed(Date.now() - questionStartTime);
-    }, 100);
-    return () => clearInterval(id);
-  }, [phase, questionStartTime]);
-
   const advanceQuestion = useCallback(() => {
     if (currentIndex + 1 >= questions.length) {
       setTransitioning(true);
@@ -135,14 +131,55 @@ export function QuestionPage({ onNavigateToLeaderboard, isQuizStarted }: Questio
       setResult(null);
       setPhase("playing");
       setQuestionStartTime(Date.now());
-      setElapsed(0);
+      setRemaining(timerSeconds);
+      timedOutRef.current = false;
+      setTimeUpNotice(false);
       setTransitioning(false);
       setQuestionAnimKey((k) => k + 1);
     }, 200);
-  }, [currentIndex, questions.length]);
+  }, [currentIndex, questions.length, timerSeconds]);
+
+  // Countdown timer (updates every 100ms while playing)
+  useEffect(() => {
+    if (phase !== "playing" || !questionStartTime) return;
+    const id = setInterval(() => {
+      const r = Math.max(0, timerSeconds - (Date.now() - questionStartTime) / 1000);
+      setRemaining(r);
+    }, 100);
+    return () => clearInterval(id);
+  }, [phase, questionStartTime, timerSeconds]);
+
+  // Auto-timeout when countdown reaches 0
+  useEffect(() => {
+    if (remaining > 0 || phase !== "playing" || timedOutRef.current || !currentQuestion) return;
+    timedOutRef.current = true;
+    setTimeUpNotice(true);
+
+    // Record as incorrect locally (no API call — timed out)
+    setRoundResults((prev) => [
+      ...prev,
+      {
+        questionText: currentQuestion.questionText,
+        result: {
+          correct: false,
+          correctAnswer: "",
+          correctIndex: -1,
+          elapsedTimeMs: timerSeconds * 1000,
+          timeTaken: timerSeconds,
+          pointsAwarded: 0,
+        },
+      },
+    ]);
+    setPhase("feedback");
+
+    autoAdvanceTimer.current = setTimeout(() => {
+      setTimeUpNotice(false);
+      advanceQuestion();
+    }, 1000);
+  }, [remaining, phase, currentQuestion, timerSeconds, advanceQuestion]);
 
   const handleSelect = async (optionIndex: number) => {
-    if (submitting || selectedIndex !== null || !currentQuestion) return;
+    if (submitting || selectedIndex !== null || !currentQuestion || timedOutRef.current) return;
 
     setSelectedIndex(optionIndex);
     setSubmitting(true);
@@ -188,11 +225,6 @@ export function QuestionPage({ onNavigateToLeaderboard, isQuizStarted }: Questio
       autoAdvanceTimer.current = null;
     }
     advanceQuestion();
-  };
-
-  const formatTime = (ms: number) => {
-    const seconds = (ms / 1000).toFixed(1);
-    return `${seconds}s`;
   };
 
   if (phase === "loading") {
@@ -314,17 +346,44 @@ export function QuestionPage({ onNavigateToLeaderboard, isQuizStarted }: Questio
         </div>
       )}
 
-      <div className="flex items-center justify-center sm:justify-between">
-        <span className="ui-label flex items-center gap-2 text-lg text-muted-foreground sm:text-base">
-          <Clock weight="regular" className="h-5 w-5" />
-          {formatTime(elapsed)}
-        </span>
-        {playerActivity && playerActivity.playerCount > 0 && (
-          <span className="ui-label flex items-center gap-1.5 text-muted-foreground animate-pulse">
-            <UsersThree weight="fill" className="h-4 w-4 text-accent" />
-            {playerActivity.playerCount} answering\u2026
+      {timeUpNotice && (
+        <div className="animate-fade-slide-in rounded-md border border-red-500/30 bg-red-500/10 px-4 py-2 text-center text-sm font-bold text-red-400">
+          ⏰ Time&apos;s up!
+        </div>
+      )}
+
+      {/* Countdown timer bar */}
+      <div className="space-y-1">
+        <div className="flex items-center justify-between">
+          <span className="ui-label flex items-center gap-2">
+            <Timer weight="fill" className="h-5 w-5" />
+            <span className={cn(
+              "text-2xl font-bold font-mono tabular-nums",
+              remaining > 5 ? "text-green-400" : remaining > 2 ? "text-amber-400" : "text-red-400 animate-pulse"
+            )}>
+              {remaining.toFixed(1)}s
+            </span>
           </span>
-        )}
+          <span className="text-xs text-muted-foreground">
+            Q{currentIndex + 1}/{questions.length}
+          </span>
+          {playerActivity && playerActivity.playerCount > 0 && (
+            <span className="ui-label flex items-center gap-1.5 text-muted-foreground animate-pulse">
+              <UsersThree weight="fill" className="h-4 w-4 text-accent" />
+              {playerActivity.playerCount} answering…
+            </span>
+          )}
+        </div>
+        {/* Progress bar that depletes */}
+        <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
+          <div
+            className={cn(
+              "h-full rounded-full transition-all duration-100",
+              remaining > 5 ? "bg-green-500" : remaining > 2 ? "bg-amber-500" : "bg-red-500"
+            )}
+            style={{ width: `${(remaining / timerSeconds) * 100}%` }}
+          />
+        </div>
       </div>
 
       <QuestionCard

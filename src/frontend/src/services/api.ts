@@ -19,6 +19,7 @@ export interface GameState {
   isStarted: boolean;
   questionIds?: string[];
   questionCount?: number;
+  timerSeconds?: number;
   updatedAt?: string;
 }
 
@@ -272,6 +273,15 @@ export async function setQuestionCount(count: number, adminUserId: string): Prom
     method: "PATCH",
     headers: { "Content-Type": "application/json", "x-user-id": adminUserId },
     body: JSON.stringify({ questionCount: count }),
+  });
+  return handleResponse<GameState>(response);
+}
+
+export async function setTimer(seconds: number, adminUserId: string): Promise<GameState> {
+  const response = await fetch("/api/game/timer", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", "x-user-id": adminUserId },
+    body: JSON.stringify({ timerSeconds: seconds }),
   });
   return handleResponse<GameState>(response);
 }

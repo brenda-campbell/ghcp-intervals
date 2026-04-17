@@ -7,7 +7,7 @@ interface PresenceEntry {
 }
 
 const onlinePlayers = new Map<string, PresenceEntry>();
-const PRESENCE_TIMEOUT_MS = 60_000; // 60 seconds before considered offline
+const PRESENCE_TIMEOUT_MS = 45_000; // 45 seconds (one missed heartbeat grace at 30s interval)
 
 export function registerPlayer(userId: string, displayName: string): void {
   onlinePlayers.set(userId, { userId, displayName, lastSeen: Date.now() });

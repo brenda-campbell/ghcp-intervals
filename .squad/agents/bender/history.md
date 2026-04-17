@@ -188,3 +188,12 @@
 - **New endpoint** `PATCH /api/game/question-count` in `src/api/src/functions/setQuestionCount.ts`. Admin-only. Validates 1–20 range. Updates GameState.questionCount. Broadcasts `questionCountChanged` SignalR event.
 - **Auto-stop quiz:** No backend changes needed. Frontend is the gatekeeper — pinned questions are fixed, backend serves same set on refresh, lifecycle is admin-controlled via start/stop.
 - **TypeScript compiles clean.**
+
+### be-timer-presence — Configurable Timer & Presence Broadcast (2026-04-17)
+- **GameState.timerSeconds** — Added `timerSeconds?: number` (default 10, range 5-60) to GameState model. Follows same pattern as `questionCount`.
+- **PATCH /api/game/timer** — New admin-only endpoint (`setTimer.ts`) modeled after `setQuestionCount.ts`. Validates integer 5-60, upserts GameState, broadcasts `timerChanged` SignalR event.
+- **startQuiz** — Accepts optional `timerSeconds` in request body (same resolution pattern as questionCount: body > gameState > default 10). Includes `timerSeconds` in `quizStarted` broadcast payload.
+- **getGameState** — Defaults `timerSeconds: 10` in all response paths (stored doc, empty state, 404 fallback).
+- **setCategory** — Preserves `timerSeconds` alongside `isStarted` and `questionCount` when switching categories.
+- **heartbeat SignalR broadcast** — Added SignalR output binding to heartbeat endpoint. After registering presence and computing count, broadcasts `presenceUpdate { count, userId, displayName }` to all connected clients. Pattern copied from submitAnswer.ts.
+- **Presence timeout** — Reduced `PRESENCE_TIMEOUT_MS` from 60s to 45s in presenceService.ts. At 30s heartbeat interval, this gives exactly one missed heartbeat grace period instead of two.

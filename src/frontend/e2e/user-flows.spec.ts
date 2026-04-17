@@ -1,6 +1,10 @@
 import { test, expect, Page } from '@playwright/test';
 
 const SCREENSHOTS_DIR = 'e2e/screenshots';
+const ADMIN_USER_ID = '328c53cd-cb6a-4201-a519-47abcad133dc';
+
+// Track test users for cleanup
+const testUserIds: string[] = [];
 
 /** Helper: clear localStorage so we start fresh */
 async function clearAppStorage(page: Page) {
@@ -12,15 +16,24 @@ async function clearAppStorage(page: Page) {
   });
 }
 
-/** Helper: perform login via EmailEntry form */
+/** Helper: perform login via EmailEntry form and capture userId for cleanup */
 async function loginAs(page: Page, email: string, displayName: string) {
   const emailInput = page.locator('#email');
   const nameInput = page.locator('#displayName');
   await emailInput.waitFor({ state: 'visible', timeout: 15000 });
   await emailInput.fill(email);
   await nameInput.fill(displayName);
-  // Click the "Enter the Game" submit button
   await page.locator('button[type="submit"]').click();
+}
+
+/** Helper: capture the userId from localStorage after login */
+async function captureTestUserId(page: Page) {
+  try {
+    const userId = await page.evaluate(() => localStorage.getItem('ff_userId'));
+    if (userId && !testUserIds.includes(userId)) {
+      testUserIds.push(userId);
+    }
+  } catch { /* ignore */ }
 }
 
 /** Helper: wait for the main app shell to appear after login */
@@ -39,6 +52,22 @@ async function captureDebugInfo(page: Page, label: string) {
     console.log(`\n--- DEBUG [${label}] page HTML (first 3000 chars) ---\n${truncated}\n---`);
   } catch { /* ignore */ }
 }
+
+// Clean up all test users after all tests complete
+test.afterAll(async ({ }, testInfo) => {
+  const baseURL = testInfo.project.use?.baseURL || 'http://localhost:4280';
+  for (const userId of testUserIds) {
+    try {
+      await fetch(`${baseURL}/api/users/${userId}`, {
+        method: 'DELETE',
+        headers: { 'x-user-id': ADMIN_USER_ID },
+      });
+    } catch {
+      // Best-effort cleanup — don't fail tests if delete fails
+    }
+  }
+  testUserIds.length = 0;
+});
 
 // =============================================================
 // Test 1: Fresh Login Flow
@@ -69,6 +98,7 @@ test('Test 1: Fresh login flow', async ({ page }) => {
     await captureDebugInfo(page, 'after-login');
     throw e;
   }
+  await captureTestUserId(page);
 
   // Screenshot: after login
   await page.screenshot({ path: `${SCREENSHOTS_DIR}/02-after-login.png`, fullPage: true });
@@ -112,8 +142,9 @@ test('Test 2: Quiz tab shows waiting room or questions', async ({ page }) => {
     await captureDebugInfo(page, 'quiz-login');
     throw e;
   }
+  await captureTestUserId(page);
 
-  // Quiz tab should be selected by default — look for quiz-related content
+  // Quiz tab should be selected by default— look for quiz-related content
   // Either WaitingScreen ("Waiting for quiz to start") or QuestionPage
   const waitingText = page.locator('text=Waiting for quiz to start');
   const questionContent = page.locator('text=Question');
@@ -149,6 +180,7 @@ test('Test 3: Leaderboard tab loads', async ({ page }) => {
     await captureDebugInfo(page, 'lb-login');
     throw e;
   }
+  await captureTestUserId(page);
 
   // Click Leaderboard tab
   await page.locator('button', { hasText: 'Leaderboard' }).click();
@@ -272,6 +304,7 @@ test('Test 6: Logout and re-login', async ({ page }) => {
   const email1 = `e2e-logout-${Date.now()}@test.com`;
   await loginAs(page, email1, 'Logout Tester');
   await waitForAppShell(page);
+  await captureTestUserId(page);
 
   // Click sign-out button (the SignOut icon button)
   const signOutBtn = page.locator('button[title="Sign out"]');
@@ -295,6 +328,7 @@ test('Test 6: Logout and re-login', async ({ page }) => {
     await captureDebugInfo(page, 're-login');
     throw e;
   }
+  await captureTestUserId(page);
 
   // Screenshot: re-login
   await page.screenshot({ path: `${SCREENSHOTS_DIR}/09-re-login.png`, fullPage: true });
@@ -316,6 +350,7 @@ test('Test 7: Return user auto-login from localStorage', async ({ page }) => {
   const email = `e2e-return-${Date.now()}@test.com`;
   await loginAs(page, email, 'Return Tester');
   await waitForAppShell(page);
+  await captureTestUserId(page);
 
   // Navigate away and come back (simulating page revisit)
   await page.goto('about:blank');
@@ -362,6 +397,7 @@ test('Test 8: Dark/Light theme toggle', async ({ page }) => {
   const testEmail = `e2e-theme-${Date.now()}@test.com`;
   await loginAs(page, testEmail, 'Theme Tester');
   await waitForAppShell(page);
+  await captureTestUserId(page);
 
   // Screenshot: initial theme state
   await page.screenshot({ path: `${SCREENSHOTS_DIR}/11-default-theme.png`, fullPage: true });

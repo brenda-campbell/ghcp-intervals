@@ -3,12 +3,20 @@ import {
   HttpRequest,
   HttpResponseInit,
   InvocationContext,
+  output,
 } from "@azure/functions";
 import {
   registerPlayer,
   cleanStalePresence,
   getOnlineCount,
 } from "../services/presenceService.js";
+
+const signalROutput = output.generic({
+  type: "signalR",
+  name: "signalRMessages",
+  hubName: "gameHub",
+  connectionStringSetting: "AzureSignalRConnectionString",
+});
 
 async function heartbeat(
   request: HttpRequest,
@@ -36,6 +44,14 @@ async function heartbeat(
   const count = getOnlineCount();
   context.log(`Heartbeat: user=${userId} online=${count}`);
 
+  // Broadcast presence update so all clients get real-time count
+  context.extraOutputs.set(signalROutput, [
+    {
+      target: "presenceUpdate",
+      arguments: [{ count, userId, displayName }],
+    },
+  ]);
+
   return { status: 200, jsonBody: { count } };
 }
 
@@ -43,5 +59,6 @@ app.http("heartbeat", {
   methods: ["POST"],
   authLevel: "anonymous",
   route: "game/heartbeat",
+  extraOutputs: [signalROutput],
   handler: heartbeat,
 });

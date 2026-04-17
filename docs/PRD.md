@@ -82,6 +82,13 @@ This is a focused competitive game with core mechanics (questions, timer, scorin
 - **Progression**: Admin stops quiz → Server broadcasts `quizStopped` via SignalR → All clients disable answer buttons → Leaderboard shows final standings → Players must wait for next admin-started quiz to continue
 - **Success criteria**: Answer buttons become disabled within 100ms of admin stop, late submissions are rejected server-side with clear error message, players cannot click through to next round until admin starts new quiz
 
+### Per-Question Countdown Timer
+- **Functionality**: Each question has a configurable countdown timer (default 10 seconds, admin-configurable 5-60s). Timer is displayed prominently above the question with a color-coded progress bar. When time expires, the question is auto-marked as incorrect and the quiz advances.
+- **Purpose**: Creates urgency and fairness — all players have the same time limit, preventing slow deliberation strategies
+- **Trigger**: Timer starts automatically when each question renders
+- **Progression**: Question appears → Countdown starts from configured seconds → Progress bar depletes (green→amber→red) → If user answers in time: normal scoring → If time expires: "Time's up!" banner → marked incorrect (0 points) → auto-advance to next question after 1 second
+- **Success criteria**: Timer is visible and accurate to 100ms, color transitions at 5s (amber) and 2s (red) thresholds, auto-timeout submits as incorrect, admin can configure 5-60 second range, timer pauses during answer feedback phase
+
 ## Edge Case Handling
 
 - **Network interruption during answer** - Timer freezes, answer queued locally, auto-submits when connection restored with original timestamp
@@ -91,6 +98,7 @@ This is a focused competitive game with core mechanics (questions, timer, scorin
 - **User closes tab before answering** - Treated as abandoned attempt, no score change, can return anytime
 - **Rapid clicking/spam** - Only first click registers, subsequent clicks ignored until next question
 - **Invalid/corrupted questions** - Error screen with "Skip question" option, no penalty applied
+- **Timer expires mid-answer** - If user hasn't selected an answer when timer hits 0, question auto-submits as incorrect (0 points), brief "Time's up!" feedback shown, auto-advances after 1 second
 
 ## Design Direction
 

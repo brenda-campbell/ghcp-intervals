@@ -19,12 +19,14 @@ async function getGameState(
       .read<GameState>();
 
     if (resource) {
-      return { status: 200, jsonBody: resource };
+      // Ensure timerSeconds defaults to 10 when missing from stored document
+      const body = { ...resource, timerSeconds: resource.timerSeconds ?? 10 };
+      return { status: 200, jsonBody: body };
     }
 
     return {
       status: 200,
-      jsonBody: { activeCategoryId: null, activeCategoryName: null, isStarted: false },
+      jsonBody: { activeCategoryId: null, activeCategoryName: null, isStarted: false, timerSeconds: 10 },
     };
   } catch (err: unknown) {
     // 404 from Cosmos means no game state set yet
@@ -36,7 +38,7 @@ async function getGameState(
     ) {
       return {
         status: 200,
-        jsonBody: { activeCategoryId: null, activeCategoryName: null, isStarted: false },
+        jsonBody: { activeCategoryId: null, activeCategoryName: null, isStarted: false, timerSeconds: 10 },
       };
     }
 
