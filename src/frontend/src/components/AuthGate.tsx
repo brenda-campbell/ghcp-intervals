@@ -68,7 +68,15 @@ export function AuthGate({ children, onUserAuthenticated, onLogout }: AuthGatePr
         })
         .catch((err) => {
           if (err instanceof ApiError && err.status === 403) {
-            setIsDeactivated(true);
+            // Check if it's a registration-closed error vs deactivated
+            const msg = err.message?.toLowerCase() ?? "";
+            if (msg.includes("registration")) {
+              // Existing user shouldn't hit this, but if they do, clear stored data
+              // and show the login form (not the deactivated screen)
+              setError("Registration is currently closed. Please try again later.");
+            } else {
+              setIsDeactivated(true);
+            }
           } else {
             setError(
               err instanceof Error ? err.message : "Failed to verify account",
@@ -131,6 +139,10 @@ export function AuthGate({ children, onUserAuthenticated, onLogout }: AuthGatePr
         setIsLegacy(false);
       } catch (err) {
         if (err instanceof ApiError && err.status === 403) {
+          const msg = err.message?.toLowerCase() ?? "";
+          if (msg.includes("registration")) {
+            throw new Error("Registration is currently closed. The quiz host will open it shortly.");
+          }
           throw new Error(
             "Your account has been deactivated. Contact an admin.",
           );
