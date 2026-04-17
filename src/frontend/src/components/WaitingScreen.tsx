@@ -17,9 +17,9 @@ export function WaitingScreen({ categoryName, onlineCount }: WaitingScreenProps)
       </div>
 
       {/* Waiting text */}
-      <h2 className="h2 mb-2 text-center">Waiting for quiz to start…</h2>
+      <h2 className="h2 mb-2 text-center">Waiting for the quiz to start…</h2>
       <p className="text-sm text-muted-foreground text-center max-w-xs mb-6">
-        The admin will kick things off shortly. Sit tight!
+        The quiz host will start the next round shortly.
       </p>
 
       {/* Category badge */}

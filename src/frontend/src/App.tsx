@@ -181,7 +181,7 @@ function App() {
         <header className="flex items-center justify-between gap-2">
           <div className="flex min-w-0 items-center gap-2">
             <Lightning weight="fill" className="h-6 w-6 shrink-0 text-accent sm:h-8 sm:w-8" />
-            <h1 className="h1 truncate">Fastest Finger</h1>
+            <h1 className="h1 truncate">Dev Days Quiz</h1>
           </div>
           <div className="flex shrink-0 items-center gap-2 sm:gap-3">
             <ConnectionStatus />

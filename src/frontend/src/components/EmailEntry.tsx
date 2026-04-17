@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Lightning, SpinnerGap, WarningCircle } from "@phosphor-icons/react";
+import { GithubLogo, Lightning, SpinnerGap, WarningCircle } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 
 interface EmailEntryProps {
@@ -51,16 +51,23 @@ export function EmailEntry({ onLogin, isLoading, error }: EmailEntryProps) {
   const isInactiveError = error?.toLowerCase().includes("deactivated") || error?.toLowerCase().includes("inactive");
 
   return (
-    <div className="flex min-h-[100dvh] items-center justify-center p-4">
+    <div className="flex min-h-[100dvh] items-center justify-center p-4 bg-gradient-to-b from-background via-background to-primary/5">
       <div className="w-full max-w-md animate-fade-slide-in">
         <Card className="border-accent/30 bg-card shadow-lg">
           <CardContent className="flex flex-col items-center gap-6 pt-6">
             {/* Branding */}
-            <Lightning weight="fill" className="h-12 w-12 text-accent" />
+            <div className="relative mb-2">
+              <div className="absolute inset-0 rounded-full bg-primary/20 blur-xl" />
+              <GithubLogo weight="fill" className="relative h-16 w-16 text-primary" />
+            </div>
+            <div className="rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary mb-3">
+              April 24, 2026 • Manchester
+            </div>
             <div className="text-center">
-              <h1 className="h2">Fastest Finger</h1>
-              <p className="caption mt-1 text-muted-foreground">
-                Enter your details to join the game
+              <h1 className="h2">GitHub Copilot Dev Days</h1>
+              <p className="text-lg font-medium text-foreground mt-1">Fastest Finger Quiz</p>
+              <p className="text-sm text-muted-foreground text-center max-w-sm leading-relaxed mt-2">
+                A quick quiz game to play during the interval between sessions. Built with the GitHub Copilot squad in CLI, deployed with GitHub Actions, and hosted on Azure.
               </p>
             </div>
 
@@ -169,7 +176,7 @@ export function EmailEntry({ onLogin, isLoading, error }: EmailEntryProps) {
                 ) : (
                   <>
                     <Lightning weight="fill" className="h-5 w-5" />
-                    Enter the Game
+                    Join the Quiz
                   </>
                 )}
               </Button>

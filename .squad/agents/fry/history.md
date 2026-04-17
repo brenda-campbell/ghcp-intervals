@@ -226,3 +226,12 @@
 - **QuestionResultEntry exported:** Made the interface `export` from QuestionPage so App.tsx can import it for type-safe completion state.
 - **QuizCompletedScreen:** New inline component in App.tsx — renders the admin-started completion card with per-question times, fastest answer highlight, score summary, and "View Leaderboard" button. Survives tab switches since it lives in App state.
 - **Verification:** TypeScript compiles clean (`npx tsc --noEmit` — 0 errors).
+
+### fe-devdays-rebrand (2026-04-17)
+- **Visual identity:** Rebranded from "Fastest Finger Quiz" to "GitHub Copilot Dev Days" visual identity. Dark theme now uses GitHub's color palette (#0D1117 bg, #161B22 cards, #30363D borders). Primary color changed from blue (#4A90E2) to GitHub green (#3FB950). Accent changed from Electric Lime (#C5F542) to soft mint green (#7EE787).
+- **Login screen:** Replaced Lightning brand icon with `GithubLogo` from `@phosphor-icons/react` (ESM export only — CJS `require` returns undefined). Added event badge ("April 24, 2026 • Manchester"), gradient background, and green glow behind icon. Button text changed to "Join the Quiz".
+- **Naming:** Page title → "GitHub Copilot Dev Days – Fastest Finger Quiz", header → "Dev Days Quiz", login heading → "GitHub Copilot Dev Days" with "Fastest Finger Quiz" subtitle.
+- **Waiting screen:** Updated copy to be event-appropriate ("quiz host" instead of "admin").
+- **Light theme:** Updated to GitHub's light palette (#F6F8FA cards, #D0D7DE borders, #656D76 muted text).
+- **Files changed:** `index.html`, `src/index.css`, `src/App.tsx`, `src/components/EmailEntry.tsx`, `src/components/WaitingScreen.tsx`.
+- **Verification:** TypeScript compiles clean (`npx tsc --noEmit` — 0 errors).
