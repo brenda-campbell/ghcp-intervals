@@ -250,8 +250,39 @@ The workflow (`.github/workflows/deploy.yml`) runs on push to `main`:
 ## Scoring
 
 - **Correct answer**: 100 base points
-- **Speed bonus**: Up to 100 additional points (inversely scaled with response time)
+- **Speed bonus**: Up to 100 additional points (inversely scaled with response time relative to the configured timer — faster = more points)
+- **Incorrect/Timeout**: 0 points (unanswered questions when timer expires are marked incorrect)
 - **Ties broken by**: Fastest cumulative response time
+- **Games Played**: Incremented once per completed round (not per question)
+- **Fastest Time**: Per-question response times shown in round summary, fastest correct answer highlighted
+
+### API Endpoints
+
+| Method | Route | Auth | Description |
+|--------|-------|------|-------------|
+| POST | `/api/users/login-or-create` | — | Login or register by email |
+| GET | `/api/users/:id` | — | Get user profile |
+| GET | `/api/users` | Admin | List all users |
+| PATCH | `/api/users/:id/status` | Admin | Toggle user active/inactive |
+| DELETE | `/api/users/:id` | Admin | Delete a user |
+| GET | `/api/questions` | — | Get quiz questions (pinned when started) |
+| POST | `/api/answer` | — | Submit answer, get score |
+| POST | `/api/game/round-complete` | — | Mark round as completed (increments gamesPlayed) |
+| GET | `/api/leaderboard` | — | Top 10 + optional category filter |
+| GET | `/api/categories` | — | List categories |
+| POST | `/api/categories` | Admin | Create category |
+| PATCH | `/api/categories/:id` | Admin | Update category |
+| DELETE | `/api/categories/:id` | Admin | Delete category + cascade questions |
+| GET | `/api/game/state` | — | Get current game state |
+| POST | `/api/game/set-category` | Admin | Set active category |
+| POST | `/api/game/start-quiz` | Admin | Start quiz (pin questions) |
+| POST | `/api/game/stop-quiz` | Admin | Stop quiz |
+| PATCH | `/api/game/question-count` | Admin | Set questions per round (1-20) |
+| PATCH | `/api/game/timer` | Admin | Set timer per question (5-60s) |
+| POST | `/api/scores/reset` | Admin | Reset scores (all/selected/category) |
+| POST | `/api/game/heartbeat` | — | Online presence heartbeat |
+| GET | `/api/game/online-players` | — | Get online player count |
+| POST | `/api/negotiate` | — | SignalR connection negotiation |
 
 ## License
 
