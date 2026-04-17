@@ -191,6 +191,9 @@ export function EmailEntry({ onLogin, isLoading, error }: EmailEntryProps) {
                 It will not be shared with third parties.
                 All quiz data will be permanently deleted within 24 hours of the event.
               </p>
+              <p className="text-[10px] text-muted-foreground/60 text-center mt-2">
+                Created by Brenda Campbell
+              </p>
             </form>
           </CardContent>
         </Card>

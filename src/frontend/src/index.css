@@ -42,10 +42,11 @@
 }
 
 /* Light mode — default when .dark is not on <html> */
-:root {
+html:not(.dark) {
   --radius: 0.75rem;
   --color-background: #FAFBFC;        /* Very pale gray-white */
   --color-foreground: #1F2328;        /* Near-black text */
+  --color-accent: #16a34a;            /* Darker green for light mode contrast */
   --color-card: #FFFFFF;              /* Pure white cards */
   --color-card-foreground: #1F2328;   /* Black text on cards */
   --color-muted: #F3F4F6;            /* Very light gray surface */
@@ -62,9 +63,10 @@
 }
 
 /* Dark mode — applied via .dark class on <html> */
-.dark {
+html.dark {
   --color-background: #0D1117;       /* Very dark near-black (GitHub dark bg) */
   --color-foreground: #E6EDF3;       /* Off-white text */
+  --color-accent: #7EE787;
   --color-card: #161B22;             /* Dark card surface */
   --color-card-foreground: #E6EDF3;
   --color-muted: #21262D;            /* Muted surface */
@@ -76,6 +78,8 @@
   --color-secondary: #21262D;
   --color-secondary-foreground: #E6EDF3;
   --color-accent-foreground: #0D1117;
+  --color-primary-foreground: #FFFFFF;
+  --color-destructive-foreground: #FFFFFF;
 }
 
 html {
