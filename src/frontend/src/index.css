@@ -4,30 +4,31 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  /* Theme colors — GitHub Copilot Dev Days aesthetic.
-     Actual runtime values are overridden below via :root (light) and .dark. */
+  /* Theme tokens — set to LIGHT mode defaults.
+     Dark mode overrides via .dark class below.
+     Primary/accent/destructive are shared across both themes. */
   --color-primary: #3FB950;          /* GitHub green */
-  --color-background: #0D1117;
-  --color-foreground: #E6EDF3;
+  --color-background: #FAFBFC;
+  --color-foreground: #1F2328;
   --color-accent: #7EE787;           /* Soft mint green accent */
-  --color-card: #161B22;
+  --color-card: #FFFFFF;
   --color-github-black: #0D1117;
 
   --color-primary-foreground: #FFFFFF;
-  --color-accent-foreground: #0D1117;
-  --color-card-foreground: #E6EDF3;
-  --color-muted: #21262D;
-  --color-muted-foreground: #8B949E;
-  --color-border: #30363D;
-  --color-input: #30363D;
+  --color-accent-foreground: #1F2328;
+  --color-card-foreground: #1F2328;
+  --color-muted: #F3F4F6;
+  --color-muted-foreground: #4B5563;
+  --color-border: #D1D5DB;
+  --color-input: #E5E7EB;
   --color-ring: #3FB950;             /* Green ring */
   --color-destructive: #F85149;      /* GitHub red */
   --color-destructive-foreground: #FFFFFF;
 
-  --color-popover: #161B22;
-  --color-popover-foreground: #E6EDF3;
-  --color-secondary: #21262D;
-  --color-secondary-foreground: #E6EDF3;
+  --color-popover: #FFFFFF;
+  --color-popover-foreground: #1F2328;
+  --color-secondary: #F3F4F6;
+  --color-secondary-foreground: #1F2328;
 
   /* Typography */
   --font-sans: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
@@ -43,19 +44,21 @@
 /* Light mode — default when .dark is not on <html> */
 :root {
   --radius: 0.75rem;
-  --color-background: #FFFFFF;
-  --color-foreground: #1F2328;       /* GitHub dark text */
-  --color-card: #F6F8FA;             /* GitHub light surface */
-  --color-card-foreground: #1F2328;
-  --color-muted: #EAEEF2;
-  --color-muted-foreground: #656D76;
-  --color-border: #D0D7DE;
-  --color-input: #D0D7DE;
+  --color-background: #FAFBFC;        /* Very pale gray-white */
+  --color-foreground: #1F2328;        /* Near-black text */
+  --color-card: #FFFFFF;              /* Pure white cards */
+  --color-card-foreground: #1F2328;   /* Black text on cards */
+  --color-muted: #F3F4F6;            /* Very light gray surface */
+  --color-muted-foreground: #4B5563;  /* Darker muted text for contrast */
+  --color-border: #D1D5DB;
+  --color-input: #E5E7EB;
   --color-popover: #FFFFFF;
   --color-popover-foreground: #1F2328;
-  --color-secondary: #F6F8FA;
+  --color-secondary: #F3F4F6;
   --color-secondary-foreground: #1F2328;
   --color-accent-foreground: #1F2328;
+  --color-primary-foreground: #FFFFFF;
+  --color-destructive-foreground: #FFFFFF;
 }
 
 /* Dark mode — applied via .dark class on <html> */
