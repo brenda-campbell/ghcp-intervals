@@ -3,14 +3,13 @@
 
 @custom-variant dark (&:is(.dark *));
 
-@theme inline {
-  /* Theme tokens — set to LIGHT mode defaults.
-     Dark mode overrides via .dark class below.
-     Primary/accent/destructive are shared across both themes. */
-  --color-primary: #3FB950;          /* GitHub green */
+@theme {
+  /* Theme tokens — Tailwind generates var() references, allowing
+     runtime overrides via html:not(.dark) and html.dark below. */
+  --color-primary: #3FB950;
   --color-background: #FAFBFC;
   --color-foreground: #1F2328;
-  --color-accent: #7EE787;           /* Soft mint green accent */
+  --color-accent: #7EE787;
   --color-card: #FFFFFF;
   --color-github-black: #0D1117;
 
@@ -21,8 +20,8 @@
   --color-muted-foreground: #4B5563;
   --color-border: #D1D5DB;
   --color-input: #E5E7EB;
-  --color-ring: #3FB950;             /* Green ring */
-  --color-destructive: #F85149;      /* GitHub red */
+  --color-ring: #3FB950;
+  --color-destructive: #F85149;
   --color-destructive-foreground: #FFFFFF;
 
   --color-popover: #FFFFFF;
