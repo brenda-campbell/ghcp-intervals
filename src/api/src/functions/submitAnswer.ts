@@ -64,16 +64,14 @@ const signalROutput = output.generic({
   connectionStringSetting: "AzureSignalRConnectionString",
 });
 
-const BASE_POINTS = 100;
-const MAX_SPEED_BONUS = 100;
+const MAX_POINTS = 200;
 
 function calculatePoints(correct: boolean, elapsedTimeMs: number, timeoutMs: number = 10_000): number {
   if (!correct) return 0;
   const clampedElapsed = Math.min(Math.max(elapsedTimeMs, 0), timeoutMs);
-  const speedBonus = Math.round(
-    MAX_SPEED_BONUS * (1 - clampedElapsed / timeoutMs)
-  );
-  return BASE_POINTS + speedBonus;
+  // Fastest correct answer (0ms) gets MAX_POINTS (200).
+  // Points reduce progressively — answering at the deadline gets ~0.
+  return Math.round(MAX_POINTS * (1 - clampedElapsed / timeoutMs));
 }
 
 async function submitAnswer(

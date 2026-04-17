@@ -144,7 +144,7 @@ describe("submitAnswer", () => {
     expect((res.jsonBody as any).pointsAwarded).toBe(200);
   });
 
-  it("awards BASE points only at timeout (10s)", async () => {
+  it("awards 0 points at timeout (10s) — speed determines all points", async () => {
     const now = 1700000010000;
     vi.spyOn(Date, "now").mockReturnValue(now);
     vi.mocked(getDeliveryTimestamp).mockReturnValue(now - 10000); // 10000ms elapsed
@@ -154,11 +154,11 @@ describe("submitAnswer", () => {
 
     const res = await handler(req, ctx);
 
-    // BASE=100 + speedBonus=0 = 100
-    expect((res.jsonBody as any).pointsAwarded).toBe(100);
+    // 200*(1 - 10000/10000) = 0
+    expect((res.jsonBody as any).pointsAwarded).toBe(0);
   });
 
-  it("awards proportional speed bonus for 5s answer", async () => {
+  it("awards proportional speed points for 5s answer", async () => {
     const now = 1700000005000;
     vi.spyOn(Date, "now").mockReturnValue(now);
     vi.mocked(getDeliveryTimestamp).mockReturnValue(now - 5000); // 5000ms elapsed
@@ -168,11 +168,11 @@ describe("submitAnswer", () => {
 
     const res = await handler(req, ctx);
 
-    // BASE=100 + round(100*(1 - 5000/10000)) = 100 + 50 = 150
-    expect((res.jsonBody as any).pointsAwarded).toBe(150);
+    // round(200*(1 - 5000/10000)) = 100
+    expect((res.jsonBody as any).pointsAwarded).toBe(100);
   });
 
-  it("clamps very long response times (>10s) to timeout", async () => {
+  it("clamps very long response times (>10s) to 0 points", async () => {
     const now = 1700000020000;
     vi.spyOn(Date, "now").mockReturnValue(now);
     vi.mocked(getDeliveryTimestamp).mockReturnValue(now - 20000); // 20000ms elapsed
@@ -182,8 +182,8 @@ describe("submitAnswer", () => {
 
     const res = await handler(req, ctx);
 
-    // clamped to 10000ms → BASE=100 + 0 = 100
-    expect((res.jsonBody as any).pointsAwarded).toBe(100);
+    // clamped to 10000ms → 200*(1 - 1) = 0
+    expect((res.jsonBody as any).pointsAwarded).toBe(0);
   });
 
   // === Validation errors (400) ===

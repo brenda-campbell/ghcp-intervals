@@ -249,8 +249,8 @@ The workflow (`.github/workflows/deploy.yml`) runs on push to `main`:
 
 ## Scoring
 
-- **Correct answer**: 100 base points
-- **Speed bonus**: Up to 100 additional points (inversely scaled with response time relative to the configured timer — faster = more points)
+- **Correct answer**: Up to **200 points** — fastest correct answer gets maximum, slower answers score progressively less
+- **Speed formula**: `200 × (1 - responseTime / timerDuration)` — e.g., answering in 2s on a 10s timer = 160 pts
 - **Incorrect/Timeout**: 0 points (unanswered questions when timer expires are marked incorrect)
 - **Ties broken by**: Fastest cumulative response time
 - **Games Played**: Incremented once per completed round (not per question)
