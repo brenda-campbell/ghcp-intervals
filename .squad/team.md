@@ -17,6 +17,7 @@
 | Bender | Backend Dev | `.squad/agents/bender/charter.md` | 🔧 Active |
 | Hermes | DevOps | `.squad/agents/hermes/charter.md` | ⚙️ Active |
 | Amy | Tester | `.squad/agents/amy/charter.md` | 🧪 Active |
+| Zoidberg | E2E Tester | `.squad/agents/zoidberg/charter.md` | 🎭 Active |
 | Scribe | Scribe | `.squad/agents/scribe/charter.md` | 📋 Active |
 | Ralph | Work Monitor | `.squad/agents/ralph/charter.md` | 🔄 Active |
 

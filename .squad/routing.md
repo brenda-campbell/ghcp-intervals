@@ -11,6 +11,7 @@ How to decide who handles what.
 | DevOps / Infra | Hermes | GitHub Actions, Bicep templates, deployment pipelines, Azure resource provisioning |
 | Code review | Leela | Review PRs, check quality, architecture review |
 | Testing | Amy | Write tests, find edge cases, verify timing accuracy, race conditions |
+| E2E / Browser testing | Zoidberg | Playwright tests, user flow verification, screenshot reports, live site smoke tests |
 | Scope & priorities | Leela | What to build next, trade-offs, architecture decisions |
 | Session logging | Scribe | Automatic — never needs routing |
 

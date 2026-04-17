@@ -48,6 +48,13 @@
       "created_at": "2026-04-15T12:04:45Z",
       "legacy_named": false,
       "status": "active"
+    },
+    "e2e-tester": {
+      "persistent_name": "Zoidberg",
+      "universe": "Futurama",
+      "created_at": "2026-04-17T08:50:00Z",
+      "legacy_named": false,
+      "status": "active"
     }
   }
 }
