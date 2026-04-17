@@ -46,6 +46,7 @@ import {
   stopQuiz,
   setQuestionCount,
   setTimer,
+  setRegistration,
   type User,
   type Category,
   type GameState,
@@ -60,11 +61,13 @@ import { cn } from "@/lib/utils";
 
 function QuizControlSection({ adminUserId }: { adminUserId: string }) {
   const [isStarted, setIsStarted] = useState<boolean>(false);
+  const [isRegOpen, setIsRegOpen] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isRegSaving, setIsRegSaving] = useState(false);
   const [questionCount, setQuestionCountState] = useState<number>(3);
   const [timerSecs, setTimerSecsState] = useState<number>(10);
-  const { quizStarted } = useSignalRContext();
+  const { quizStarted, registrationOpen } = useSignalRContext();
 
   // Fetch initial state
   useEffect(() => {
@@ -74,6 +77,7 @@ function QuizControlSection({ adminUserId }: { adminUserId: string }) {
         const gs = await getGameState();
         if (!cancelled) {
           setIsStarted(gs.isStarted ?? false);
+          setIsRegOpen(gs.isRegistrationOpen !== false);
           if (gs.questionCount) setQuestionCountState(gs.questionCount);
           if (gs.timerSeconds) setTimerSecsState(gs.timerSeconds);
         }
@@ -91,6 +95,10 @@ function QuizControlSection({ adminUserId }: { adminUserId: string }) {
   useEffect(() => {
     if (quizStarted !== null) setIsStarted(quizStarted);
   }, [quizStarted]);
+
+  useEffect(() => {
+    if (registrationOpen !== null) setIsRegOpen(registrationOpen);
+  }, [registrationOpen]);
 
   const handleToggle = async () => {
     setIsSaving(true);
@@ -124,6 +132,18 @@ function QuizControlSection({ adminUserId }: { adminUserId: string }) {
     }
   };
 
+  const handleToggleRegistration = async () => {
+    setIsRegSaving(true);
+    try {
+      const gs = await setRegistration(!isRegOpen, adminUserId);
+      setIsRegOpen(gs.isRegistrationOpen !== false);
+    } catch {
+      /* silent — button re-enables */
+    } finally {
+      setIsRegSaving(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center gap-3 rounded-lg border border-border bg-card px-4 py-3">
@@ -144,7 +164,7 @@ function QuizControlSection({ adminUserId }: { adminUserId: string }) {
       />
       <span className="text-sm font-medium">
         Quiz is{" "}
-        <span className={cn("font-semibold", isStarted ? "text-green-400" : "text-red-400")}>
+        <span className={cn("font-semibold", isStarted ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400")}>
           {isStarted ? "LIVE" : "STOPPED"}
         </span>
       </span>
@@ -197,12 +217,27 @@ function QuizControlSection({ adminUserId }: { adminUserId: string }) {
         </span>
       )}
 
+      <div className="flex items-center gap-3 ml-auto">
+        <span className="text-sm">Registration:</span>
+        <Button
+          size="sm"
+          variant={isRegOpen ? "default" : "destructive"}
+          disabled={isRegSaving}
+          onClick={() => void handleToggleRegistration()}
+        >
+          {isRegSaving ? (
+            <SpinnerGap className="mr-1 size-3.5 animate-spin" />
+          ) : null}
+          {isRegOpen ? "🔓 Open" : "🔒 Closed"}
+        </Button>
+      </div>
+
       <Button
         size="sm"
         onClick={() => void handleToggle()}
         disabled={isSaving}
         className={cn(
-          "ml-auto min-h-[36px] font-semibold transition-transform duration-150 hover:scale-[1.03] active:scale-[0.97]",
+          "min-h-[36px] font-semibold transition-transform duration-150 hover:scale-[1.03] active:scale-[0.97]",
           isStarted
             ? "bg-red-500 hover:bg-red-600 text-white"
             : "bg-green-500 hover:bg-green-600 text-white",
@@ -245,7 +280,7 @@ function OnlinePlayersSection({ adminUserId }: { adminUserId: string }) {
 
   return (
     <div className="flex items-center gap-3 rounded-lg border border-border bg-card px-4 py-2.5">
-      <Broadcast weight="fill" className="size-4 text-green-400" />
+      <Broadcast weight="fill" className="size-4 text-green-600 dark:text-green-400" />
       <span className="text-sm font-medium">
         Online Players:{" "}
         <span className="font-mono text-accent">{data?.count ?? "—"}</span>
@@ -330,7 +365,7 @@ function ActiveCategorySwitcher({
           Set Active
         </Button>
         {showSuccess && (
-          <span className="text-xs text-green-400 flex items-center gap-1">
+          <span className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
             <CheckCircle weight="fill" className="size-3.5" /> Updated!
           </span>
         )}
@@ -660,8 +695,8 @@ function CategoryManagement({ adminUserId }: { adminUserId: string }) {
                           className={cn(
                             "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium transition-all duration-150",
                             cat.isActive
-                              ? "bg-green-500/15 text-green-400 hover:bg-green-500/25"
-                              : "bg-red-500/15 text-red-400 hover:bg-red-500/25",
+                              ? "bg-green-500/15 text-green-600 dark:text-green-400 hover:bg-green-500/25"
+                              : "bg-red-500/15 text-red-600 dark:text-red-400 hover:bg-red-500/25",
                             isToggling && "cursor-not-allowed opacity-50",
                             !isToggling && "hover:scale-[1.05] active:scale-[0.95]",
                           )}
@@ -684,7 +719,7 @@ function CategoryManagement({ adminUserId }: { adminUserId: string }) {
                               <button
                                 onClick={() => void handleSaveEdit()}
                                 disabled={isSavingEdit || !editName.trim()}
-                                className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium bg-green-500/15 text-green-400 hover:bg-green-500/25 transition-all duration-150 hover:scale-[1.05] active:scale-[0.95] disabled:cursor-not-allowed disabled:opacity-50"
+                                className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium bg-green-500/15 text-green-600 dark:text-green-400 hover:bg-green-500/25 transition-all duration-150 hover:scale-[1.05] active:scale-[0.95] disabled:cursor-not-allowed disabled:opacity-50"
                               >
                                 {isSavingEdit ? (
                                   <SpinnerGap className="size-3.5 animate-spin" />
@@ -704,7 +739,7 @@ function CategoryManagement({ adminUserId }: { adminUserId: string }) {
                               <button
                                 onClick={() => startEdit(cat)}
                                 title="Edit category"
-                                className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium bg-blue-500/15 text-blue-400 hover:bg-blue-500/25 transition-all duration-150 hover:scale-[1.05] active:scale-[0.95]"
+                                className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium bg-blue-500/15 text-blue-600 dark:text-blue-400 hover:bg-blue-500/25 transition-all duration-150 hover:scale-[1.05] active:scale-[0.95]"
                               >
                                 <PencilSimple weight="fill" className="size-3.5" />
                               </button>
@@ -714,7 +749,7 @@ function CategoryManagement({ adminUserId }: { adminUserId: string }) {
                                 title="Delete category"
                                 className={cn(
                                   "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium transition-all duration-150",
-                                  "bg-red-500/15 text-red-400 hover:bg-red-500/25",
+                                  "bg-red-500/15 text-red-600 dark:text-red-400 hover:bg-red-500/25",
                                   isDeleting && "cursor-not-allowed opacity-50",
                                   !isDeleting && "hover:scale-[1.05] active:scale-[0.95]",
                                 )}
@@ -800,7 +835,7 @@ function ScoreResetSection({
     <Card className="border-border bg-card">
       <CardHeader className="flex flex-row items-center justify-between gap-2">
         <CardTitle className="flex items-center gap-2 text-lg">
-          <Eraser weight="fill" className="size-5 text-red-400" />
+          <Eraser weight="fill" className="size-5 text-red-600 dark:text-red-400" />
           Score Management
         </CardTitle>
       </CardHeader>
@@ -810,7 +845,7 @@ function ScoreResetSection({
             className={cn(
               "flex items-center gap-2 rounded-md border px-3 py-2 text-sm",
               feedback.type === "success"
-                ? "border-green-500/30 bg-green-500/10 text-green-400"
+                ? "border-green-500/30 bg-green-500/10 text-green-600 dark:text-green-400"
                 : "border-destructive/30 bg-destructive/10 text-destructive",
             )}
           >
@@ -851,8 +886,8 @@ function ScoreResetSection({
             </Button>
           ) : (
             <div className="flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2">
-              <WarningCircle weight="fill" className="size-4 text-red-400 shrink-0" />
-              <span className="text-sm text-red-300">
+              <WarningCircle weight="fill" className="size-4 text-red-600 dark:text-red-400 shrink-0" />
+              <span className="text-sm text-red-600 dark:text-red-300">
                 Reset scores for {userCount} user{userCount !== 1 ? "s" : ""}
                 {categoryId ? " in selected category" : ""}?
               </span>
@@ -1076,7 +1111,7 @@ export function AdminPanel() {
             className={cn(
               "mb-4 flex items-center gap-2 rounded-md border px-3 py-2 text-sm",
               resetFeedback.type === "success"
-                ? "border-green-500/30 bg-green-500/10 text-green-400"
+                ? "border-green-500/30 bg-green-500/10 text-green-600 dark:text-green-400"
                 : "border-destructive/30 bg-destructive/10 text-destructive",
             )}
           >
@@ -1090,8 +1125,8 @@ export function AdminPanel() {
         )}
         {confirmingSelected && selectedUserIds.size > 0 && (
           <div className="mb-4 flex flex-wrap items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2">
-            <WarningCircle weight="fill" className="size-4 text-red-400 shrink-0" />
-            <span className="text-sm text-red-300">
+            <WarningCircle weight="fill" className="size-4 text-red-600 dark:text-red-400 shrink-0" />
+            <span className="text-sm text-red-600 dark:text-red-300">
               Reset scores for {selectedUserIds.size} selected user{selectedUserIds.size !== 1 ? "s" : ""}?
             </span>
             <Button
@@ -1202,8 +1237,8 @@ export function AdminPanel() {
                         className={cn(
                           "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium transition-all duration-150",
                           isActive
-                            ? "bg-green-500/15 text-green-400 hover:bg-green-500/25"
-                            : "bg-red-500/15 text-red-400 hover:bg-red-500/25",
+                            ? "bg-green-500/15 text-green-600 dark:text-green-400 hover:bg-green-500/25"
+                            : "bg-red-500/15 text-red-600 dark:text-red-400 hover:bg-red-500/25",
                           (isSelf || isToggling) && "cursor-not-allowed opacity-50",
                           !isSelf && !isToggling && "hover:scale-[1.05] active:scale-[0.95]",
                         )}
@@ -1225,7 +1260,7 @@ export function AdminPanel() {
                         title={isSelf ? "Cannot delete yourself" : "Delete user"}
                         className={cn(
                           "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium transition-all duration-150",
-                          "bg-red-500/15 text-red-400 hover:bg-red-500/25",
+                          "bg-red-500/15 text-red-600 dark:text-red-400 hover:bg-red-500/25",
                           (isSelf || isDeleting) && "cursor-not-allowed opacity-50",
                           !isSelf && !isDeleting && "hover:scale-[1.05] active:scale-[0.95]",
                         )}

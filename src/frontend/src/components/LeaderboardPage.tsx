@@ -132,7 +132,7 @@ export function LeaderboardPage({ userId }: LeaderboardPageProps) {
           <Trophy weight="fill" className="size-6 text-primary" />
           <h2 className="h2">Leaderboard</h2>
           {isLive && (
-            <span className="flex items-center gap-1 rounded-full bg-green-500/15 px-2 py-0.5 text-xs font-medium text-green-400">
+            <span className="flex items-center gap-1 rounded-full bg-green-500/15 px-2 py-0.5 text-xs font-medium text-green-600 dark:text-green-400">
               <Broadcast weight="fill" className="size-3" />
               Live
             </span>
