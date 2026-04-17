@@ -90,7 +90,7 @@ function App() {
   const { user, isLoading } = useUser()
   const logout = useLogout()
   const { isDark, toggle: toggleTheme } = useTheme()
-  const { quizStarted: quizStartedSignal, presenceCount } = useSignalRContext()
+  const { quizStarted: quizStartedSignal, presenceCount, categoryChanged } = useSignalRContext()
   const [view, setView] = useState<View>("quiz")
   const [onlineCount, setOnlineCount] = useState(0)
   const [isQuizStarted, setIsQuizStarted] = useState<boolean | null>(null)
@@ -132,6 +132,13 @@ function App() {
       setCompletedResults([])
     }
   }, [isQuizStarted])
+
+  // Update category name in real-time when admin switches category
+  useEffect(() => {
+    if (categoryChanged) {
+      setActiveCategoryName(categoryChanged.categoryName ?? null)
+    }
+  }, [categoryChanged])
 
   // Use SignalR presence updates for immediate online count
   useEffect(() => {
