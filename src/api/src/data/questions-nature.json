@@ -1,0 +1,812 @@
+[
+  {
+    "id": "nature-001",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "What is the largest land animal on Earth?",
+    "options": ["White rhinoceros", "African elephant", "Hippopotamus", "Giraffe"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "nature-002",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "How many hearts does an octopus have?",
+    "options": ["One", "Two", "Three", "Four"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "nature-003",
+    "category": "nature",
+    "type": "true-false",
+    "questionText": "A group of flamingos is called a 'flamboyance'.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "nature-004",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "Which animal can sleep for up to three years?",
+    "options": ["Tortoise", "Snail", "Bear", "Sloth"],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "nature-005",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "What is the fastest land animal?",
+    "options": ["Lion", "Pronghorn antelope", "Cheetah", "Greyhound"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "nature-006",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "Which biome covers the largest area of Earth's surface?",
+    "options": ["Desert", "Tropical rainforest", "Taiga", "Grassland"],
+    "correctIndex": 2,
+    "difficulty": "hard"
+  },
+  {
+    "id": "nature-007",
+    "category": "nature",
+    "type": "true-false",
+    "questionText": "Dolphins sleep with one eye open.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "nature-008",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "What type of animal is a Komodo dragon?",
+    "options": ["Dinosaur", "Lizard", "Crocodilian", "Snake"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "nature-009",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "Which plant is known as the 'corpse flower' due to its smell?",
+    "options": ["Rafflesia arnoldii", "Venus flytrap", "Pitcher plant", "Stinking hellebore"],
+    "correctIndex": 0,
+    "difficulty": "hard"
+  },
+  {
+    "id": "nature-010",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "How long can a great white shark go without eating?",
+    "options": ["Up to 1 week", "Up to 1 month", "Up to 3 months", "Up to 6 months"],
+    "correctIndex": 2,
+    "difficulty": "hard"
+  },
+  {
+    "id": "nature-011",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "What is the tallest type of grass?",
+    "options": ["Pampas grass", "Bamboo", "Elephant grass", "Sugar cane"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "nature-012",
+    "category": "nature",
+    "type": "true-false",
+    "questionText": "A hummingbird can fly backwards.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "nature-013",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "Which ocean is home to the Great Barrier Reef?",
+    "options": ["Indian Ocean", "Atlantic Ocean", "Pacific Ocean", "Southern Ocean"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "nature-014",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "What is the largest species of penguin?",
+    "options": ["King penguin", "Emperor penguin", "Gentoo penguin", "Macaroni penguin"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "nature-015",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "Which mammal has the longest gestation period?",
+    "options": ["Blue whale", "African elephant", "White rhinoceros", "Giraffe"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "nature-016",
+    "category": "nature",
+    "type": "true-false",
+    "questionText": "Starfish have a brain.",
+    "options": ["True", "False"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "nature-017",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "What is the process by which plants make their own food using sunlight?",
+    "options": ["Respiration", "Fermentation", "Photosynthesis", "Transpiration"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "nature-018",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "Which animal is known for changing its colour to blend in with its surroundings?",
+    "options": ["Gecko", "Chameleon", "Iguana", "Tree frog"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "nature-019",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "What is the largest living organism on Earth by area?",
+    "options": ["Blue whale", "Giant sequoia", "Honey fungus", "Aspen grove"],
+    "correctIndex": 2,
+    "difficulty": "hard"
+  },
+  {
+    "id": "nature-020",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "Which bird is famous for its elaborate courtship dance?",
+    "options": ["Bald eagle", "Bird of paradise", "Penguin", "Flamingo"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "nature-021",
+    "category": "nature",
+    "type": "true-false",
+    "questionText": "An ostrich's eye is bigger than its brain.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "nature-022",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "Which natural phenomenon is measured on the Richter scale?",
+    "options": ["Tornadoes", "Earthquakes", "Hurricanes", "Tsunamis"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "nature-023",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "What is the only mammal capable of true sustained flight?",
+    "options": ["Flying squirrel", "Sugar glider", "Bat", "Colugo"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "nature-024",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "Which endangered animal is native only to the island of Madagascar?",
+    "options": ["Orangutan", "Lemur", "Slow loris", "Tarsier"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "nature-025",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "What gas do plants primarily absorb from the atmosphere?",
+    "options": ["Oxygen", "Nitrogen", "Carbon dioxide", "Hydrogen"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "nature-026",
+    "category": "nature",
+    "type": "true-false",
+    "questionText": "Sharks are mammals.",
+    "options": ["True", "False"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "nature-027",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "Which famous naturalist sailed on HMS Beagle?",
+    "options": ["Alfred Wallace", "Charles Darwin", "Carl Linnaeus", "Alexander von Humboldt"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "nature-028",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "What is the deepest point in the world's oceans?",
+    "options": ["Tonga Trench", "Puerto Rico Trench", "Mariana Trench", "Java Trench"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "nature-029",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "Which insect is responsible for pollinating the most food crops worldwide?",
+    "options": ["Butterfly", "Honeybee", "Wasp", "Beetle"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "nature-030",
+    "category": "nature",
+    "type": "true-false",
+    "questionText": "The Amazon rainforest produces about 20% of the world's oxygen.",
+    "options": ["True", "False"],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "nature-031",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "What type of ecosystem is characterised by permafrost?",
+    "options": ["Savanna", "Tundra", "Taiga", "Steppe"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "nature-032",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "Which animal has the strongest bite force?",
+    "options": ["Hippopotamus", "Saltwater crocodile", "Great white shark", "Grizzly bear"],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "nature-033",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "What colour is a polar bear's skin underneath its white fur?",
+    "options": ["White", "Pink", "Black", "Grey"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "nature-034",
+    "category": "nature",
+    "type": "true-false",
+    "questionText": "Butterflies taste with their feet.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "nature-035",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "Which is the largest species of bear?",
+    "options": ["Grizzly bear", "Kodiak bear", "Polar bear", "Kamchatka brown bear"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "nature-036",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "What type of animal is a seahorse?",
+    "options": ["Crustacean", "Mollusc", "Fish", "Amphibian"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "nature-037",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "Which tree can live for thousands of years and is among the oldest living organisms?",
+    "options": ["Oak", "Bristlecone pine", "Baobab", "Redwood"],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "nature-038",
+    "category": "nature",
+    "type": "true-false",
+    "questionText": "A group of owls is called a parliament.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "nature-039",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "Which venomous snake is the longest in the world?",
+    "options": ["Black mamba", "King cobra", "Inland taipan", "Eastern brown snake"],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "nature-040",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "What is the name for an animal that eats both plants and meat?",
+    "options": ["Herbivore", "Carnivore", "Omnivore", "Insectivore"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "nature-041",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "Which continent is the natural habitat of the jaguar?",
+    "options": ["Africa", "Asia", "South America", "Australia"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "nature-042",
+    "category": "nature",
+    "type": "true-false",
+    "questionText": "Crocodiles can't stick their tongues out.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "hard"
+  },
+  {
+    "id": "nature-043",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "What is the largest flower in the world?",
+    "options": ["Sunflower", "Titan arum", "Rafflesia arnoldii", "Lotus"],
+    "correctIndex": 2,
+    "difficulty": "hard"
+  },
+  {
+    "id": "nature-044",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "Which marine creature has the largest brain relative to its body size?",
+    "options": ["Dolphin", "Octopus", "Sperm whale", "Blue whale"],
+    "correctIndex": 0,
+    "difficulty": "hard"
+  },
+  {
+    "id": "nature-045",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "What is the main diet of a koala?",
+    "options": ["Bamboo", "Eucalyptus leaves", "Grass", "Fruits"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "nature-046",
+    "category": "nature",
+    "type": "true-false",
+    "questionText": "Electric eels are actually a type of knifefish, not true eels.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "hard"
+  },
+  {
+    "id": "nature-047",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "Which is the only bird that can fly backwards?",
+    "options": ["Kingfisher", "Swift", "Hummingbird", "Wren"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "nature-048",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "In which habitat would you find a mangrove tree?",
+    "options": ["Desert", "Mountain summit", "Coastal wetland", "Tundra"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "nature-049",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "What is the world's most venomous spider?",
+    "options": ["Black widow", "Sydney funnel-web", "Brazilian wandering spider", "Brown recluse"],
+    "correctIndex": 2,
+    "difficulty": "hard"
+  },
+  {
+    "id": "nature-050",
+    "category": "nature",
+    "type": "true-false",
+    "questionText": "Elephants are the only animals that can't jump.",
+    "options": ["True", "False"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "nature-051",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "What causes the Northern Lights (Aurora Borealis)?",
+    "options": ["Reflection of sunlight off ice", "Solar wind interacting with Earth's magnetic field", "Light refraction through ice crystals", "Volcanic gas emissions"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "nature-052",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "Which animal is known as the 'king of the jungle'?",
+    "options": ["Tiger", "Gorilla", "Lion", "Elephant"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "nature-053",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "What is the largest reptile in the world?",
+    "options": ["Komodo dragon", "Green anaconda", "Saltwater crocodile", "Leatherback turtle"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "nature-054",
+    "category": "nature",
+    "type": "true-false",
+    "questionText": "A rhinoceros horn is made of bone.",
+    "options": ["True", "False"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "nature-055",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "Which naturalist is known for the theory of evolution by natural selection?",
+    "options": ["Gregor Mendel", "Charles Darwin", "Louis Pasteur", "Carl Linnaeus"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "nature-056",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "What percentage of Earth's water is freshwater?",
+    "options": ["About 3%", "About 10%", "About 25%", "About 50%"],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "nature-057",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "Which species of whale is the largest animal ever to have lived?",
+    "options": ["Humpback whale", "Sperm whale", "Blue whale", "Fin whale"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "nature-058",
+    "category": "nature",
+    "type": "true-false",
+    "questionText": "Sloths can hold their breath longer than dolphins can.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "hard"
+  },
+  {
+    "id": "nature-059",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "What is the name for a scientist who studies fungi?",
+    "options": ["Botanist", "Mycologist", "Entomologist", "Zoologist"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "nature-060",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "Which bird lays the largest eggs?",
+    "options": ["Emu", "Ostrich", "Cassowary", "Albatross"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "nature-061",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "In which country would you find the Galápagos Islands?",
+    "options": ["Brazil", "Mexico", "Ecuador", "Colombia"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "nature-062",
+    "category": "nature",
+    "type": "true-false",
+    "questionText": "Cows have four stomachs.",
+    "options": ["True", "False"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "nature-063",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "What is the term for animals that are active at night?",
+    "options": ["Diurnal", "Crepuscular", "Nocturnal", "Cathemeral"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "nature-064",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "Which endangered great ape shares about 97% of its DNA with humans?",
+    "options": ["Gorilla", "Orangutan", "Bonobo", "Gibbon"],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "nature-065",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "What natural phenomenon is measured on the Beaufort scale?",
+    "options": ["Earthquakes", "Wind speed", "Rainfall", "Wave height"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "nature-066",
+    "category": "nature",
+    "type": "true-false",
+    "questionText": "Honeybees can recognise human faces.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "hard"
+  },
+  {
+    "id": "nature-067",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "Which of these animals is a marsupial?",
+    "options": ["Hedgehog", "Armadillo", "Wombat", "Meerkat"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "nature-068",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "What do you call a group of wolves?",
+    "options": ["Herd", "Pack", "Flock", "Colony"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "nature-069",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "Which gas makes up the majority of Earth's atmosphere?",
+    "options": ["Oxygen", "Carbon dioxide", "Nitrogen", "Argon"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "nature-070",
+    "category": "nature",
+    "type": "true-false",
+    "questionText": "The tongue of a blue whale weighs as much as an elephant.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "nature-071",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "Which animal produces the loudest sound in the animal kingdom?",
+    "options": ["Howler monkey", "Sperm whale", "African elephant", "Blue whale"],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "nature-072",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "What is the world's largest tropical rainforest?",
+    "options": ["Congo rainforest", "Daintree rainforest", "Amazon rainforest", "Southeast Asian rainforest"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "nature-073",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "Which famous naturalist wrote 'On the Origin of Species'?",
+    "options": ["Alfred Russel Wallace", "Charles Darwin", "Thomas Huxley", "Jean-Baptiste Lamarck"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "nature-074",
+    "category": "nature",
+    "type": "true-false",
+    "questionText": "Penguins are found naturally in the Arctic.",
+    "options": ["True", "False"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "nature-075",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "What is the process by which a caterpillar transforms into a butterfly called?",
+    "options": ["Evolution", "Metamorphosis", "Mutation", "Adaptation"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "nature-076",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "Which layer of the rainforest receives the most sunlight?",
+    "options": ["Forest floor", "Understory", "Canopy", "Emergent layer"],
+    "correctIndex": 3,
+    "difficulty": "medium"
+  },
+  {
+    "id": "nature-077",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "What is the name of the symbiotic relationship where both organisms benefit?",
+    "options": ["Parasitism", "Commensalism", "Mutualism", "Predation"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "nature-078",
+    "category": "nature",
+    "type": "true-false",
+    "questionText": "A woodpecker's tongue wraps around the back of its skull.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "hard"
+  },
+  {
+    "id": "nature-079",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "Which sea creature can regenerate its arms if they are lost?",
+    "options": ["Jellyfish", "Sea urchin", "Starfish", "Seahorse"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "nature-080",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "What is the collective noun for a group of crows?",
+    "options": ["A flock", "A murder", "A parliament", "A conspiracy"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "nature-081",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "Which endangered animal is sometimes called the 'sea cow'?",
+    "options": ["Walrus", "Manatee", "Dugong", "Sea lion"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "nature-082",
+    "category": "nature",
+    "type": "true-false",
+    "questionText": "Coral reefs are made up of tiny animals, not plants.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "nature-083",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "What is the world's largest desert?",
+    "options": ["Sahara", "Arabian", "Antarctic", "Gobi"],
+    "correctIndex": 2,
+    "difficulty": "hard"
+  },
+  {
+    "id": "nature-084",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "Which primate is known for using tools to extract insects from tree bark?",
+    "options": ["Gorilla", "Chimpanzee", "Orangutan", "Baboon"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "nature-085",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "What is the term for an animal that only eats plants?",
+    "options": ["Omnivore", "Carnivore", "Herbivore", "Detritivore"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "nature-086",
+    "category": "nature",
+    "type": "true-false",
+    "questionText": "Octopuses have blue blood.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "nature-087",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "Which animal migrates the longest distance each year?",
+    "options": ["Monarch butterfly", "Arctic tern", "Humpback whale", "Wildebeest"],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "nature-088",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "What is the primary cause of ocean tides?",
+    "options": ["Wind patterns", "Earth's rotation", "Gravitational pull of the Moon", "Ocean currents"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "nature-089",
+    "category": "nature",
+    "type": "multiple-choice",
+    "questionText": "Which plant is commonly known as 'the king of the forest' in Scandinavian folklore?",
+    "options": ["Oak", "Birch", "Spruce", "Pine"],
+    "correctIndex": 0,
+    "difficulty": "hard"
+  },
+  {
+    "id": "nature-090",
+    "category": "nature",
+    "type": "true-false",
+    "questionText": "Flamingos are born pink.",
+    "options": ["True", "False"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  }
+]

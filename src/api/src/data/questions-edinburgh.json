@@ -1,0 +1,272 @@
+[
+  {
+    "id": "edinburgh-001",
+    "category": "edinburgh",
+    "type": "multiple-choice",
+    "questionText": "Which extinct volcano sits in the heart of Edinburgh and is a popular hiking spot?",
+    "options": ["Calton Hill", "Arthur's Seat", "Castle Rock", "Blackford Hill"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "edinburgh-002",
+    "category": "edinburgh",
+    "type": "true-false",
+    "questionText": "Edinburgh Castle is built on top of an extinct volcano.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "edinburgh-003",
+    "category": "edinburgh",
+    "type": "multiple-choice",
+    "questionText": "Which famous author wrote much of the Harry Potter series in Edinburgh cafés?",
+    "options": ["Ian Rankin", "Irvine Welsh", "J.K. Rowling", "Alexander McCall Smith"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "edinburgh-004",
+    "category": "edinburgh",
+    "type": "multiple-choice",
+    "questionText": "What is the name of Edinburgh's famous arts festival, the world's largest?",
+    "options": ["Edinburgh International Film Festival", "Edinburgh Fringe Festival", "Edinburgh Jazz Festival", "Edinburgh Book Festival"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "edinburgh-005",
+    "category": "edinburgh",
+    "type": "multiple-choice",
+    "questionText": "Which Edinburgh-born inventor is credited with inventing the telephone?",
+    "options": ["James Watt", "Alexander Graham Bell", "John Logie Baird", "James Clerk Maxwell"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "edinburgh-006",
+    "category": "edinburgh",
+    "type": "true-false",
+    "questionText": "Edinburgh's New Year celebration is called 'Hogmanay'.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "edinburgh-007",
+    "category": "edinburgh",
+    "type": "multiple-choice",
+    "questionText": "Which famous detective character was created by Edinburgh-born Arthur Conan Doyle?",
+    "options": ["Hercule Poirot", "Inspector Morse", "Sherlock Holmes", "Philip Marlowe"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "edinburgh-008",
+    "category": "edinburgh",
+    "type": "multiple-choice",
+    "questionText": "What is the main street that runs through Edinburgh's Old Town from the Castle to Holyrood Palace?",
+    "options": ["Princes Street", "The Royal Mile", "George Street", "Grassmarket"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "edinburgh-009",
+    "category": "edinburgh",
+    "type": "multiple-choice",
+    "questionText": "Which notorious body snatchers operated in Edinburgh in the 1820s?",
+    "options": ["Bonnie and Clyde", "Burke and Hare", "Jekyll and Hyde", "Deacon Brodie and Co."],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "edinburgh-010",
+    "category": "edinburgh",
+    "type": "true-false",
+    "questionText": "Edinburgh was the first city in the world to have its own fire brigade.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "hard"
+  },
+  {
+    "id": "edinburgh-011",
+    "category": "edinburgh",
+    "type": "multiple-choice",
+    "questionText": "What intellectual movement flourished in 18th-century Edinburgh, earning it the nickname 'Athens of the North'?",
+    "options": ["The Renaissance", "The Enlightenment", "The Reformation", "The Romantic Movement"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "edinburgh-012",
+    "category": "edinburgh",
+    "type": "multiple-choice",
+    "questionText": "Which Edinburgh landmark is a Gothic monument to a famous Scottish novelist?",
+    "options": ["Nelson Monument", "Scott Monument", "National Monument", "Burns Monument"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "edinburgh-013",
+    "category": "edinburgh",
+    "type": "multiple-choice",
+    "questionText": "What is the name of the official residence of the British monarch in Edinburgh?",
+    "options": ["Edinburgh Castle", "Balmoral Castle", "Palace of Holyroodhouse", "Glamis Castle"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "edinburgh-014",
+    "category": "edinburgh",
+    "type": "true-false",
+    "questionText": "Greyfriars Bobby was a Skye Terrier who famously guarded his owner's grave for 14 years in Edinburgh.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "edinburgh-015",
+    "category": "edinburgh",
+    "type": "multiple-choice",
+    "questionText": "Which UNESCO designation does Edinburgh's Old and New Towns hold?",
+    "options": ["Biosphere Reserve", "World Heritage Site", "Global Geopark", "Creative City"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "edinburgh-016",
+    "category": "edinburgh",
+    "type": "multiple-choice",
+    "questionText": "Which famous Edinburgh figure inspired Robert Louis Stevenson's 'Strange Case of Dr Jekyll and Mr Hyde'?",
+    "options": ["Burke and Hare", "Deacon Brodie", "David Hume", "Adam Smith"],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "edinburgh-017",
+    "category": "edinburgh",
+    "type": "multiple-choice",
+    "questionText": "What is the name of Edinburgh's hill that offers panoramic views and features unfinished Greek-style columns?",
+    "options": ["Arthur's Seat", "Calton Hill", "Blackford Hill", "Corstorphine Hill"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "edinburgh-018",
+    "category": "edinburgh",
+    "type": "true-false",
+    "questionText": "Edinburgh has more listed buildings than anywhere else in the world.",
+    "options": ["True", "False"],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "edinburgh-019",
+    "category": "edinburgh",
+    "type": "multiple-choice",
+    "questionText": "Which Edinburgh-born philosopher is known as the father of modern economics for writing 'The Wealth of Nations'?",
+    "options": ["David Hume", "Adam Smith", "John Stuart Mill", "Thomas Carlyle"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "edinburgh-020",
+    "category": "edinburgh",
+    "type": "multiple-choice",
+    "questionText": "Which animal was famously cloned at the Roslin Institute near Edinburgh in 1996?",
+    "options": ["A cat", "A horse", "A sheep", "A dog"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "edinburgh-021",
+    "category": "edinburgh",
+    "type": "multiple-choice",
+    "questionText": "What is the name of Edinburgh's famous whisky experience located on the Royal Mile?",
+    "options": ["The Scotch Whisky Experience", "Edinburgh Malt House", "Royal Mile Distillery", "Highland Whisky Museum"],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "edinburgh-022",
+    "category": "edinburgh",
+    "type": "true-false",
+    "questionText": "The One O'Clock Gun has been fired from Edinburgh Castle almost every day since 1861.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "edinburgh-023",
+    "category": "edinburgh",
+    "type": "multiple-choice",
+    "questionText": "Which Edinburgh festival is one of the world's largest New Year celebrations?",
+    "options": ["Edinburgh Fringe", "Beltane Fire Festival", "Hogmanay", "Edinburgh International Festival"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "edinburgh-024",
+    "category": "edinburgh",
+    "type": "multiple-choice",
+    "questionText": "Which crime fiction series by Ian Rankin is set in Edinburgh?",
+    "options": ["Rebus", "Morse", "Wallander", "Frost"],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "edinburgh-025",
+    "category": "edinburgh",
+    "type": "multiple-choice",
+    "questionText": "What distinctive feature of Edinburgh's Old Town earned it the nickname 'Auld Reekie'?",
+    "options": ["Its age", "Its smoky chimneys", "Its grey buildings", "Its frequent rain"],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "edinburgh-026",
+    "category": "edinburgh",
+    "type": "true-false",
+    "questionText": "Edinburgh's Old Town and New Town were designed and built at the same time.",
+    "options": ["True", "False"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "edinburgh-027",
+    "category": "edinburgh",
+    "type": "multiple-choice",
+    "questionText": "Which Edinburgh scientist played a key role in the development of electromagnetic theory?",
+    "options": ["Alexander Graham Bell", "James Clerk Maxwell", "Lord Kelvin", "Peter Higgs"],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "edinburgh-028",
+    "category": "edinburgh",
+    "type": "multiple-choice",
+    "questionText": "What is the name of the annual military tattoo performed at Edinburgh Castle?",
+    "options": ["Edinburgh Castle Tattoo", "The Royal Edinburgh Military Tattoo", "Scottish Military Festival", "Castle Guard Ceremony"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "edinburgh-029",
+    "category": "edinburgh",
+    "type": "multiple-choice",
+    "questionText": "Which famous Edinburgh street is known for its high-end shopping and views of the castle?",
+    "options": ["The Royal Mile", "George Street", "Princes Street", "Rose Street"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "edinburgh-030",
+    "category": "edinburgh",
+    "type": "true-false",
+    "questionText": "Edinburgh was the first city in the world to be designated a UNESCO City of Literature.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "hard"
+  }
+]

@@ -35,6 +35,10 @@ async function seedQuestions(): Promise<void> {
     "questions-geography.json",
     "questions-physics.json",
     "questions-maths.json",
+    "questions-nature.json",
+    "questions-sport.json",
+    "questions-manchester.json",
+    "questions-edinburgh.json",
   ];
 
   let totalSuccess = 0;

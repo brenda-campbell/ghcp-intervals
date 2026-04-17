@@ -1,0 +1,272 @@
+[
+  {
+    "id": "manchester-001",
+    "category": "manchester",
+    "type": "multiple-choice",
+    "questionText": "Which Manchester band released the album 'Definitely Maybe' in 1994?",
+    "options": ["The Stone Roses", "Oasis", "The Smiths", "Joy Division"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "manchester-002",
+    "category": "manchester",
+    "type": "true-false",
+    "questionText": "The world's first programmable computer was built in Manchester.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "manchester-003",
+    "category": "manchester",
+    "type": "multiple-choice",
+    "questionText": "What is the name of Manchester's iconic tall glass skyscraper, also known as the Hilton Tower?",
+    "options": ["Deansgate Square", "Beetham Tower", "CIS Tower", "One Angel Square"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "manchester-004",
+    "category": "manchester",
+    "type": "multiple-choice",
+    "questionText": "Which long-running British soap opera is filmed at MediaCityUK in Salford?",
+    "options": ["EastEnders", "Emmerdale", "Coronation Street", "Hollyoaks"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "manchester-005",
+    "category": "manchester",
+    "type": "multiple-choice",
+    "questionText": "In which year was the atom first split at the University of Manchester?",
+    "options": ["1917", "1919", "1932", "1945"],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "manchester-006",
+    "category": "manchester",
+    "type": "true-false",
+    "questionText": "Manchester has more canals than Venice.",
+    "options": ["True", "False"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "manchester-007",
+    "category": "manchester",
+    "type": "multiple-choice",
+    "questionText": "Which scientist split the atom at the University of Manchester?",
+    "options": ["Niels Bohr", "Ernest Rutherford", "J.J. Thomson", "James Chadwick"],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "manchester-008",
+    "category": "manchester",
+    "type": "multiple-choice",
+    "questionText": "What is Old Trafford commonly known as in football?",
+    "options": ["The Stadium of Light", "The Theatre of Dreams", "The Den", "The Etihad"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "manchester-009",
+    "category": "manchester",
+    "type": "multiple-choice",
+    "questionText": "Which Manchester band was fronted by Ian Curtis before his death in 1980?",
+    "options": ["The Smiths", "The Fall", "Joy Division", "Buzzcocks"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "manchester-010",
+    "category": "manchester",
+    "type": "true-false",
+    "questionText": "Manchester Town Hall was designed by Alfred Waterhouse in a Gothic Revival style.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "manchester-011",
+    "category": "manchester",
+    "type": "multiple-choice",
+    "questionText": "Manchester played a key role in which major historical event that transformed industry worldwide?",
+    "options": ["The Renaissance", "The Industrial Revolution", "The Space Race", "The Age of Exploration"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "manchester-012",
+    "category": "manchester",
+    "type": "multiple-choice",
+    "questionText": "Which famous Manchester United manager led the club for 26 years until 2013?",
+    "options": ["Matt Busby", "Alex Ferguson", "José Mourinho", "Ron Atkinson"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "manchester-013",
+    "category": "manchester",
+    "type": "multiple-choice",
+    "questionText": "What is the name of Manchester's annual international festival of original new work from across the arts?",
+    "options": ["Manchester International Festival", "FutureEverything", "Parklife", "Manchester Art Fair"],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "manchester-014",
+    "category": "manchester",
+    "type": "true-false",
+    "questionText": "The Gallagher brothers, Noel and Liam, from Oasis grew up in Burnage, Manchester.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "manchester-015",
+    "category": "manchester",
+    "type": "multiple-choice",
+    "questionText": "Which Manchester landmark is home to one of the largest collections of Pre-Raphaelite paintings?",
+    "options": ["The Lowry", "Manchester Art Gallery", "Whitworth Art Gallery", "Imperial War Museum North"],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "manchester-016",
+    "category": "manchester",
+    "type": "multiple-choice",
+    "questionText": "What nickname was given to Manchester due to its role in cotton manufacturing?",
+    "options": ["Steel City", "Cottonopolis", "The Workshop of the World", "Smoky City"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "manchester-017",
+    "category": "manchester",
+    "type": "multiple-choice",
+    "questionText": "Which famous suffragette was born in Moss Side, Manchester in 1858?",
+    "options": ["Millicent Fawcett", "Emmeline Pankhurst", "Emily Davison", "Annie Kenney"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "manchester-018",
+    "category": "manchester",
+    "type": "true-false",
+    "questionText": "The Bridgewater Canal, opened in 1761, is often considered the first true canal in England.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "hard"
+  },
+  {
+    "id": "manchester-019",
+    "category": "manchester",
+    "type": "multiple-choice",
+    "questionText": "Which band featured Morrissey and Johnny Marr and is synonymous with 1980s Manchester?",
+    "options": ["New Order", "The Stone Roses", "The Smiths", "Happy Mondays"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "manchester-020",
+    "category": "manchester",
+    "type": "multiple-choice",
+    "questionText": "What is the name of Manchester City's home stadium?",
+    "options": ["Old Trafford", "Anfield", "Etihad Stadium", "Emirates Stadium"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "manchester-021",
+    "category": "manchester",
+    "type": "multiple-choice",
+    "questionText": "Which Nobel Prize-winning physicist discovered the neutron while working at the University of Manchester?",
+    "options": ["Ernest Rutherford", "James Chadwick", "Niels Bohr", "Hans Geiger"],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "manchester-022",
+    "category": "manchester",
+    "type": "true-false",
+    "questionText": "Manchester Airport is the busiest airport in the UK outside London.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "manchester-023",
+    "category": "manchester",
+    "type": "multiple-choice",
+    "questionText": "What tragic event occurred at St Peter's Field in Manchester in 1819?",
+    "options": ["The Great Fire of Manchester", "The Peterloo Massacre", "The Manchester Blitz", "The Cotton Famine"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "manchester-024",
+    "category": "manchester",
+    "type": "multiple-choice",
+    "questionText": "Which famous L.S. Lowry gallery is located in Salford Quays, near Manchester?",
+    "options": ["Tate Modern", "The Whitworth", "The Lowry", "Manchester Art Gallery"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "manchester-025",
+    "category": "manchester",
+    "type": "multiple-choice",
+    "questionText": "Which Manchester-born actor starred in 'Billy Elliot' and 'Rocketman'?",
+    "options": ["Ian McKellen", "Robert Powell", "Jamie Bell", "None — the actor is not from Manchester"],
+    "correctIndex": 3,
+    "difficulty": "hard"
+  },
+  {
+    "id": "manchester-026",
+    "category": "manchester",
+    "type": "true-false",
+    "questionText": "Alan Turing, the father of modern computing, worked at the University of Manchester.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "manchester-027",
+    "category": "manchester",
+    "type": "multiple-choice",
+    "questionText": "What was the original name of Joy Division before they became famous?",
+    "options": ["New Order", "The Durutti Column", "Warsaw", "The Nosebleeds"],
+    "correctIndex": 2,
+    "difficulty": "hard"
+  },
+  {
+    "id": "manchester-028",
+    "category": "manchester",
+    "type": "multiple-choice",
+    "questionText": "Which Manchester building is nicknamed 'The Toastrack' due to its distinctive shape?",
+    "options": ["The Triangle", "The Hollings Building", "Beetham Tower", "One Angel Square"],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "manchester-029",
+    "category": "manchester",
+    "type": "multiple-choice",
+    "questionText": "Which material, isolated at the University of Manchester in 2004, won its discoverers a Nobel Prize?",
+    "options": ["Carbon nanotubes", "Graphene", "Silicon carbide", "Buckminsterfullerene"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "manchester-030",
+    "category": "manchester",
+    "type": "true-false",
+    "questionText": "The worker bee is an emblem of Manchester, symbolising the city's industrial heritage.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  }
+]

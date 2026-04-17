@@ -46,5 +46,37 @@
     "isActive": true,
     "questionFormat": "multiple-choice",
     "createdAt": "2026-04-16T00:00:00Z"
+  },
+  {
+    "id": "nature",
+    "name": "Nature & Animals",
+    "description": "Wildlife, ecosystems, and the natural world",
+    "isActive": true,
+    "questionFormat": "multiple-choice",
+    "createdAt": "2026-04-17T15:00:00Z"
+  },
+  {
+    "id": "sport",
+    "name": "Sport",
+    "description": "Football, Olympics, tennis, cricket, and sporting legends",
+    "isActive": true,
+    "questionFormat": "multiple-choice",
+    "createdAt": "2026-04-17T15:00:00Z"
+  },
+  {
+    "id": "manchester",
+    "name": "Manchester",
+    "description": "Music, history, inventions, and quirky facts about Manchester",
+    "isActive": true,
+    "questionFormat": "multiple-choice",
+    "createdAt": "2026-04-17T15:00:00Z"
+  },
+  {
+    "id": "edinburgh",
+    "name": "Edinburgh",
+    "description": "Festivals, famous figures, landmarks, and secrets of Edinburgh",
+    "isActive": true,
+    "questionFormat": "multiple-choice",
+    "createdAt": "2026-04-17T15:00:00Z"
   }
 ]

@@ -1,0 +1,812 @@
+[
+  {
+    "id": "sport-001",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "Which country has won the most FIFA World Cup titles?",
+    "options": ["Germany", "Argentina", "Italy", "Brazil"],
+    "correctIndex": 3,
+    "difficulty": "easy"
+  },
+  {
+    "id": "sport-002",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "In tennis, what is the term for a score of 40-40?",
+    "options": ["Match point", "Deuce", "Advantage", "Break point"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "sport-003",
+    "category": "sport",
+    "type": "true-false",
+    "questionText": "The Olympic rings represent the five inhabited continents.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "sport-004",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "How many players are on a rugby union team?",
+    "options": ["13", "14", "15", "16"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "sport-005",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "Which athlete holds the record for the most Olympic gold medals?",
+    "options": ["Usain Bolt", "Carl Lewis", "Michael Phelps", "Mark Spitz"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "sport-006",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "In which sport would you perform a 'slam dunk'?",
+    "options": ["Volleyball", "Basketball", "Tennis", "Handball"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "sport-007",
+    "category": "sport",
+    "type": "true-false",
+    "questionText": "A cricket test match can last up to five days.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "sport-008",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "Which Formula 1 driver holds the record for the most World Championship titles?",
+    "options": ["Ayrton Senna", "Michael Schumacher", "Lewis Hamilton", "Sebastian Vettel"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "sport-009",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "In golf, what is the term for one stroke under par?",
+    "options": ["Bogey", "Eagle", "Birdie", "Albatross"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "sport-010",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "Which city hosted the 2012 Summer Olympics?",
+    "options": ["Beijing", "London", "Rio de Janeiro", "Athens"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "sport-011",
+    "category": "sport",
+    "type": "true-false",
+    "questionText": "The Tour de France is a cycling race that always finishes on the Champs-Élysées in Paris.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "sport-012",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "Which swimmer is known as 'The Thorpedo'?",
+    "options": ["Mark Spitz", "Ian Thorpe", "Ryan Lochte", "Grant Hackett"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "sport-013",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "What is the maximum score in a single frame of ten-pin bowling?",
+    "options": ["10", "20", "30", "50"],
+    "correctIndex": 2,
+    "difficulty": "hard"
+  },
+  {
+    "id": "sport-014",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "Which football club has won the most UEFA Champions League titles?",
+    "options": ["AC Milan", "Barcelona", "Real Madrid", "Liverpool"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "sport-015",
+    "category": "sport",
+    "type": "true-false",
+    "questionText": "The Ashes is a cricket series played between England and Australia.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "sport-016",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "In athletics, how long is a marathon in kilometres?",
+    "options": ["40.195 km", "42.195 km", "44.195 km", "46.195 km"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "sport-017",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "Which country is the sport of sumo wrestling most associated with?",
+    "options": ["China", "South Korea", "Japan", "Mongolia"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "sport-018",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "Who holds the world record for the 100m sprint?",
+    "options": ["Tyson Gay", "Yohan Blake", "Usain Bolt", "Justin Gatlin"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "sport-019",
+    "category": "sport",
+    "type": "true-false",
+    "questionText": "In football (soccer), a standard match is 80 minutes long.",
+    "options": ["True", "False"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "sport-020",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "Which Grand Slam tennis tournament is played on clay?",
+    "options": ["Wimbledon", "US Open", "Australian Open", "French Open"],
+    "correctIndex": 3,
+    "difficulty": "medium"
+  },
+  {
+    "id": "sport-021",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "In which sport do teams compete for the Stanley Cup?",
+    "options": ["American football", "Ice hockey", "Baseball", "Lacrosse"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "sport-022",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "Which basketball player is known as 'King James'?",
+    "options": ["James Harden", "LeBron James", "Kevin Durant", "Kobe Bryant"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "sport-023",
+    "category": "sport",
+    "type": "true-false",
+    "questionText": "Roger Federer has won more Grand Slam singles titles than any other male tennis player.",
+    "options": ["True", "False"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "sport-024",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "How many points is a try worth in rugby union?",
+    "options": ["3", "4", "5", "6"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "sport-025",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "Which country hosted the first modern Olympic Games in 1896?",
+    "options": ["France", "United Kingdom", "Greece", "Italy"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "sport-026",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "What is the highest possible break in snooker?",
+    "options": ["147", "155", "135", "170"],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "sport-027",
+    "category": "sport",
+    "type": "true-false",
+    "questionText": "The FIFA Women's World Cup was first held in 1991.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "hard"
+  },
+  {
+    "id": "sport-028",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "Which golfer has won the most major championships?",
+    "options": ["Tiger Woods", "Jack Nicklaus", "Arnold Palmer", "Phil Mickelson"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "sport-029",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "In swimming, which stroke is performed face-up?",
+    "options": ["Freestyle", "Breaststroke", "Backstroke", "Butterfly"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "sport-030",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "Which Formula 1 circuit is famous for its street race through a principality?",
+    "options": ["Silverstone", "Monza", "Monaco", "Spa-Francorchamps"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "sport-031",
+    "category": "sport",
+    "type": "true-false",
+    "questionText": "A badminton shuttlecock can travel faster than a tennis ball served at top speed.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "hard"
+  },
+  {
+    "id": "sport-032",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "Which footballer has scored the most goals in international football history?",
+    "options": ["Lionel Messi", "Cristiano Ronaldo", "Ali Daei", "Pelé"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "sport-033",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "What is the name of the trophy awarded to the winner of the Rugby World Cup?",
+    "options": ["The Calcutta Cup", "The Bledisloe Cup", "The Webb Ellis Cup", "The Tri-Nations Trophy"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "sport-034",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "In which Olympic event do athletes combine cross-country skiing and rifle shooting?",
+    "options": ["Nordic combined", "Biathlon", "Pentathlon", "Decathlon"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "sport-035",
+    "category": "sport",
+    "type": "true-false",
+    "questionText": "The NBA's three-point line is the same distance in all professional basketball leagues worldwide.",
+    "options": ["True", "False"],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "sport-036",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "Which cricketer holds the record for the highest individual test score of 400 not out?",
+    "options": ["Don Bradman", "Brian Lara", "Sachin Tendulkar", "Matthew Hayden"],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "sport-037",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "How many players are on a standard football (soccer) team on the pitch?",
+    "options": ["9", "10", "11", "12"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "sport-038",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "Which Williams sister has won more Grand Slam singles titles?",
+    "options": ["Venus Williams", "Serena Williams", "They are tied", "Neither has won a Grand Slam"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "sport-039",
+    "category": "sport",
+    "type": "true-false",
+    "questionText": "Table tennis was originally called 'wiff-waff'.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "hard"
+  },
+  {
+    "id": "sport-040",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "In which year did Usain Bolt first break the 100m world record?",
+    "options": ["2006", "2008", "2010", "2012"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "sport-041",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "Which country has won the most Cricket World Cups?",
+    "options": ["India", "West Indies", "Australia", "England"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "sport-042",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "What is the diameter of a basketball hoop in inches?",
+    "options": ["16 inches", "18 inches", "20 inches", "22 inches"],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "sport-043",
+    "category": "sport",
+    "type": "true-false",
+    "questionText": "Golf was originally banned in Scotland because it distracted from archery practice.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "hard"
+  },
+  {
+    "id": "sport-044",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "Which sport uses a puck?",
+    "options": ["Field hockey", "Ice hockey", "Lacrosse", "Curling"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "sport-045",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "Who was the first footballer to win the Ballon d'Or?",
+    "options": ["Pelé", "Stanley Matthews", "Alfredo Di Stéfano", "Raymond Kopa"],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "sport-046",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "In the Olympic Games, what does the motto 'Citius, Altius, Fortius' translate to?",
+    "options": ["Peace, Honour, Glory", "Faster, Higher, Stronger", "Mind, Body, Spirit", "Unity, Strength, Victory"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "sport-047",
+    "category": "sport",
+    "type": "true-false",
+    "questionText": "Wimbledon is the only Grand Slam tennis tournament played on grass.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "sport-048",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "Which country is the sport of cricket believed to have originated in?",
+    "options": ["India", "Australia", "England", "South Africa"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "sport-049",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "How many rings are on the Olympic flag?",
+    "options": ["4", "5", "6", "7"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "sport-050",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "Which heavyweight boxer was known as 'The Greatest'?",
+    "options": ["Mike Tyson", "Muhammad Ali", "Joe Frazier", "George Foreman"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "sport-051",
+    "category": "sport",
+    "type": "true-false",
+    "questionText": "The first modern Olympic marathon was won by a Greek runner.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "hard"
+  },
+  {
+    "id": "sport-052",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "What colour card is shown for a sending off in football (soccer)?",
+    "options": ["Yellow", "Red", "Orange", "Blue"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "sport-053",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "Which nation has dominated Olympic gymnastics historically?",
+    "options": ["USA", "China", "Romania", "Soviet Union/Russia"],
+    "correctIndex": 3,
+    "difficulty": "hard"
+  },
+  {
+    "id": "sport-054",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "In Formula 1, what colour is the flag waved to indicate the end of a race?",
+    "options": ["Red", "Green", "Chequered (black and white)", "Yellow"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "sport-055",
+    "category": "sport",
+    "type": "true-false",
+    "questionText": "Volleyball was invented by William G. Morgan in 1895.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "hard"
+  },
+  {
+    "id": "sport-056",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "Which football team is known as 'The Red Devils'?",
+    "options": ["Liverpool", "Arsenal", "Manchester United", "Bayern Munich"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "sport-057",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "What is the term for three consecutive strikes in bowling?",
+    "options": ["Triple", "Hat-trick", "Turkey", "Threepeat"],
+    "correctIndex": 2,
+    "difficulty": "hard"
+  },
+  {
+    "id": "sport-058",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "Which tennis player has won the most Grand Slam men's singles titles?",
+    "options": ["Roger Federer", "Rafael Nadal", "Novak Djokovic", "Pete Sampras"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "sport-059",
+    "category": "sport",
+    "type": "true-false",
+    "questionText": "The Ryder Cup is a golf competition between Europe and the USA.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "sport-060",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "Which country won the first ever FIFA World Cup in 1930?",
+    "options": ["Brazil", "Argentina", "Uruguay", "Italy"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "sport-061",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "In basketball, how many points is a standard free throw worth?",
+    "options": ["1", "2", "3", "4"],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "sport-062",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "Which swimmer has won the most Olympic gold medals for Australia?",
+    "options": ["Grant Hackett", "Ian Thorpe", "Dawn Fraser", "Emma McKeon"],
+    "correctIndex": 3,
+    "difficulty": "hard"
+  },
+  {
+    "id": "sport-063",
+    "category": "sport",
+    "type": "true-false",
+    "questionText": "In cricket, an over consists of six balls.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "sport-064",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "Which athlete is known as the 'Lightning Bolt'?",
+    "options": ["Carl Lewis", "Usain Bolt", "Mo Farah", "Justin Gatlin"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "sport-065",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "What is the length of an Olympic swimming pool?",
+    "options": ["25 metres", "50 metres", "75 metres", "100 metres"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "sport-066",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "Which rugby nation performs the 'Haka' before international matches?",
+    "options": ["Australia", "Fiji", "Samoa", "New Zealand"],
+    "correctIndex": 3,
+    "difficulty": "easy"
+  },
+  {
+    "id": "sport-067",
+    "category": "sport",
+    "type": "true-false",
+    "questionText": "Michael Jordan won six NBA championships with the Chicago Bulls.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "sport-068",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "In which sport would you perform an 'Ollie'?",
+    "options": ["Surfing", "Skateboarding", "Snowboarding", "BMX"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "sport-069",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "Which athlete won four consecutive Olympic gold medals in the discus throw?",
+    "options": ["Al Oerter", "Robert Harting", "Jürgen Schult", "Virgilijus Alekna"],
+    "correctIndex": 0,
+    "difficulty": "hard"
+  },
+  {
+    "id": "sport-070",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "What is the oldest football club in the world?",
+    "options": ["Notts County", "Sheffield FC", "Stoke City", "Queen's Park"],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "sport-071",
+    "category": "sport",
+    "type": "true-false",
+    "questionText": "The Super Bowl is the championship game of the NFL.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "sport-072",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "Which country has won the most medals at a single Summer Olympics?",
+    "options": ["China (2008)", "USA (1984)", "Great Britain (2012)", "Soviet Union (1980)"],
+    "correctIndex": 1,
+    "difficulty": "hard"
+  },
+  {
+    "id": "sport-073",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "In Formula 1, how many points does the race winner receive?",
+    "options": ["10", "20", "25", "30"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "sport-074",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "Which sport is played at Augusta National?",
+    "options": ["Tennis", "Cricket", "Golf", "Horse racing"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "sport-075",
+    "category": "sport",
+    "type": "true-false",
+    "questionText": "Baseball has nine innings in a standard professional game.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "sport-076",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "Which footballer is known as 'The Egyptian King'?",
+    "options": ["Ahmed Hegazi", "Mohamed Salah", "Mahmoud Trezeguet", "Mohamed Elneny"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "sport-077",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "In athletics, what event combines ten track and field events?",
+    "options": ["Heptathlon", "Pentathlon", "Decathlon", "Triathlon"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "sport-078",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "Which country dominates Olympic table tennis?",
+    "options": ["Japan", "South Korea", "Germany", "China"],
+    "correctIndex": 3,
+    "difficulty": "medium"
+  },
+  {
+    "id": "sport-079",
+    "category": "sport",
+    "type": "true-false",
+    "questionText": "The FIFA World Cup is held every four years.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "easy"
+  },
+  {
+    "id": "sport-080",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "Which sport features the terms 'love', 'ace', and 'let'?",
+    "options": ["Badminton", "Squash", "Tennis", "Table tennis"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "sport-081",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "Which city will host the 2028 Summer Olympics?",
+    "options": ["Paris", "Los Angeles", "Brisbane", "Tokyo"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "sport-082",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "What is the name of the annual horse race held at Aintree, Liverpool?",
+    "options": ["The Derby", "The Grand National", "Royal Ascot", "The Gold Cup"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "sport-083",
+    "category": "sport",
+    "type": "true-false",
+    "questionText": "Sachin Tendulkar scored 100 international centuries across all formats of cricket.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "sport-084",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "Which NBA team did Michael Jordan primarily play for?",
+    "options": ["Los Angeles Lakers", "Boston Celtics", "Chicago Bulls", "New York Knicks"],
+    "correctIndex": 2,
+    "difficulty": "easy"
+  },
+  {
+    "id": "sport-085",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "In which country was the sport of judo developed?",
+    "options": ["China", "Japan", "South Korea", "Thailand"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  },
+  {
+    "id": "sport-086",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "Which female tennis player has won the most Grand Slam singles titles in the Open Era?",
+    "options": ["Martina Navratilova", "Steffi Graf", "Serena Williams", "Margaret Court"],
+    "correctIndex": 2,
+    "difficulty": "medium"
+  },
+  {
+    "id": "sport-087",
+    "category": "sport",
+    "type": "true-false",
+    "questionText": "The yellow jersey in the Tour de France is worn by the overall race leader.",
+    "options": ["True", "False"],
+    "correctIndex": 0,
+    "difficulty": "medium"
+  },
+  {
+    "id": "sport-088",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "Which sport uses the term 'scrum'?",
+    "options": ["American football", "Rugby", "Ice hockey", "Cricket"],
+    "correctIndex": 1,
+    "difficulty": "easy"
+  },
+  {
+    "id": "sport-089",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "What is the world record for the men's high jump closest to?",
+    "options": ["2.25 metres", "2.35 metres", "2.45 metres", "2.55 metres"],
+    "correctIndex": 2,
+    "difficulty": "hard"
+  },
+  {
+    "id": "sport-090",
+    "category": "sport",
+    "type": "multiple-choice",
+    "questionText": "Which Formula 1 team is based in Maranello, Italy?",
+    "options": ["McLaren", "Ferrari", "Red Bull", "Mercedes"],
+    "correctIndex": 1,
+    "difficulty": "medium"
+  }
+]
