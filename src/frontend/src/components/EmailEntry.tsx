@@ -60,8 +60,13 @@ export function EmailEntry({ onLogin, isLoading, error }: EmailEntryProps) {
               <div className="absolute inset-0 rounded-full bg-primary/20 blur-xl" />
               <GithubLogo weight="fill" className="relative h-16 w-16 text-primary" />
             </div>
-            <div className="rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary mb-3">
-              April 24, 2026 • Manchester
+            <div className="flex flex-wrap justify-center gap-2 mb-3">
+              <div className="rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                📍 Manchester · April 24
+              </div>
+              <div className="rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                📍 Edinburgh · April 29
+              </div>
             </div>
             <div className="text-center">
               <h1 className="h2">GitHub Copilot Dev Days</h1>
@@ -180,6 +185,12 @@ export function EmailEntry({ onLogin, isLoading, error }: EmailEntryProps) {
                   </>
                 )}
               </Button>
+
+              <p className="text-xs text-muted-foreground text-center leading-relaxed mt-4">
+                🔒 Your email is used only for identification during the quiz.
+                It will not be shared with third parties.
+                All quiz data will be permanently deleted within 24 hours of the event.
+              </p>
             </form>
           </CardContent>
         </Card>

@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { EmailEntry } from "@/components/EmailEntry";
-import { loginOrCreate, ApiError, type User } from "@/services/api";
+import { loginOrCreate, getGameState, ApiError, type User } from "@/services/api";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ShieldSlash, SpinnerGap, ArrowClockwise } from "@phosphor-icons/react";
+import { GithubLogo, ShieldSlash, SpinnerGap, ArrowClockwise } from "@phosphor-icons/react";
 import { LogoutProvider } from "@/contexts/LogoutContext";
 
 const KEY_USER_ID = "ff_userId";
@@ -22,6 +22,8 @@ export function AuthGate({ children, onUserAuthenticated, onLogout }: AuthGatePr
   const [error, setError] = useState<string | null>(null);
   const [isLegacy, setIsLegacy] = useState(false);
   const [isDeactivated, setIsDeactivated] = useState(false);
+  const [isRegistrationOpen, setIsRegistrationOpen] = useState<boolean | null>(null);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const handleLogout = useCallback(() => {
     localStorage.removeItem(KEY_USER_ID);
@@ -85,6 +87,35 @@ export function AuthGate({ children, onUserAuthenticated, onLogout }: AuthGatePr
     // Run once on mount
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Check registration state (only matters for new users without stored data)
+  useEffect(() => {
+    const storedUserId = localStorage.getItem(KEY_USER_ID);
+    const storedEmail = localStorage.getItem(KEY_EMAIL);
+
+    // Returning users bypass the registration lock
+    if (storedUserId && storedEmail) {
+      setIsRegistrationOpen(true);
+      return;
+    }
+
+    const checkRegistration = async () => {
+      try {
+        const gs = await getGameState();
+        setIsRegistrationOpen(gs.isRegistrationOpen !== false);
+      } catch {
+        // On error, assume open so users aren't locked out by a glitch
+        setIsRegistrationOpen(true);
+      }
+    };
+
+    void checkRegistration();
+    pollRef.current = setInterval(() => void checkRegistration(), 10_000);
+
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current);
+    };
+  }, [user]);
 
   // Handle EmailEntry login submission
   const handleLogin = useCallback(
@@ -183,6 +214,29 @@ export function AuthGate({ children, onUserAuthenticated, onLogout }: AuthGatePr
 
   // --- EmailEntry for new or legacy users ---
   if (!user) {
+    // Registration closed — show locked state for new users
+    if (isRegistrationOpen === false) {
+      return (
+        <div className="flex min-h-[100dvh] items-center justify-center p-4">
+          <Card className="border-border/50 bg-card shadow-lg max-w-md w-full">
+            <CardContent className="flex flex-col items-center gap-6 pt-6">
+              <GithubLogo weight="fill" className="h-16 w-16 text-primary" />
+              <h1 className="h2 text-center">GitHub Copilot Dev Days</h1>
+              <p className="text-lg font-semibold text-primary">Fastest Finger Quiz</p>
+              <div className="rounded-lg border border-border bg-muted/30 p-4 text-center">
+                <p className="text-sm text-muted-foreground">
+                  🔒 Registration is currently closed.
+                </p>
+                <p className="text-xs text-muted-foreground mt-2">
+                  The quiz host will open registration shortly.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      );
+    }
+
     return (
       <EmailEntry
         onLogin={handleLogin}

@@ -104,6 +104,7 @@ export interface GameState {
   activeCategoryName: string;
   activeQuestionFormat: QuestionType;
   isStarted: boolean;
+  isRegistrationOpen?: boolean; // default true when missing
   questionIds?: string[];  // pinned question IDs for synchronized quiz rounds
   questionCount?: number;  // questions per round (default 3, range 1-20)
   timerSeconds?: number;   // per-question timer (default 10, range 5-60)

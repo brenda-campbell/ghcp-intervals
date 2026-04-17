@@ -16,11 +16,14 @@ vi.mock("../../services/cosmosClient", () => ({
     item: vi.fn(),
     items: { create: vi.fn(), query: vi.fn() },
   },
+  gameStateContainer: {
+    item: vi.fn(),
+  },
   database: {},
 }));
 
 import { app } from "@azure/functions";
-import { usersContainer } from "../../services/cosmosClient";
+import { usersContainer, gameStateContainer } from "../../services/cosmosClient";
 
 type Handler = (req: any, ctx: any) => Promise<HttpResponseInit>;
 let handler: Handler;
@@ -70,6 +73,7 @@ describe("loginOrCreate", () => {
   const mockRead = vi.fn();
   const mockReplace = vi.fn();
   const mockCreate = vi.fn();
+  const mockGameStateRead = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -81,6 +85,11 @@ describe("loginOrCreate", () => {
       replace: mockReplace,
     } as any);
     vi.mocked(usersContainer.items.create).mockImplementation(mockCreate);
+    // Default: registration open (no game state)
+    mockGameStateRead.mockRejectedValue({ code: 404 });
+    vi.mocked(gameStateContainer.item).mockReturnValue({
+      read: mockGameStateRead,
+    } as any);
   });
 
   it("creates a new user with valid email and displayName → 201", async () => {
@@ -236,5 +245,56 @@ describe("loginOrCreate", () => {
 
     expect(res.status).toBe(500);
     expect((res.jsonBody as any).error).toContain("Failed to login or create");
+  });
+
+  it("returns 403 when registration is closed and user is new", async () => {
+    mockQuery.mockResolvedValue({ resources: [] });
+    mockGameStateRead.mockResolvedValue({
+      resource: { id: "current", isRegistrationOpen: false },
+    });
+    const req = createMockRequest({
+      body: { email: "new@example.com", displayName: "NewPlayer" },
+    });
+    const ctx = createMockContext();
+
+    const res = await handler(req, ctx);
+
+    expect(res.status).toBe(403);
+    expect((res.jsonBody as any).error).toBe("Registration is currently closed");
+    expect((res.jsonBody as any).code).toBe("REGISTRATION_CLOSED");
+    expect(mockCreate).not.toHaveBeenCalled();
+  });
+
+  it("allows existing user login when registration is closed", async () => {
+    mockQuery.mockResolvedValue({ resources: [EXISTING_USER] });
+    mockGameStateRead.mockResolvedValue({
+      resource: { id: "current", isRegistrationOpen: false },
+    });
+    const req = createMockRequest({
+      body: { email: "existing@example.com", displayName: "Whatever" },
+    });
+    const ctx = createMockContext();
+
+    const res = await handler(req, ctx);
+
+    expect(res.status).toBe(200);
+    expect((res.jsonBody as any).userId).toBe("user-existing");
+  });
+
+  it("allows new user when isRegistrationOpen is explicitly true", async () => {
+    mockQuery.mockResolvedValue({ resources: [] });
+    mockGameStateRead.mockResolvedValue({
+      resource: { id: "current", isRegistrationOpen: true },
+    });
+    mockCreate.mockResolvedValue({});
+    const req = createMockRequest({
+      body: { email: "new@example.com", displayName: "NewPlayer" },
+    });
+    const ctx = createMockContext();
+
+    const res = await handler(req, ctx);
+
+    expect(res.status).toBe(201);
+    expect(mockCreate).toHaveBeenCalledOnce();
   });
 });

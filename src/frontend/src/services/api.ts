@@ -17,6 +17,7 @@ export interface GameState {
   activeCategoryName: string | null;
   activeQuestionFormat: QuestionType;
   isStarted: boolean;
+  isRegistrationOpen?: boolean;
   questionIds?: string[];
   questionCount?: number;
   timerSeconds?: number;
@@ -282,6 +283,15 @@ export async function setTimer(seconds: number, adminUserId: string): Promise<Ga
     method: "PATCH",
     headers: { "Content-Type": "application/json", "x-user-id": adminUserId },
     body: JSON.stringify({ timerSeconds: seconds }),
+  });
+  return handleResponse<GameState>(response);
+}
+
+export async function setRegistration(isOpen: boolean, adminUserId: string): Promise<GameState> {
+  const response = await fetch("/api/game/registration", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", "x-user-id": adminUserId },
+    body: JSON.stringify({ isOpen }),
   });
   return handleResponse<GameState>(response);
 }

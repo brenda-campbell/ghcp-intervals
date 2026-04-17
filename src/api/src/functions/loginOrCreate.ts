@@ -5,8 +5,8 @@ import {
   InvocationContext,
 } from "@azure/functions";
 import { randomUUID } from "crypto";
-import { usersContainer } from "../services/cosmosClient";
-import { User } from "../models";
+import { gameStateContainer, usersContainer } from "../services/cosmosClient";
+import { GameState, User } from "../models";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -51,6 +51,26 @@ async function loginOrCreate(
       }
 
       return { status: 200, jsonBody: existing };
+    }
+
+    // New user — check if registration is open
+    let registrationOpen = true;
+    try {
+      const { resource: gameState } = await gameStateContainer
+        .item("current", "current")
+        .read<GameState>();
+      if (gameState && gameState.isRegistrationOpen === false) {
+        registrationOpen = false;
+      }
+    } catch {
+      // No game state or 404 — default to open
+    }
+
+    if (!registrationOpen) {
+      return {
+        status: 403,
+        jsonBody: { error: "Registration is currently closed", code: "REGISTRATION_CLOSED" },
+      };
     }
 
     // New user — validate displayName
