@@ -346,3 +346,34 @@ Added `questionCount?: number` to GameState singleton (default 3, range 1–20).
 Frontend `QuizControlSection` shows dropdown (1–20) when quiz stopped; hidden and labeled when live.
 
 **Rationale:** Admins need per-round customization without code changes. Storing on GameState means config persists across rounds unless explicitly changed. 20-question ceiling prevents accidental DoS from large category queries. Request body override allows per-start tuning without separate API call.
+
+---
+
+### ADR-034: Configurable Per-Question Timer (timerSeconds on GameState)
+
+Added `timerSeconds?: number` to GameState singleton (default 10, range 5-60).
+
+- `startQuiz` resolves timer from: request body → GameState stored value → default 10
+- New `PATCH /api/game/timer` (admin-only) persists timer and broadcasts `timerChanged`
+- `setCategory` preserves `timerSeconds` when switching categories
+- `getGameState` defaults `timerSeconds: 10` in all response paths
+
+**Rationale:** Follows identical pattern to ADR-033 (questionCount). Timer stored on GameState means config persists across rounds. 5-60 range prevents degenerate gameplay (too fast to read / too slow to stay engaged). Included in `quizStarted` broadcast so clients get the value without a separate fetch.
+
+---
+
+### ADR-035: SignalR Presence Broadcast via Heartbeat
+
+Heartbeat endpoint (`POST /api/game/heartbeat`) now includes a SignalR output binding that broadcasts `presenceUpdate { count, userId, displayName }` to all connected clients after registering presence.
+
+Presence timeout reduced from 60s to 45s (one missed heartbeat grace at 30s interval).
+
+**Rationale:** Previously, each client only learned the online count from its own heartbeat response. Now all clients receive real-time count updates via SignalR whenever any player heartbeats. Timeout reduction removes the scenario where a player appears online for 30+ seconds after closing their browser. Per-instance limitation (ADR-018) remains — fixing that requires Redis or Cosmos, which is out of scope for this change.
+
+---
+
+### ADR-036: E2E Test User Cleanup
+
+Playwright E2E tests now track all test user IDs created during the suite and delete them in an `afterAll` hook via `DELETE /api/users/{userId}` using the admin user ID. Cleanup is best-effort — failures are silently ignored to avoid masking real test failures.
+
+**Rationale:** Prevents accumulation of `e2e-test-*@test.com` users in Cosmos DB. Addresses the future consideration noted in ADR-030.
