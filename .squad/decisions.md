@@ -286,3 +286,19 @@ Admin endpoint with flexible scope for resetting player scores:
 The new `syncQuestions.test.ts` already covers question-pinning behavior cross-endpoint, so the old test just needs its mocks fixed—not rewritten.
 
 **Rationale:** Test coverage remains valid; only infrastructure (mocks) needed updating. New tests (resetScores + syncQuestions) verify all behaviors in isolation and integration.
+
+---
+
+### ADR-030: E2E Test Infrastructure Setup
+
+Created Playwright E2E test suite at `src/frontend/e2e/` with 7 tests covering the complete user journey (login, waiting room, leaderboard, admin panel, logout, re-login, return user flow). All tests pass against live site. Screenshots captured at each step (10 total) for visual regression tracking.
+
+**Key Decisions:**
+- Tests run against live site (baseURL parameterized for CI in future)
+- Screenshots to `e2e/screenshots/` for incident documentation
+- Admin tests use `brencampbell@microsoft.com`
+- Test user emails timestamped to avoid collisions
+
+**Rationale:** Post-Cosmos-DB-outage verification required repeatable safety net. Screenshots provide visual proof. Provides regression protection for future development.
+
+**Future Consideration:** E2E test user records accumulate in Cosmos—add cleanup script.
