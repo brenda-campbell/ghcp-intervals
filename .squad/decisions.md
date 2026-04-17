@@ -302,3 +302,47 @@ Created Playwright E2E test suite at `src/frontend/e2e/` with 7 tests covering t
 **Rationale:** Post-Cosmos-DB-outage verification required repeatable safety net. Screenshots provide visual proof. Provides regression protection for future development.
 
 **Future Consideration:** E2E test user records accumulate in Cosmos—add cleanup script.
+
+---
+
+### ADR-031: Dark/Light Theme State Management
+
+Theme preference is stored in localStorage and applied via `.dark` CSS class on the `<html>` element. CSS uses `:root` for light-mode defaults and `.dark` pseudo-class for overrides. Runtime values injected via CSS custom properties (e.g., `--color-primary`).
+
+- Inline `<script>` in `index.html` reads localStorage before first paint to prevent flash-of-wrong-theme
+- Theme toggle via `useTheme` hook (global state)
+- Primary (#4A90E2), accent (#C5F542), and destructive (#EF4444) colors consistent across both themes
+- All existing components auto-support via semantic Tailwind classes (bg-card, text-foreground, etc.)
+
+**Rationale:** LocalStorage persists user preference across sessions. CSS-first approach keeps theme rendering fast and avoids JavaScript flicker. Semantic Tailwind classes mean component updates are unnecessary.
+
+---
+
+### ADR-032: Admin-Controlled Quiz Rounds (Auto-Stop Without Replay)
+
+When an admin launches a quiz via `startQuiz`:
+- All players see the exact same questions in order (via GameState.questionIds pinning)
+- Upon quiz completion, players see score summary but no "Play Again" button
+- Players await admin to stop quiz and launch next round
+
+Free/practice mode (isQuizStarted=false) retains existing "Play Again" button.
+
+When admin stops quiz via SignalR `quizStopped` event, all clients switch back to WaitingScreen automatically.
+
+**Rationale:** Eliminates unfair replaying during competitive admin-launched rounds. Keeps all players synchronized on round lifecycle. SignalR broadcast ensures real-time state sync across all connected clients.
+
+---
+
+### ADR-033: Configurable Question Count per Round (Range 1–20)
+
+Added `questionCount?: number` to GameState singleton (default 3, range 1–20).
+
+- `startQuiz` resolves count from: request body → GameState stored value → default 3
+- New `PATCH /api/game/question-count` (admin-only) persists count and broadcasts `questionCountChanged`
+- `setCategory` preserves `questionCount` when switching categories
+- `getQuestions.ts` `MAX_QUESTIONS` raised to 20 as hard ceiling for fallback mode
+- Validation: rejects start if question pool too small for requested count
+
+Frontend `QuizControlSection` shows dropdown (1–20) when quiz stopped; hidden and labeled when live.
+
+**Rationale:** Admins need per-round customization without code changes. Storing on GameState means config persists across rounds unless explicitly changed. 20-question ceiling prevents accidental DoS from large category queries. Request body override allows per-start tuning without separate API call.
