@@ -366,32 +366,27 @@ test('Test 8: Dark/Light theme toggle', async ({ page }) => {
   // Screenshot: initial theme state
   await page.screenshot({ path: `${SCREENSHOTS_DIR}/11-default-theme.png`, fullPage: true });
 
-  // Detect current theme from the toggle button title
-  // In dark mode: title="Switch to light mode" (Sun icon shown)
-  // In light mode: title="Switch to dark mode" (Moon icon shown)
+  // The theme toggle button is next to the Sign out button in the header
+  // It has a title like "Switch to light mode" or "Switch to dark mode"
   const switchToLightBtn = page.locator('button[title="Switch to light mode"]');
   const switchToDarkBtn = page.locator('button[title="Switch to dark mode"]');
+  const themeToggle = switchToLightBtn.or(switchToDarkBtn);
 
-  // One of them must be visible
-  const lightBtnVisible = await switchToLightBtn.isVisible({ timeout: 5000 }).catch(() => false);
-  const darkBtnVisible = await switchToDarkBtn.isVisible({ timeout: 2000 }).catch(() => false);
-  expect(lightBtnVisible || darkBtnVisible).toBe(true);
+  // Verify the theme toggle exists (this feature may not be deployed yet)
+  await expect(themeToggle).toBeVisible({ timeout: 10000 });
+
+  // Determine which is initially visible
+  const startedInDark = await switchToLightBtn.isVisible();
 
   // Toggle the theme
-  if (lightBtnVisible) {
-    // Currently dark → switch to light
-    await switchToLightBtn.click();
-  } else {
-    // Currently light → switch to dark
-    await switchToDarkBtn.click();
-  }
+  await themeToggle.click();
   await page.waitForTimeout(500);
 
   // Screenshot: toggled theme
   await page.screenshot({ path: `${SCREENSHOTS_DIR}/12-light-theme.png`, fullPage: true });
 
   // After toggling, the OTHER button should now be visible
-  if (lightBtnVisible) {
+  if (startedInDark) {
     await expect(switchToDarkBtn).toBeVisible({ timeout: 5000 });
   } else {
     await expect(switchToLightBtn).toBeVisible({ timeout: 5000 });
@@ -403,18 +398,15 @@ test('Test 8: Dark/Light theme toggle', async ({ page }) => {
   );
 
   // Toggle back to original theme
-  if (lightBtnVisible) {
-    await switchToDarkBtn.click();
-  } else {
-    await switchToLightBtn.click();
-  }
+  const themeToggleBack = switchToLightBtn.or(switchToDarkBtn);
+  await themeToggleBack.click();
   await page.waitForTimeout(500);
 
   // Screenshot: original theme restored
   await page.screenshot({ path: `${SCREENSHOTS_DIR}/13-dark-theme-restored.png`, fullPage: true });
 
   // Verify we're back to original state
-  if (lightBtnVisible) {
+  if (startedInDark) {
     await expect(switchToLightBtn).toBeVisible({ timeout: 5000 });
   } else {
     await expect(switchToDarkBtn).toBeVisible({ timeout: 5000 });
@@ -497,7 +489,7 @@ test('Test 9: Quiz complete shows waiting state (no Play Again)', async ({ page 
   await expect(quizComplete.or(roundComplete)).toBeVisible({ timeout: 10000 });
 
   // If admin-started quiz, should show waiting message and NO "Play Again"
-  const waitingMsg = page.getByText(/waiting for/i);
+  const waitingMsg = page.getByText('Waiting for the next round');
   const playAgainBtn = page.getByText('Play Again');
 
   // Check for the admin-started quiz done screen features
@@ -511,8 +503,8 @@ test('Test 9: Quiz complete shows waiting state (no Play Again)', async ({ page 
   // Go back to Admin and stop the quiz
   await adminTab.click();
   await page.waitForTimeout(2000);
-  const stopBtnFinal = page.getByText('Stop Quiz', { exact: false });
-  if (await stopBtnFinal.isVisible({ timeout: 3000 }).catch(() => false)) {
+  const stopBtnFinal = page.getByRole('button', { name: /stop quiz/i });
+  if (await stopBtnFinal.isVisible()) {
     await stopBtnFinal.click();
     await page.waitForTimeout(2000);
   }
@@ -541,18 +533,27 @@ test('Test 10: Configurable question count selector', async ({ page }) => {
   await expect(page.getByText(/quiz is/i)).toBeVisible({ timeout: 15000 });
 
   // If quiz is running, stop it — the question count selector only shows when stopped
-  const quizLiveText = page.getByText('LIVE');
-  if (await quizLiveText.isVisible({ timeout: 2000 }).catch(() => false)) {
-    const stopBtn = page.getByRole('button', { name: /stop quiz/i });
+  // Use the Stop Quiz button directly to avoid strict mode issues with "LIVE" text
+  const stopBtn = page.getByRole('button', { name: /stop quiz/i });
+  if (await stopBtn.isVisible()) {
     await stopBtn.click();
     await page.waitForTimeout(3000);
-    // Wait for "STOPPED" to confirm quiz is stopped
-    await expect(page.getByText('STOPPED')).toBeVisible({ timeout: 10000 });
   }
+
+  // Wait for Start Quiz button to confirm quiz is in stopped state
+  await expect(page.getByRole('button', { name: /start quiz/i })).toBeVisible({ timeout: 10000 });
+
+  // Debug: capture admin panel state
+  await page.screenshot({ path: `${SCREENSHOTS_DIR}/15-debug-admin-state.png`, fullPage: true });
 
   // Now verify the question count selector is visible
   const questionCountSelect = page.locator('#qcount');
-  await expect(questionCountSelect).toBeVisible({ timeout: 10000 });
+  try {
+    await expect(questionCountSelect).toBeVisible({ timeout: 10000 });
+  } catch (e) {
+    await captureDebugInfo(page, 'question-count-not-found');
+    throw e;
+  }
 
   // Verify the "Questions:" label is visible
   const questionsLabel = page.locator('label[for="qcount"]');
