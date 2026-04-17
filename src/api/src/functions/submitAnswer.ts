@@ -5,14 +5,14 @@ import {
   InvocationContext,
   output,
 } from "@azure/functions";
-import { questionsContainer, categoryScoresContainer, usersContainer } from "../services/cosmosClient.js";
+import { questionsContainer, categoryScoresContainer, usersContainer, gameStateContainer } from "../services/cosmosClient.js";
 import {
   getDeliveryTimestamp,
   clearDelivery,
 } from "../services/questionDeliveryTracker.js";
 import { updateUserScore } from "../services/scoringService.js";
 import { getTopLeaderboard } from "../services/leaderboardService.js";
-import type { AnswerSubmission, AnswerResult, Question, LeaderboardEntry, CategoryScore } from "../models/index.js";
+import type { AnswerSubmission, AnswerResult, Question, LeaderboardEntry, CategoryScore, GameState } from "../models/index.js";
 
 // Module-level question cache (questions don't change during gameplay)
 const questionCache = new Map<string, Question>();
@@ -22,11 +22,34 @@ let lastLeaderboardBroadcast = 0;
 let cachedLeaderboard: LeaderboardEntry[] | null = null;
 const LEADERBOARD_THROTTLE_MS = 1000;
 
+// Cache for configurable timer from GameState (avoids Cosmos read on every answer)
+let cachedTimerSeconds: number | null = null;
+let timerCacheTimestamp = 0;
+const TIMER_CACHE_TTL_MS = 30_000;
+
+async function getTimerSeconds(): Promise<number> {
+  const now = Date.now();
+  if (cachedTimerSeconds !== null && (now - timerCacheTimestamp) < TIMER_CACHE_TTL_MS) {
+    return cachedTimerSeconds;
+  }
+  try {
+    const { resource } = await gameStateContainer.item("current", "current").read<GameState>();
+    cachedTimerSeconds = resource?.timerSeconds ?? 10;
+    timerCacheTimestamp = now;
+  } catch {
+    cachedTimerSeconds = 10;
+    timerCacheTimestamp = now;
+  }
+  return cachedTimerSeconds;
+}
+
 /** Reset module-level caches (for testing) */
 export function _resetSubmitAnswerCaches(): void {
   questionCache.clear();
   lastLeaderboardBroadcast = 0;
   cachedLeaderboard = null;
+  cachedTimerSeconds = null;
+  timerCacheTimestamp = 0;
 }
 
 interface SignalRMessage {
@@ -41,15 +64,14 @@ const signalROutput = output.generic({
   connectionStringSetting: "AzureSignalRConnectionString",
 });
 
-const QUESTION_TIMEOUT_MS = 10_000; // 10-second round window
 const BASE_POINTS = 100;
 const MAX_SPEED_BONUS = 100;
 
-function calculatePoints(correct: boolean, elapsedTimeMs: number): number {
+function calculatePoints(correct: boolean, elapsedTimeMs: number, timeoutMs: number = 10_000): number {
   if (!correct) return 0;
-  const clampedElapsed = Math.min(Math.max(elapsedTimeMs, 0), QUESTION_TIMEOUT_MS);
+  const clampedElapsed = Math.min(Math.max(elapsedTimeMs, 0), timeoutMs);
   const speedBonus = Math.round(
-    MAX_SPEED_BONUS * (1 - clampedElapsed / QUESTION_TIMEOUT_MS)
+    MAX_SPEED_BONUS * (1 - clampedElapsed / timeoutMs)
   );
   return BASE_POINTS + speedBonus;
 }
@@ -135,7 +157,10 @@ async function submitAnswer(
   }
   elapsedTimeMs = Math.max(elapsedTimeMs, 0);
 
-  const pointsAwarded = calculatePoints(correct, elapsedTimeMs);
+  // Use configurable timer from GameState for speed bonus calculation
+  const timerSeconds = await getTimerSeconds();
+  const timeoutMs = timerSeconds * 1000;
+  const pointsAwarded = calculatePoints(correct, elapsedTimeMs, timeoutMs);
 
   context.log(
     `Answer: user=${userId} q=${questionId} option=${selectedOption} ` +
@@ -161,7 +186,8 @@ async function submitAnswer(
       if (resource) {
         categoryScore = resource;
         categoryScore.totalScore += pointsAwarded;
-        categoryScore.gamesPlayed += 1;
+        // NOTE: gamesPlayed is NOT incremented here — it's done once per
+        // completed round via the /api/game/round-complete endpoint.
         if (elapsedTimeMs < categoryScore.fastestTimeMs || categoryScore.fastestTimeMs === 0) {
           categoryScore.fastestTimeMs = elapsedTimeMs;
         }
@@ -179,7 +205,7 @@ async function submitAnswer(
         categoryName: question.category,
         displayName: "",
         totalScore: pointsAwarded,
-        gamesPlayed: 1,
+        gamesPlayed: 0,  // incremented once per completed round, not per answer
         fastestTimeMs: elapsedTimeMs,
         updatedAt: new Date().toISOString(),
       };

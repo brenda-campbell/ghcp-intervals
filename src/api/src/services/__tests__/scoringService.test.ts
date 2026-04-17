@@ -8,7 +8,7 @@ vi.mock("../cosmosClient.js", () => ({
   database: {},
 }));
 
-import { updateUserScore } from "../scoringService.js";
+import { updateUserScore, incrementGamesPlayed } from "../scoringService.js";
 import { usersContainer } from "../cosmosClient.js";
 
 describe("updateUserScore", () => {
@@ -23,7 +23,7 @@ describe("updateUserScore", () => {
     } as any);
   });
 
-  it("increments score and gamesPlayed", async () => {
+  it("increments score (not gamesPlayed — that is per-round now)", async () => {
     mockRead.mockResolvedValue({
       resource: {
         userId: "u1",
@@ -39,7 +39,8 @@ describe("updateUserScore", () => {
     expect(usersContainer.item).toHaveBeenCalledWith("u1", "u1");
     const ops = mockPatch.mock.calls[0][0];
     expect(ops).toContainEqual({ op: "incr", path: "/totalScore", value: 150 });
-    expect(ops).toContainEqual({ op: "incr", path: "/gamesPlayed", value: 1 });
+    // gamesPlayed is NOT incremented per answer — only via incrementGamesPlayed()
+    expect(ops).not.toContainEqual(expect.objectContaining({ path: "/gamesPlayed" }));
   });
 
   it("updates fastestTimeMs when new time is faster", async () => {
@@ -141,6 +142,38 @@ describe("updateUserScore", () => {
     const updatedAtOp = ops.find(
       (op: any) => op.path === "/updatedAt"
     );
+    expect(updatedAtOp.op).toBe("replace");
+    expect(updatedAtOp.value >= before).toBe(true);
+    expect(updatedAtOp.value <= after).toBe(true);
+  });
+});
+
+describe("incrementGamesPlayed", () => {
+  const mockPatch = vi.fn();
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(usersContainer.item).mockReturnValue({
+      patch: mockPatch,
+    } as any);
+    mockPatch.mockResolvedValue({});
+  });
+
+  it("increments gamesPlayed by 1", async () => {
+    await incrementGamesPlayed("u1");
+
+    expect(usersContainer.item).toHaveBeenCalledWith("u1", "u1");
+    const ops = mockPatch.mock.calls[0][0];
+    expect(ops).toContainEqual({ op: "incr", path: "/gamesPlayed", value: 1 });
+  });
+
+  it("sets updatedAt", async () => {
+    const before = new Date().toISOString();
+    await incrementGamesPlayed("u1");
+    const after = new Date().toISOString();
+
+    const ops = mockPatch.mock.calls[0][0];
+    const updatedAtOp = ops.find((op: any) => op.path === "/updatedAt");
     expect(updatedAtOp.op).toBe("replace");
     expect(updatedAtOp.value >= before).toBe(true);
     expect(updatedAtOp.value <= after).toBe(true);

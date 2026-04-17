@@ -20,6 +20,11 @@ vi.mock("../../services/cosmosClient.js", () => ({
     item: vi.fn(),
     items: { upsert: vi.fn() },
   },
+  gameStateContainer: {
+    item: vi.fn(() => ({
+      read: vi.fn().mockResolvedValue({ resource: { timerSeconds: 10 } }),
+    })),
+  },
   database: {},
 }));
 

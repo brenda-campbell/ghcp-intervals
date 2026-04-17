@@ -218,3 +218,11 @@
 - **SignalR presenceUpdate:** Added `presenceUpdate` event handler in `useSignalR.ts` with new `PresenceUpdateEvent` interface. Exposes `presenceCount: number | null`. `App.tsx` uses SignalR `presenceCount` to update online count immediately on arrival; heartbeat kept as fallback.
 - **E2E test user cleanup:** Added `afterAll` hook in `user-flows.spec.ts` that deletes all test users via `DELETE /api/users/{userId}` with admin header. `captureTestUserId` helper extracts userId from localStorage after each login. Test users tracked in `testUserIds` array, cleaned up best-effort after suite completes.
 - **Verification:** TypeScript compiles clean (`npx tsc --noEmit` — 0 errors).
+
+### fe-quiz-fixes (2026-04-17)
+- **Issue 1 — Quiz restart on tab switch:** Lifted quiz completion state from QuestionPage up to App.tsx. New `quizCompleted` boolean + `completedResults` state in App. When `onQuizComplete` fires, App takes over rendering a `QuizCompletedScreen` component instead of re-mounting QuestionPage. Reset when `isQuizStarted` goes false (admin stops round). QuestionPage no longer re-fetches questions after navigating away and back.
+- **Issue 2 — Show answer times:** Both admin-started completion card (QuestionPage + QuizCompletedScreen) and practice mode (RoundComplete) now display per-question response times (`elapsedTimeMs / 1000`) and a "⚡ Fastest correct answer: Xs" summary. RoundComplete also shows time column next to each question row.
+- **Issue 3 — Round-complete endpoint:** Added `markRoundComplete(userId)` to `api.ts` calling `POST /api/game/round-complete`. QuestionPage fires it (fire-and-forget) when phase transitions to "done", incrementing `gamesPlayed` once per round instead of per question.
+- **QuestionResultEntry exported:** Made the interface `export` from QuestionPage so App.tsx can import it for type-safe completion state.
+- **QuizCompletedScreen:** New inline component in App.tsx — renders the admin-started completion card with per-question times, fastest answer highlight, score summary, and "View Leaderboard" button. Survives tab switches since it lives in App state.
+- **Verification:** TypeScript compiles clean (`npx tsc --noEmit` — 0 errors).

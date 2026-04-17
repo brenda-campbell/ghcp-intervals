@@ -108,7 +108,7 @@ export function RoundComplete({
             <span className="h1 text-accent">{displayPoints}</span>
           </div>
 
-          {/* Answer summary */}
+          {/* Answer summary with times */}
           <div className="w-full space-y-2">
             <span className="ui-label text-muted-foreground">
               {totalCorrect} / {results.length} Correct
@@ -133,12 +133,26 @@ export function RoundComplete({
                   <span className="caption flex-1 text-foreground/80">
                     {r.questionText}
                   </span>
+                  <span className="caption shrink-0 font-mono text-xs text-muted-foreground">
+                    {r.result ? `${(r.result.elapsedTimeMs / 1000).toFixed(1)}s` : "—"}
+                  </span>
                   <span className="caption shrink-0 text-muted-foreground">
                     +{r.result?.pointsAwarded ?? 0}
                   </span>
                 </div>
               ))}
             </div>
+            {(() => {
+              const correctTimes = results
+                .filter((r) => r.result?.correct)
+                .map((r) => r.result!.elapsedTimeMs);
+              const fastest = correctTimes.length > 0 ? Math.min(...correctTimes) : null;
+              return fastest !== null ? (
+                <div className="text-center text-sm font-medium text-accent pt-1">
+                  ⚡ Fastest correct answer: {(fastest / 1000).toFixed(1)}s
+                </div>
+              ) : null;
+            })()}
           </div>
 
           {/* Action buttons */}

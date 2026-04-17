@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import {
   fetchQuestions,
   submitAnswer,
+  markRoundComplete,
   type Question,
   type AnswerResult,
   ApiError,
@@ -20,7 +21,7 @@ import {
 
 type Phase = "loading" | "playing" | "feedback" | "done" | "error";
 
-interface QuestionResultEntry {
+export interface QuestionResultEntry {
   questionText: string;
   result: AnswerResult | null;
 }
@@ -32,9 +33,10 @@ interface QuestionPageProps {
   onNavigateToLeaderboard?: () => void;
   isQuizStarted?: boolean;
   timerSeconds?: number;
+  onQuizComplete?: (results: QuestionResultEntry[]) => void;
 }
 
-export function QuestionPage({ onNavigateToLeaderboard, isQuizStarted, timerSeconds = 10 }: QuestionPageProps) {
+export function QuestionPage({ onNavigateToLeaderboard, isQuizStarted, timerSeconds = 10, onQuizComplete }: QuestionPageProps) {
   const { user } = useUser();
   const { playerActivity, categoryChanged } = useSignalRContext();
 
@@ -96,6 +98,18 @@ export function QuestionPage({ onNavigateToLeaderboard, isQuizStarted, timerSeco
       if (autoAdvanceTimer.current) clearTimeout(autoAdvanceTimer.current);
     };
   }, []);
+
+  // Signal quiz completion to parent + fire round-complete API
+  useEffect(() => {
+    if (phase !== "done") return;
+    if (isQuizStarted && onQuizComplete) {
+      onQuizComplete(roundResults);
+    }
+    if (user?.userId) {
+      markRoundComplete(user.userId).catch(() => {});
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase]);
 
   // When admin switches category, reload questions
   useEffect(() => {
@@ -271,6 +285,10 @@ export function QuestionPage({ onNavigateToLeaderboard, isQuizStarted, timerSeco
         (sum, r) => sum + (r.result?.pointsAwarded ?? 0),
         0,
       );
+      const correctTimes = roundResults
+        .filter((r) => r.result?.correct)
+        .map((r) => r.result!.elapsedTimeMs);
+      const fastestTime = correctTimes.length > 0 ? Math.min(...correctTimes) : null;
       return (
         <div className="animate-fade-slide-in">
           <Card className="border-accent/30 bg-card shadow-lg">
@@ -291,6 +309,30 @@ export function QuestionPage({ onNavigateToLeaderboard, isQuizStarted, timerSeco
                   {totalCorrect} / {roundResults.length} Correct
                 </span>
               </div>
+
+              {/* Per-question results with times */}
+              <div className="w-full space-y-2">
+                {roundResults.map((r, i) => (
+                  <div key={i} className="flex items-center justify-between rounded-lg border border-border/40 bg-background/30 px-4 py-2 text-sm">
+                    <span className={r.result?.correct ? "text-green-400" : "text-red-400"}>
+                      {r.result?.correct ? "✓" : "✗"} Q{i + 1}
+                    </span>
+                    <span className="font-mono text-xs text-muted-foreground">
+                      {r.result ? `${(r.result.elapsedTimeMs / 1000).toFixed(1)}s` : "—"}
+                    </span>
+                    <span className="font-mono text-accent">
+                      {r.result?.pointsAwarded ?? 0} pts
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Fastest correct answer */}
+              {fastestTime !== null && (
+                <div className="text-sm font-medium text-accent">
+                  ⚡ Fastest correct answer: {(fastestTime / 1000).toFixed(1)}s
+                </div>
+              )}
 
               {/* Pulsing waiting indicator */}
               <div className="flex items-center gap-2 text-sm text-muted-foreground">

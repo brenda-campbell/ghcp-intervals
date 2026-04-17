@@ -1,13 +1,15 @@
 import { useState, useRef, useEffect } from "react"
-import { Lightning, Trophy, GearSix, SignOut, Sun, Moon } from "@phosphor-icons/react"
+import { Lightning, Trophy, GearSix, SignOut, Sun, Moon, Clock, UsersThree } from "@phosphor-icons/react"
 import { UserBadge } from "@/components/UserBadge"
 import { ConnectionStatus } from "@/components/ConnectionStatus"
 import { useUser } from "@/contexts/UserContext"
 import { useLogout } from "@/contexts/LogoutContext"
 import { useSignalRContext } from "@/contexts/SignalRContext"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import { LeaderboardPage } from "@/components/LeaderboardPage"
-import { QuestionPage } from "@/components/QuestionPage"
+import { QuestionPage, type QuestionResultEntry } from "@/components/QuestionPage"
 import { AdminPanel } from "@/components/AdminPanel"
 import { WaitingScreen } from "@/components/WaitingScreen"
 import { cn } from "@/lib/utils"
@@ -15,6 +17,74 @@ import { useTheme } from "@/hooks/useTheme"
 import { sendHeartbeat, getGameState } from "@/services/api"
 
 type View = "quiz" | "leaderboard" | "admin"
+
+function QuizCompletedScreen({ results, onNavigateToLeaderboard }: { results: QuestionResultEntry[]; onNavigateToLeaderboard: () => void }) {
+  const totalCorrect = results.filter((r) => r.result?.correct).length
+  const totalPoints = results.reduce((sum, r) => sum + (r.result?.pointsAwarded ?? 0), 0)
+  const correctTimes = results.filter((r) => r.result?.correct).map((r) => r.result!.elapsedTimeMs)
+  const fastestTime = correctTimes.length > 0 ? Math.min(...correctTimes) : null
+
+  return (
+    <div className="animate-fade-slide-in">
+      <Card className="border-accent/30 bg-card shadow-lg">
+        <CardContent className="flex flex-col items-center gap-6 pt-6">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-500/10 border border-green-500/30">
+            <span className="text-3xl">✅</span>
+          </div>
+          <h2 className="h2 text-center">Quiz Complete!</h2>
+          <p className="text-sm text-muted-foreground text-center max-w-xs">
+            Waiting for the next round…
+          </p>
+
+          <div className="flex flex-col items-center gap-1">
+            <span className="caption text-muted-foreground">Points Earned</span>
+            <span className="h1 text-accent">{totalPoints}</span>
+            <span className="ui-label text-muted-foreground">
+              {totalCorrect} / {results.length} Correct
+            </span>
+          </div>
+
+          <div className="w-full space-y-2">
+            {results.map((r, i) => (
+              <div key={i} className="flex items-center justify-between rounded-lg border border-border/40 bg-background/30 px-4 py-2 text-sm">
+                <span className={r.result?.correct ? "text-green-400" : "text-red-400"}>
+                  {r.result?.correct ? "✓" : "✗"} Q{i + 1}
+                </span>
+                <span className="font-mono text-xs text-muted-foreground">
+                  {r.result ? `${(r.result.elapsedTimeMs / 1000).toFixed(1)}s` : "—"}
+                </span>
+                <span className="font-mono text-accent">
+                  {r.result?.pointsAwarded ?? 0} pts
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {fastestTime !== null && (
+            <div className="text-sm font-medium text-accent">
+              ⚡ Fastest correct answer: {(fastestTime / 1000).toFixed(1)}s
+            </div>
+          )}
+
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Clock weight="regular" className="h-4 w-4 animate-pulse" />
+            <span>Waiting for admin to start next round</span>
+          </div>
+
+          <Button
+            onClick={onNavigateToLeaderboard}
+            variant="outline"
+            size="lg"
+            className="transition-transform duration-150 hover:scale-[1.03] active:scale-[0.97]"
+          >
+            <UsersThree weight="fill" className="mr-2 h-4 w-4" />
+            View Leaderboard
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
 
 function App() {
   const { user, isLoading } = useUser()
@@ -30,6 +100,8 @@ function App() {
   const leaderboardTabRef = useRef<HTMLButtonElement>(null)
   const adminTabRef = useRef<HTMLButtonElement>(null)
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 })
+  const [quizCompleted, setQuizCompleted] = useState(false)
+  const [completedResults, setCompletedResults] = useState<QuestionResultEntry[]>([])
 
   const showAdmin = user?.isAdmin === true
 
@@ -52,6 +124,14 @@ function App() {
   useEffect(() => {
     if (quizStartedSignal !== null) setIsQuizStarted(quizStartedSignal)
   }, [quizStartedSignal])
+
+  // Reset completed state when admin stops/restarts the quiz
+  useEffect(() => {
+    if (isQuizStarted === false) {
+      setQuizCompleted(false)
+      setCompletedResults([])
+    }
+  }, [isQuizStarted])
 
   // Use SignalR presence updates for immediate online count
   useEffect(() => {
@@ -184,7 +264,17 @@ function App() {
           >
             {view === "quiz" && (
               isQuizStarted
-                ? <QuestionPage onNavigateToLeaderboard={() => setView("leaderboard")} isQuizStarted={isQuizStarted ?? false} timerSeconds={timerSeconds} />
+                ? quizCompleted
+                  ? <QuizCompletedScreen results={completedResults} onNavigateToLeaderboard={() => setView("leaderboard")} />
+                  : <QuestionPage
+                      onNavigateToLeaderboard={() => setView("leaderboard")}
+                      isQuizStarted={isQuizStarted ?? false}
+                      timerSeconds={timerSeconds}
+                      onQuizComplete={(results) => {
+                        setQuizCompleted(true)
+                        setCompletedResults(results)
+                      }}
+                    />
                 : <WaitingScreen categoryName={activeCategoryName} onlineCount={onlineCount} />
             )}
             {view === "leaderboard" && (

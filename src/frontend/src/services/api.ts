@@ -323,6 +323,15 @@ export async function resetScores(
   return handleResponse<{ reset: boolean; usersAffected: number }>(response);
 }
 
+export async function markRoundComplete(userId: string): Promise<{ success: boolean }> {
+  const response = await fetch("/api/game/round-complete", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userId }),
+  });
+  return handleResponse<{ success: boolean }>(response);
+}
+
 export async function sendHeartbeat(userId: string, displayName: string): Promise<{ count: number }> {
   const response = await fetch("/api/game/heartbeat", {
     method: "POST",
