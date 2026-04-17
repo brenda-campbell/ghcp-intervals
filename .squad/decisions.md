@@ -377,3 +377,66 @@ Presence timeout reduced from 60s to 45s (one missed heartbeat grace at 30s inte
 Playwright E2E tests now track all test user IDs created during the suite and delete them in an `afterAll` hook via `DELETE /api/users/{userId}` using the admin user ID. Cleanup is best-effort — failures are silently ignored to avoid masking real test failures.
 
 **Rationale:** Prevents accumulation of `e2e-test-*@test.com` users in Cosmos DB. Addresses the future consideration noted in ADR-030.
+
+---
+
+### ADR-037: Scoring Metric Fix — gamesPlayed Increments Per-Round
+
+`gamesPlayed` was being incremented on every answer submitted. Changed to increment exactly once per round (admin-started or practice) via:
+
+1. **Removed:** Per-answer increment from `updateUserScore()` in `scoringService.ts` and from category score updates in `submitAnswer.ts`
+2. **Added:** New `incrementGamesPlayed(userId)` function exported from `scoringService.ts`
+3. **New Endpoint:** `POST /api/game/round-complete` with body `{ userId: string }`
+   - Calls `incrementGamesPlayed()` on user document
+   - Also increments `gamesPlayed` on active category's categoryScore document
+   - Not admin-gated — any player can call
+4. **Frontend Action:** Frontend calls endpoint when round phase → `"done"` via fire-and-forget `markRoundComplete(userId)`
+
+**Rationale:** `gamesPlayed` should count completed rounds, not individual answers. Separating this metric from answer submission allows speed scoring to remain accurate regardless of question count. Server-authoritative round completion ensures clients can't artificially inflate the metric.
+
+---
+
+### ADR-038: Speed Scoring Decoupled from Hardcoded Timer
+
+Speed scoring now uses configurable per-round timer instead of hardcoded 10-second timeout:
+
+1. **Changed:** `calculatePoints()` now accepts `timeoutMs` parameter (configurable, no longer hardcoded)
+2. **Cache Added:** `submitAnswer` reads `GameState.timerSeconds` via 30s-TTL cache (avoids per-request lookups)
+3. **Calculation:** Speed bonus scales proportionally from 5-60s timer range per ADR-034
+
+**Consequences:**
+- Speed bonus is now fair across different timer configurations (e.g., 5s quiz vs. 60s quiz)
+- No longer pegged to 10s fixed timeout
+- Timing verification uses server-side delivery tracker with clientTimestamp fallback (ADR-003 still applies)
+
+**Rationale:** Supports new quiz customization features (ADR-034) without breaking speed scoring math. Decoupling makes scoring mechanics testable independently of timer settings.
+
+---
+
+### ADR-039: Quiz Completion State Persisted in App.tsx
+
+Quiz completion state (boolean flag + results array) moved from `QuestionPage` local state to `App.tsx` to survive tab switches and navigation:
+
+1. **State Holder:** `App.tsx` now owns `quizCompleted: boolean` and `completedResults: QuestionResultEntry[]`
+2. **UI Component:** New `QuizCompletedScreen` component renders in App when round completes
+3. **Lifecycle:** State resets when `isQuizStarted` → `false` (admin stops quiz via SignalR)
+4. **Consequence:** Users can switch to leaderboard tab and back without losing quiz completion UI or triggering accidental restart
+
+**Timing Data:** Per-question response times and fastest correct answer included in round summary.
+
+**Rationale:** Component unmount/remount during tab navigation was causing accidental quiz restart. Lifting state to App boundary ensures persistence across child component lifecycle. This is essential for multiplayer scenarios where players navigate during active competitive rounds.
+
+---
+
+### ADR-040: Fire-and-Forget Round-Complete API Call
+
+Frontend calls `POST /api/game/round-complete` endpoint without blocking UI or error handling via new `markRoundComplete(userId)` function:
+
+1. **Trigger:** Called in `useEffect` when `phase` transitions to `"done"` in `QuestionPage`
+2. **Pattern:** `.catch(() => {})` — silently swallows all errors
+3. **Scope:** Applies to both admin-started and practice-mode rounds
+4. **Deployment Gap:** If backend endpoint not yet deployed, 404 is silently ignored (graceful degradation)
+
+**Rationale:** Round completion metrics are secondary to user experience. Non-blocking pattern ensures UI never stalls on network latency or backend outages. Graceful degradation allows frontend and backend to deploy independently.
+
+---
