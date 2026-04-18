@@ -88,9 +88,36 @@ export { ApiError as ApiRequestError };
 
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
-    throw new ApiError(response.status, `API error: ${response.statusText}`);
+    // Parse JSON body to get the actual error message from the API
+    let message = `Server error (${response.status})`;
+    try {
+      const body = await response.json();
+      if (body?.error) message = body.error;
+    } catch {
+      // Body wasn't JSON — use status code fallback
+      if (response.statusText) message = `API error: ${response.statusText}`;
+    }
+    throw new ApiError(response.status, message);
   }
   return response.json() as Promise<T>;
+}
+
+/** Retry a fetch-based call up to `retries` times on 5xx / network errors */
+async function withRetry<T>(fn: () => Promise<T>, retries = 2, delayMs = 800): Promise<T> {
+  let lastErr: unknown;
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      lastErr = err;
+      const isRetryable =
+        (err instanceof ApiError && err.status >= 500) ||
+        (err instanceof TypeError); // network error
+      if (!isRetryable || attempt === retries) throw err;
+      await new Promise((r) => setTimeout(r, delayMs * (attempt + 1)));
+    }
+  }
+  throw lastErr;
 }
 
 export async function fetchQuestions(count: number): Promise<Question[]> {
@@ -115,14 +142,16 @@ export async function loginOrCreate(
   displayName: string,
   legacyUserId?: string,
 ): Promise<User> {
-  const headers: Record<string, string> = { "Content-Type": "application/json" };
-  if (legacyUserId) headers["x-legacy-user-id"] = legacyUserId;
-  const response = await fetch("/api/users/login-or-create", {
-    method: "POST",
-    headers,
-    body: JSON.stringify({ email, displayName }),
+  return withRetry(async () => {
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    if (legacyUserId) headers["x-legacy-user-id"] = legacyUserId;
+    const response = await fetch("/api/users/login-or-create", {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ email, displayName }),
+    });
+    return handleResponse<User>(response);
   });
-  return handleResponse<User>(response);
 }
 
 export async function getUser(userId: string): Promise<User> {
@@ -248,8 +277,10 @@ export async function deleteCategory(
 // --- Game State ---
 
 export async function getGameState(): Promise<GameState> {
-  const response = await fetch("/api/game/state");
-  return handleResponse<GameState>(response);
+  return withRetry(async () => {
+    const response = await fetch("/api/game/state");
+    return handleResponse<GameState>(response);
+  });
 }
 
 export async function startQuiz(adminUserId: string, questionCount?: number): Promise<GameState> {
