@@ -7,12 +7,23 @@ import {
 import { usersContainer } from "../services/cosmosClient.js";
 import { getTopLeaderboard, toLeaderboardEntry, getCategoryLeaderboard } from "../services/leaderboardService.js";
 import type { User, LeaderboardEntry } from "../models/index.js";
+import {
+  getCorrelationId,
+  logRequest,
+  logSuccess,
+  logError,
+  correlationHeaders,
+} from "../services/logger.js";
 
 async function getLeaderboard(
   request: HttpRequest,
   context: InvocationContext
 ): Promise<HttpResponseInit> {
-  context.log("getLeaderboard called");
+  const start = Date.now();
+  const correlationId = getCorrelationId(request.headers);
+  const headers = correlationHeaders(correlationId);
+
+  logRequest(context, "getLeaderboard", correlationId);
 
   const categoryId = request.query.get("categoryId") || undefined;
 
@@ -20,11 +31,12 @@ async function getLeaderboard(
     // Category-specific leaderboard
     try {
       const leaderboard = await getCategoryLeaderboard(categoryId);
-      return { status: 200, jsonBody: { leaderboard, categoryId } };
+      logSuccess(context, "getLeaderboard", correlationId, Date.now() - start, `category=${categoryId}`);
+      return { status: 200, headers, jsonBody: { leaderboard, categoryId } };
     } catch (err) {
-      context.error("getCategoryLeaderboard failed:", err);
+      logError(context, "getLeaderboard", correlationId, err, Date.now() - start);
       const msg = err instanceof Error ? err.message : String(err);
-      return { status: 500, jsonBody: { error: "Failed to fetch category leaderboard", detail: msg } };
+      return { status: 500, headers, jsonBody: { error: "Failed to fetch category leaderboard", detail: msg } };
     }
   }
 
@@ -72,14 +84,16 @@ async function getLeaderboard(
       }
     }
 
+    logSuccess(context, "getLeaderboard", correlationId, Date.now() - start, `entries=${leaderboard.length}`);
     return {
       status: 200,
+      headers,
       jsonBody: { leaderboard, userRank },
     };
   } catch (err) {
-    context.error("getLeaderboard failed:", err);
+    logError(context, "getLeaderboard", correlationId, err, Date.now() - start);
     const msg = err instanceof Error ? err.message : String(err);
-    return { status: 500, jsonBody: { error: "Failed to fetch leaderboard", detail: msg } };
+    return { status: 500, headers, jsonBody: { error: "Failed to fetch leaderboard", detail: msg } };
   }
 }
 

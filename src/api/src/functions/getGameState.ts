@@ -6,31 +6,60 @@ import {
 } from "@azure/functions";
 import { gameStateContainer } from "../services/cosmosClient.js";
 import type { GameState } from "../models/index.js";
+import {
+  getCorrelationId,
+  logRequest,
+  logSuccess,
+  logError,
+  correlationHeaders,
+} from "../services/logger.js";
+import { withResilience } from "../services/resilience.js";
+
+const DEFAULT_GAME_STATE = {
+  activeCategoryId: null,
+  activeCategoryName: null,
+  isStarted: false,
+  timerSeconds: 10,
+  isRegistrationOpen: true,
+};
 
 async function getGameState(
-  _request: HttpRequest,
+  request: HttpRequest,
   context: InvocationContext
 ): Promise<HttpResponseInit> {
-  context.log("getGameState called");
+  const start = Date.now();
+  const correlationId = getCorrelationId(request.headers);
+  const headers = correlationHeaders(correlationId);
+
+  logRequest(context, "getGameState", correlationId);
 
   try {
-    const { resource } = await gameStateContainer
-      .item("current", "current")
-      .read<GameState>();
+    const { result: resource, fromFallback } = await withResilience(
+      "cosmos-getGameState",
+      async () => {
+        const { resource: res } = await gameStateContainer
+          .item("current", "current")
+          .read<GameState>();
+        return res ?? null;
+      },
+      null, // fallback: null means use defaults
+      context
+    );
 
-    if (resource) {
-      const body = {
-        ...resource,
-        timerSeconds: resource.timerSeconds ?? 10,
-        isRegistrationOpen: resource.isRegistrationOpen ?? true,
-      };
-      return { status: 200, jsonBody: body };
+    if (fromFallback || !resource) {
+      const summary = fromFallback ? "circuit-open fallback" : "no game state";
+      logSuccess(context, "getGameState", correlationId, Date.now() - start, summary);
+      return { status: 200, headers, jsonBody: DEFAULT_GAME_STATE };
     }
 
-    return {
-      status: 200,
-      jsonBody: { activeCategoryId: null, activeCategoryName: null, isStarted: false, timerSeconds: 10, isRegistrationOpen: true },
+    const body = {
+      ...resource,
+      timerSeconds: resource.timerSeconds ?? 10,
+      isRegistrationOpen: resource.isRegistrationOpen ?? true,
     };
+
+    logSuccess(context, "getGameState", correlationId, Date.now() - start, "ok");
+    return { status: 200, headers, jsonBody: body };
   } catch (err: unknown) {
     // 404 from Cosmos means no game state set yet
     if (
@@ -39,15 +68,12 @@ async function getGameState(
       "code" in err &&
       (err as { code: number }).code === 404
     ) {
-      return {
-        status: 200,
-        jsonBody: { activeCategoryId: null, activeCategoryName: null, isStarted: false, timerSeconds: 10, isRegistrationOpen: true },
-      };
+      logSuccess(context, "getGameState", correlationId, Date.now() - start, "not-found default");
+      return { status: 200, headers, jsonBody: DEFAULT_GAME_STATE };
     }
 
-    const message = err instanceof Error ? err.message : "Unknown error";
-    context.error(`getGameState failed: ${message}`);
-    return { status: 500, jsonBody: { error: "Failed to get game state" } };
+    logError(context, "getGameState", correlationId, err, Date.now() - start);
+    return { status: 500, headers, jsonBody: { error: "Failed to get game state" } };
   }
 }
 

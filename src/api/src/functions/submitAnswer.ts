@@ -14,6 +14,13 @@ import { updateUserScore } from "../services/scoringService.js";
 import { getTopLeaderboard } from "../services/leaderboardService.js";
 import { recordCorrectAnswer, getFastestCorrectMs, _resetFastestTracker } from "../services/fastestAnswerTracker.js";
 import type { AnswerSubmission, AnswerResult, Question, LeaderboardEntry, CategoryScore } from "../models/index.js";
+import {
+  getCorrelationId,
+  logRequest,
+  logSuccess,
+  logError,
+  correlationHeaders,
+} from "../services/logger.js";
 
 // Module-level question cache (questions don't change during gameplay)
 const questionCache = new Map<string, Question>();
@@ -69,26 +76,30 @@ async function submitAnswer(
 ): Promise<HttpResponseInit> {
   // ADR-003: Record server receipt timestamp immediately — this is authoritative
   const serverReceiptTimestamp = Date.now();
+  const correlationId = getCorrelationId(request.headers);
+  const headers = correlationHeaders(correlationId);
+
+  logRequest(context, "submitAnswer", correlationId, { method: request.method });
 
   // Parse request body
   let body: AnswerSubmission;
   try {
     body = (await request.json()) as AnswerSubmission;
   } catch {
-    return { status: 400, jsonBody: { error: "Invalid JSON body" } };
+    return { status: 400, headers, jsonBody: { error: "Invalid JSON body" } };
   }
 
   const { questionId, selectedOption, userId, clientTimestamp } = body;
 
   // Validate required fields
   if (!questionId || typeof questionId !== "string") {
-    return { status: 400, jsonBody: { error: "Missing or invalid questionId" } };
+    return { status: 400, headers, jsonBody: { error: "Missing or invalid questionId" } };
   }
   if (!userId || typeof userId !== "string") {
-    return { status: 400, jsonBody: { error: "Missing or invalid userId" } };
+    return { status: 400, headers, jsonBody: { error: "Missing or invalid userId" } };
   }
   if (typeof selectedOption !== "number" || !Number.isInteger(selectedOption)) {
-    return { status: 400, jsonBody: { error: "Missing or invalid selectedOption" } };
+    return { status: 400, headers, jsonBody: { error: "Missing or invalid selectedOption" } };
   }
   // Look up question — check in-memory cache first to avoid cross-partition query
   let question = questionCache.get(questionId);
@@ -102,13 +113,13 @@ async function submitAnswer(
         .fetchAll();
 
       if (resources.length === 0) {
-        return { status: 404, jsonBody: { error: "Question not found" } };
+        return { status: 404, headers, jsonBody: { error: "Question not found" } };
       }
       question = resources[0];
       questionCache.set(questionId, question);
     } catch (err) {
       context.error("Cosmos DB query failed:", err);
-      return { status: 500, jsonBody: { error: "Internal server error" } };
+      return { status: 500, headers, jsonBody: { error: "Internal server error" } };
     }
   }
 
@@ -118,6 +129,7 @@ async function submitAnswer(
   if (selectedOption < 0 || selectedOption > maxOption) {
     return {
       status: 400,
+      headers,
       jsonBody: { error: `selectedOption must be 0 to ${maxOption} for ${questionType} questions` },
     };
   }
@@ -247,7 +259,10 @@ async function submitAnswer(
     categoryId: question.category,
   };
 
-  return { status: 200, jsonBody: result };
+  logSuccess(context, "submitAnswer", correlationId, Date.now() - serverReceiptTimestamp,
+    `user=${userId} correct=${correct} pts=${pointsAwarded}`);
+
+  return { status: 200, headers, jsonBody: result };
 }
 
 app.http("submitAnswer", {

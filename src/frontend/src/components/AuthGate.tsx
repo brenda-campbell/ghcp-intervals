@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { EmailEntry } from "@/components/EmailEntry";
 import { loginOrCreate, getGameState, ApiError, type User } from "@/services/api";
+import { logEvent } from "@/services/logger";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { GithubLogo, ShieldSlash, SpinnerGap, ArrowClockwise } from "@phosphor-icons/react";
@@ -198,30 +199,9 @@ export function AuthGate({ children, onUserAuthenticated, onLogout }: AuthGatePr
     );
   }
 
-  // --- Error state with retry ---
+  // --- Error state with auto-retry countdown ---
   if (error && !user) {
-    return (
-      <div className="flex min-h-[100dvh] items-center justify-center p-4">
-        <div className="w-full max-w-md animate-fade-slide-in">
-          <Card className="border-destructive/30 bg-card shadow-lg">
-            <CardContent className="flex flex-col items-center gap-4 pt-6 text-center">
-              <p className="caption text-destructive">{error}</p>
-              <Button
-                variant="outline"
-                className="min-h-[44px] transition-transform duration-150 hover:scale-[1.03] active:scale-[0.97]"
-                onClick={() => {
-                  setError(null);
-                  window.location.reload();
-                }}
-              >
-                <ArrowClockwise className="h-5 w-5" />
-                Retry
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    );
+    return <AuthGateError error={error} />;
   }
 
   // --- EmailEntry for new or legacy users ---
@@ -260,4 +240,79 @@ export function AuthGate({ children, onUserAuthenticated, onLogout }: AuthGatePr
 
   // --- Authenticated — render children ---
   return <LogoutProvider value={handleLogout}>{children}</LogoutProvider>;
+}
+
+// --- Auto-retry error screen ---
+const MAX_AUTO_RETRIES = 3;
+const COUNTDOWN_SECONDS = 10;
+
+function AuthGateError({ error }: { error: string }) {
+  const [countdown, setCountdown] = useState(COUNTDOWN_SECONDS);
+  const [autoAttempts, setAutoAttempts] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    if (autoAttempts >= MAX_AUTO_RETRIES) return;
+
+    setCountdown(COUNTDOWN_SECONDS);
+    timerRef.current = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          // Time's up — retry
+          if (timerRef.current) clearInterval(timerRef.current);
+          setAutoAttempts((a) => a + 1);
+          logEvent("auth_auto_retry", { attempt: String(autoAttempts + 1) });
+          window.location.reload();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [autoAttempts]);
+
+  const exhausted = autoAttempts >= MAX_AUTO_RETRIES;
+
+  return (
+    <div className="flex min-h-[100dvh] items-center justify-center p-4">
+      <div className="w-full max-w-md animate-fade-slide-in">
+        <Card className="border-destructive/30 bg-card shadow-lg">
+          <CardContent className="flex flex-col items-center gap-4 pt-6 text-center">
+            <p className="caption text-destructive">{error}</p>
+
+            {!exhausted && (
+              <p className="text-sm text-muted-foreground">
+                Retrying in{" "}
+                <span className="font-mono font-semibold text-foreground">
+                  {countdown}s
+                </span>
+                …
+              </p>
+            )}
+
+            {exhausted && (
+              <p className="text-xs text-muted-foreground">
+                Auto-retry failed after {MAX_AUTO_RETRIES} attempts.
+              </p>
+            )}
+
+            <Button
+              variant="outline"
+              className="min-h-[44px] transition-transform duration-150 hover:scale-[1.03] active:scale-[0.97]"
+              onClick={() => {
+                logEvent("auth_manual_retry");
+                window.location.reload();
+              }}
+            >
+              <ArrowClockwise className="h-5 w-5" />
+              Retry Now
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
 }

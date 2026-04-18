@@ -7,14 +7,37 @@ import {
 import { randomUUID } from "crypto";
 import { gameStateContainer, usersContainer } from "../services/cosmosClient";
 import { GameState, User } from "../models";
+import {
+  getCorrelationId,
+  logRequest,
+  logSuccess,
+  logError,
+  correlationHeaders,
+} from "../services/logger.js";
+import { withRetry, isCircuitOpen, recordSuccess, recordFailure } from "../services/resilience.js";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const CIRCUIT_NAME = "cosmos-loginOrCreate";
 
 async function loginOrCreate(
   request: HttpRequest,
   context: InvocationContext
 ): Promise<HttpResponseInit> {
-  context.log("loginOrCreate called");
+  const start = Date.now();
+  const correlationId = getCorrelationId(request.headers);
+  const headers = correlationHeaders(correlationId);
+
+  logRequest(context, "loginOrCreate", correlationId, { method: request.method });
+
+  // Circuit breaker — fast-fail if Cosmos is known-down
+  if (isCircuitOpen(CIRCUIT_NAME)) {
+    logError(context, "loginOrCreate", correlationId, new Error("Circuit open"), Date.now() - start);
+    return {
+      status: 503,
+      headers,
+      jsonBody: { error: "Service temporarily unavailable. Please try again shortly." },
+    };
+  }
 
   let email: string;
   let displayName: string;
@@ -27,38 +50,51 @@ async function loginOrCreate(
     email = (body?.email ?? "").trim();
     displayName = (body?.displayName ?? "").trim();
   } catch {
-    return { status: 400, jsonBody: { error: "Invalid JSON body" } };
+    return { status: 400, headers, jsonBody: { error: "Invalid JSON body" } };
   }
 
   if (!EMAIL_REGEX.test(email)) {
-    return { status: 400, jsonBody: { error: "Invalid email format" } };
+    return { status: 400, headers, jsonBody: { error: "Invalid email format" } };
   }
 
+  // Mask email for logging (show domain only)
+  const emailDomain = email.split("@")[1] ?? "unknown";
+
   try {
-    // Look up existing user by email
-    const { resources } = await usersContainer.items
-      .query<User>({
-        query: "SELECT * FROM c WHERE c.email = @email",
-        parameters: [{ name: "@email", value: email }],
-      })
-      .fetchAll();
+    // Look up existing user by email (with retry)
+    const { resources } = await withRetry(
+      () =>
+        usersContainer.items
+          .query<User>({
+            query: "SELECT * FROM c WHERE c.email = @email",
+            parameters: [{ name: "@email", value: email }],
+          })
+          .fetchAll(),
+      context,
+      "loginOrCreate-lookup"
+    );
 
     if (resources.length > 0) {
       const existing = resources[0];
 
       if (existing.isActive === false) {
-        return { status: 403, jsonBody: { error: "Account is inactive" } };
+        logSuccess(context, "loginOrCreate", correlationId, Date.now() - start, "inactive account");
+        return { status: 403, headers, jsonBody: { error: "Account is inactive" } };
       }
 
-      return { status: 200, jsonBody: existing };
+      recordSuccess(CIRCUIT_NAME);
+      logSuccess(context, "loginOrCreate", correlationId, Date.now() - start, "existing user login");
+      return { status: 200, headers, jsonBody: existing };
     }
 
     // New user — check if registration is open
     let registrationOpen = true;
     try {
-      const { resource: gameState } = await gameStateContainer
-        .item("current", "current")
-        .read<GameState>();
+      const { resource: gameState } = await withRetry(
+        () => gameStateContainer.item("current", "current").read<GameState>(),
+        context,
+        "loginOrCreate-gameState"
+      );
       if (gameState && gameState.isRegistrationOpen === false) {
         registrationOpen = false;
       }
@@ -67,8 +103,10 @@ async function loginOrCreate(
     }
 
     if (!registrationOpen) {
+      logSuccess(context, "loginOrCreate", correlationId, Date.now() - start, "registration closed");
       return {
         status: 403,
+        headers,
         jsonBody: { error: "Registration is currently closed", code: "REGISTRATION_CLOSED" },
       };
     }
@@ -77,6 +115,7 @@ async function loginOrCreate(
     if (displayName.length < 2 || displayName.length > 30) {
       return {
         status: 400,
+        headers,
         jsonBody: { error: "displayName must be 2-30 characters" },
       };
     }
@@ -86,9 +125,11 @@ async function loginOrCreate(
 
     if (legacyUserId) {
       try {
-        const { resource: legacyUser } = await usersContainer
-          .item(legacyUserId, legacyUserId)
-          .read<User>();
+        const { resource: legacyUser } = await withRetry(
+          () => usersContainer.item(legacyUserId, legacyUserId).read<User>(),
+          context,
+          "loginOrCreate-legacyLookup"
+        );
 
         if (legacyUser) {
           const now = new Date().toISOString();
@@ -99,17 +140,17 @@ async function loginOrCreate(
             updatedAt: now,
           };
 
-          await usersContainer
-            .item(legacyUserId, legacyUserId)
-            .replace(updated);
-
-          context.log(
-            `Linked legacy user ${legacyUserId} to email ${email}`
+          await withRetry(
+            () => usersContainer.item(legacyUserId, legacyUserId).replace(updated),
+            context,
+            "loginOrCreate-legacyLink"
           );
-          return { status: 200, jsonBody: updated };
+
+          recordSuccess(CIRCUIT_NAME);
+          logSuccess(context, "loginOrCreate", correlationId, Date.now() - start, `linked legacy user to @${emailDomain}`);
+          return { status: 200, headers, jsonBody: updated };
         }
       } catch {
-        // Legacy user not found — fall through to create new
         context.log(
           `Legacy user ${legacyUserId} not found, creating new user`
         );
@@ -134,14 +175,19 @@ async function loginOrCreate(
       updatedAt: now,
     };
 
-    await usersContainer.items.create(newUser);
-    context.log(`Created user ${userId} (${displayName})`);
+    await withRetry(
+      () => usersContainer.items.create(newUser),
+      context,
+      "loginOrCreate-create"
+    );
 
-    return { status: 201, jsonBody: newUser };
+    recordSuccess(CIRCUIT_NAME);
+    logSuccess(context, "loginOrCreate", correlationId, Date.now() - start, `new user @${emailDomain}`);
+    return { status: 201, headers, jsonBody: newUser };
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Unknown error";
-    context.error(`loginOrCreate failed: ${message}`);
-    return { status: 500, jsonBody: { error: "Failed to login or create user" } };
+    recordFailure(CIRCUIT_NAME, context);
+    logError(context, "loginOrCreate", correlationId, err, Date.now() - start);
+    return { status: 500, headers, jsonBody: { error: "Failed to login or create user" } };
   }
 }
 

@@ -1,3 +1,5 @@
+import { logApiCall, logError } from "@/services/logger";
+
 // --- Category Types ---
 
 export type QuestionType = "multiple-choice" | "true-false";
@@ -97,7 +99,14 @@ async function handleResponse<T>(response: Response): Promise<T> {
       // Body wasn't JSON — use status code fallback
       if (response.statusText) message = `API error: ${response.statusText}`;
     }
-    throw new ApiError(response.status, message);
+    const correlationId = response.headers.get("x-correlation-id");
+    const err = new ApiError(response.status, message);
+    logError("api.handleResponse", err, {
+      endpoint: response.url,
+      statusCode: String(response.status),
+      ...(correlationId ? { correlationId } : {}),
+    });
+    throw err;
   }
   return response.json() as Promise<T>;
 }
@@ -106,10 +115,19 @@ async function handleResponse<T>(response: Response): Promise<T> {
 async function withRetry<T>(fn: () => Promise<T>, retries = 2, delayMs = 800): Promise<T> {
   let lastErr: unknown;
   for (let attempt = 0; attempt <= retries; attempt++) {
+    const start = performance.now();
     try {
-      return await fn();
+      const result = await fn();
+      logApiCall("withRetry", performance.now() - start, true);
+      return result;
     } catch (err) {
       lastErr = err;
+      logApiCall(
+        "withRetry",
+        performance.now() - start,
+        false,
+        err instanceof ApiError ? err.status : undefined,
+      );
       const isRetryable =
         (err instanceof ApiError && err.status >= 500) ||
         (err instanceof TypeError); // network error
@@ -120,8 +138,22 @@ async function withRetry<T>(fn: () => Promise<T>, retries = 2, delayMs = 800): P
   throw lastErr;
 }
 
+/** Instrumented fetch — logs timing and status for every API call */
+async function instrumentedFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+  const endpoint = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+  const start = performance.now();
+  try {
+    const response = await fetch(input, init);
+    logApiCall(endpoint, performance.now() - start, response.ok, response.status);
+    return response;
+  } catch (err) {
+    logApiCall(endpoint, performance.now() - start, false);
+    throw err;
+  }
+}
+
 export async function fetchQuestions(count: number): Promise<Question[]> {
-  const response = await fetch(`/api/questions?count=${count}`);
+  const response = await instrumentedFetch(`/api/questions?count=${count}`);
   const data = await handleResponse<QuestionsResponse>(response);
   return data.questions;
 }
@@ -129,7 +161,7 @@ export async function fetchQuestions(count: number): Promise<Question[]> {
 export async function submitAnswer(
   submission: AnswerSubmission,
 ): Promise<AnswerResult> {
-  const response = await fetch("/api/answer", {
+  const response = await instrumentedFetch("/api/answer", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(submission),
@@ -145,7 +177,7 @@ export async function loginOrCreate(
   return withRetry(async () => {
     const headers: Record<string, string> = { "Content-Type": "application/json" };
     if (legacyUserId) headers["x-legacy-user-id"] = legacyUserId;
-    const response = await fetch("/api/users/login-or-create", {
+    const response = await instrumentedFetch("/api/users/login-or-create", {
       method: "POST",
       headers,
       body: JSON.stringify({ email, displayName }),
@@ -155,14 +187,14 @@ export async function loginOrCreate(
 }
 
 export async function getUser(userId: string): Promise<User> {
-  const response = await fetch(`/api/users/${encodeURIComponent(userId)}`);
+  const response = await instrumentedFetch(`/api/users/${encodeURIComponent(userId)}`);
   return handleResponse<User>(response);
 }
 
 export async function listUsers(
   adminUserId: string,
 ): Promise<{ users: User[] }> {
-  const response = await fetch("/api/users", {
+  const response = await instrumentedFetch("/api/users", {
     headers: { "x-user-id": adminUserId },
   });
   return handleResponse<{ users: User[] }>(response);
@@ -173,7 +205,7 @@ export async function toggleUserStatus(
   isActive: boolean,
   adminUserId: string,
 ): Promise<User> {
-  const response = await fetch(
+  const response = await instrumentedFetch(
     `/api/users/${encodeURIComponent(targetUserId)}/status`,
     {
       method: "PATCH",
@@ -188,7 +220,7 @@ export async function deleteUser(
   targetUserId: string,
   adminUserId: string,
 ): Promise<{ deleted: boolean; userId: string }> {
-  const response = await fetch(
+  const response = await instrumentedFetch(
     `/api/users/${encodeURIComponent(targetUserId)}`,
     {
       method: "DELETE",
@@ -222,7 +254,7 @@ export async function getLeaderboard(userId?: string, categoryId?: string): Prom
   if (userId) params.set("userId", userId);
   if (categoryId) params.set("categoryId", categoryId);
   const qs = params.toString();
-  const response = await fetch(`/api/leaderboard${qs ? `?${qs}` : ""}`);
+  const response = await instrumentedFetch(`/api/leaderboard${qs ? `?${qs}` : ""}`);
   return handleResponse<LeaderboardResponse>(response);
 }
 
@@ -231,7 +263,7 @@ export async function getLeaderboard(userId?: string, categoryId?: string): Prom
 export async function listCategories(adminUserId?: string): Promise<Category[]> {
   const headers: Record<string, string> = {};
   if (adminUserId) headers["x-user-id"] = adminUserId;
-  const response = await fetch("/api/categories", { headers });
+  const response = await instrumentedFetch("/api/categories", { headers });
   const data = await handleResponse<{ categories: Category[] }>(response);
   return data.categories;
 }
@@ -242,7 +274,7 @@ export async function createCategory(
   questionFormat: QuestionType,
   adminUserId: string,
 ): Promise<Category> {
-  const response = await fetch("/api/categories", {
+  const response = await instrumentedFetch("/api/categories", {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-user-id": adminUserId },
     body: JSON.stringify({ name, description, questionFormat }),
@@ -255,7 +287,7 @@ export async function updateCategory(
   updates: Partial<Pick<Category, "name" | "description" | "questionFormat" | "isActive">>,
   adminUserId: string,
 ): Promise<Category> {
-  const response = await fetch(`/api/categories/${encodeURIComponent(categoryId)}`, {
+  const response = await instrumentedFetch(`/api/categories/${encodeURIComponent(categoryId)}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json", "x-user-id": adminUserId },
     body: JSON.stringify(updates),
@@ -267,7 +299,7 @@ export async function deleteCategory(
   categoryId: string,
   adminUserId: string,
 ): Promise<void> {
-  const response = await fetch(`/api/categories/${encodeURIComponent(categoryId)}`, {
+  const response = await instrumentedFetch(`/api/categories/${encodeURIComponent(categoryId)}`, {
     method: "DELETE",
     headers: { "x-user-id": adminUserId },
   });
@@ -278,13 +310,13 @@ export async function deleteCategory(
 
 export async function getGameState(): Promise<GameState> {
   return withRetry(async () => {
-    const response = await fetch("/api/game/state");
+    const response = await instrumentedFetch("/api/game/state");
     return handleResponse<GameState>(response);
   });
 }
 
 export async function startQuiz(adminUserId: string, questionCount?: number): Promise<GameState> {
-  const response = await fetch("/api/game/start-quiz", {
+  const response = await instrumentedFetch("/api/game/start-quiz", {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-user-id": adminUserId },
     body: JSON.stringify(questionCount ? { questionCount } : {}),
@@ -293,7 +325,7 @@ export async function startQuiz(adminUserId: string, questionCount?: number): Pr
 }
 
 export async function stopQuiz(adminUserId: string): Promise<GameState> {
-  const response = await fetch("/api/game/stop-quiz", {
+  const response = await instrumentedFetch("/api/game/stop-quiz", {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-user-id": adminUserId },
   });
@@ -301,7 +333,7 @@ export async function stopQuiz(adminUserId: string): Promise<GameState> {
 }
 
 export async function setQuestionCount(count: number, adminUserId: string): Promise<GameState> {
-  const response = await fetch("/api/game/question-count", {
+  const response = await instrumentedFetch("/api/game/question-count", {
     method: "PATCH",
     headers: { "Content-Type": "application/json", "x-user-id": adminUserId },
     body: JSON.stringify({ questionCount: count }),
@@ -310,7 +342,7 @@ export async function setQuestionCount(count: number, adminUserId: string): Prom
 }
 
 export async function setTimer(seconds: number, adminUserId: string): Promise<GameState> {
-  const response = await fetch("/api/game/timer", {
+  const response = await instrumentedFetch("/api/game/timer", {
     method: "PATCH",
     headers: { "Content-Type": "application/json", "x-user-id": adminUserId },
     body: JSON.stringify({ timerSeconds: seconds }),
@@ -319,7 +351,7 @@ export async function setTimer(seconds: number, adminUserId: string): Promise<Ga
 }
 
 export async function setRegistration(isOpen: boolean, adminUserId: string): Promise<GameState> {
-  const response = await fetch("/api/game/registration", {
+  const response = await instrumentedFetch("/api/game/registration", {
     method: "PATCH",
     headers: { "Content-Type": "application/json", "x-user-id": adminUserId },
     body: JSON.stringify({ isOpen }),
@@ -331,7 +363,7 @@ export async function setActiveCategory(
   categoryId: string,
   adminUserId: string,
 ): Promise<GameState> {
-  const response = await fetch("/api/game/set-category", {
+  const response = await instrumentedFetch("/api/game/set-category", {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-user-id": adminUserId },
     body: JSON.stringify({ categoryId }),
@@ -344,7 +376,7 @@ export async function setActiveCategory(
 export async function getOnlinePlayers(adminUserId?: string): Promise<OnlinePlayersResponse> {
   const headers: Record<string, string> = {};
   if (adminUserId) headers["x-user-id"] = adminUserId;
-  const response = await fetch("/api/game/online-players", { headers });
+  const response = await instrumentedFetch("/api/game/online-players", { headers });
   return handleResponse<OnlinePlayersResponse>(response);
 }
 
@@ -356,7 +388,7 @@ export async function resetScores(
   userIds?: string[],
   categoryId?: string,
 ): Promise<{ reset: boolean; usersAffected: number }> {
-  const response = await fetch("/api/scores/reset", {
+  const response = await instrumentedFetch("/api/scores/reset", {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-user-id": adminUserId },
     body: JSON.stringify({ scope, userIds, categoryId }),
@@ -365,7 +397,7 @@ export async function resetScores(
 }
 
 export async function markRoundComplete(userId: string): Promise<{ success: boolean }> {
-  const response = await fetch("/api/game/round-complete", {
+  const response = await instrumentedFetch("/api/game/round-complete", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ userId }),
@@ -374,7 +406,7 @@ export async function markRoundComplete(userId: string): Promise<{ success: bool
 }
 
 export async function sendHeartbeat(userId: string, displayName: string): Promise<{ count: number }> {
-  const response = await fetch("/api/game/heartbeat", {
+  const response = await instrumentedFetch("/api/game/heartbeat", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ userId, displayName }),

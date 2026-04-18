@@ -235,3 +235,11 @@
 - **Light theme:** Updated to GitHub's light palette (#F6F8FA cards, #D0D7DE borders, #656D76 muted text).
 - **Files changed:** `index.html`, `src/index.css`, `src/App.tsx`, `src/components/EmailEntry.tsx`, `src/components/WaitingScreen.tsx`.
 - **Verification:** TypeScript compiles clean (`npx tsc --noEmit` — 0 errors).
+
+### fe-logging-selfheal (2026-04-17)
+- **Logger service** (`src/services/logger.ts`): Structured JSON logging to console - `logError`, `logEvent`, `logApiCall`. Includes timestamp, session ID (from `ff_userId`), user agent, page URL. Rate-limits repeated errors (2s dedup window). Console-only for now; designed for easy App Insights upgrade later.
+- **ErrorBoundary** (`src/components/ErrorBoundary.tsx`): React class-based error boundary wrapping entire app in `main.tsx`. Shows dark card with Warning icon, error message, correlation ID, and Reload button. Logs crash via `logError` with component stack.
+- **API instrumentation** (`src/services/api.ts`): Added `instrumentedFetch` wrapper that times every API call and logs via `logApiCall`. All fetch calls routed through it. `handleResponse` now captures `x-correlation-id` header on errors. `withRetry` logs per-attempt timing.
+- **ConnectionStatus enhanced** (`src/components/ConnectionStatus.tsx`): Added HTTP health-check polling (`/api/health`). States: connected (hidden banner), checking (yellow pulse), disconnected (red fixed bar "API unreachable"). Polls every 30s normally, every 5s when disconnected. Preserves existing SignalR status dot.
+- **AuthGate auto-retry** (`src/components/AuthGate.tsx`): New `AuthGateError` sub-component with 10s countdown auto-retry on API errors. After 3 failed auto-retries, stops and shows manual "Retry Now" button. Logs retry events.
+- **Build:** Clean (`tsc -b && vite build` - 0 errors, 0 warnings).

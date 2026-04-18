@@ -214,3 +214,11 @@
 - **`_resetSubmitAnswerCaches()`** now calls `_resetFastestTracker()` to clear fastest-time state in tests.
 - **Tests:** Rewrote 3 submitAnswer scoring tests for relative formula (first-correct-gets-200, proportional-slower, min-cap-1). Added 7 new tests for `fastestAnswerTracker.test.ts`. Removed `gameStateContainer` mock from submitAnswer tests. All 152 tests pass (was 145).
 - **Trade-off accepted:** First correct answer gets 200 even if a later answer is faster. Since questions are synchronized (ADR-027) and all players start at the same time, the first server-received answer is likely the fastest. Minor unfairness is acceptable for simplicity.
+
+### be-logging-resilience — Structured Logging, Health Check & Self-Healing (2026-04-17)
+- **Structured logging utility:** Created `src/api/src/services/logger.ts` with `logRequest()`, `logSuccess()`, `logError()`, `correlationHeaders()`, and `getCorrelationId()`. All log entries are JSON-structured with correlation ID, function name, timing, and error details. Uses `context.log`/`context.error` — no external deps.
+- **Resilience utility:** Created `src/api/src/services/resilience.ts` with `withRetry()` (exponential backoff, 3 attempts, retries 429/503/transient network errors, skips 400/401/403/404) and circuit breaker (`withResilience()` — trips after 5 consecutive failures, 30s cooldown, returns fallback).
+- **Health check endpoint:** Created `src/api/src/functions/healthCheck.ts` — `GET /api/health`. Checks Cosmos DB connectivity (reads gameState doc), returns 200 with `{ status: "healthy", cosmosDb: "connected", cosmosResponseMs, timestamp }` or 503 with unhealthy status. Treats 404 as "connected" (doc may not exist).
+- **Instrumented 5 critical endpoints:** `loginOrCreate.ts` (retry on all Cosmos calls + circuit breaker), `getGameState.ts` (full `withResilience` + fallback defaults), `submitAnswer.ts`, `getLeaderboard.ts`, `heartbeat.ts` — all with structured request/success/error logging and correlation ID propagation via `x-correlation-id` header (read from request or auto-generated UUID, returned in response).
+- **Request correlation:** Every response from instrumented endpoints returns `x-correlation-id` header. Frontend can include this in error reports for end-to-end tracing.
+- **All 155 existing tests pass** — no regressions.
