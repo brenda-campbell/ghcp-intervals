@@ -440,3 +440,148 @@ Frontend calls `POST /api/game/round-complete` endpoint without blocking UI or e
 **Rationale:** Round completion metrics are secondary to user experience. Non-blocking pattern ensures UI never stalls on network latency or backend outages. Graceful degradation allows frontend and backend to deploy independently.
 
 ---
+
+### ADR-041: Relative Speed-Based Scoring
+
+**Author:** Bender (Backend Dev)  
+**Date:** 2026-04-17  
+**Status:** Implemented
+
+The old scoring formula `200 × (1 - elapsed/timer)` gave nearly identical scores regardless of speed. Replaced with **relative speed-based scoring**:
+
+```
+If correct: score = round(200 × (fastestCorrectMs ÷ playerResponseMs))
+Score capped between 1 and 200
+If incorrect: 0
+```
+
+The fastest correct answer per question gets exactly 200 points. Everyone else gets proportionally less based on how much slower they were.
+
+**Implementation:**
+- New `fastestAnswerTracker.ts` service tracks per-question fastest correct time in-memory
+- `submitAnswer.ts` uses relative formula instead of timer-based
+- `stopQuiz.ts` resets the tracker when a round ends
+- Timer cache removed from `submitAnswer.ts` — no longer needed for scoring
+
+**Trade-off:** The first correct answer always gets 200, even if a later answer is technically faster. Since questions are synchronized (ADR-027), this is unlikely and the minor unfairness is accepted for simplicity.
+
+**Test Results:** 152 tests pass (was 145). 3 old scoring tests rewritten + 7 new tracker tests added.
+
+**Rationale:** Provides fair differentiation based on actual response speed. Simplifies scoring logic and works well with synchronized question delivery (ADR-027).
+
+---
+
+### ADR-042: Backend Observability & Resilience Patterns
+
+**Author:** Bender (Backend Dev)  
+**Date:** 2026-04-17  
+**Status:** Implemented
+
+Backend API endpoints hardened with structured logging, request correlation IDs, retry logic, and circuit breaker patterns for improved diagnostics and fault tolerance.
+
+**Structured Logging (`src/api/src/services/logger.ts`):**
+- JSON-structured log entries with `event`, `functionName`, `correlationId`, `durationMs`, error details
+- Uses Azure Functions managed backend `context.log`/`context.error` (no external library)
+- Sensitive data (email addresses) masked in logs (domain only)
+
+**Request Correlation via `x-correlation-id` Header:**
+- Every request gets a correlation ID (from request header or auto-generated UUID)
+- Returned in response headers so frontend can include it in error reports
+- All log entries for that request share the same correlation ID
+
+**Cosmos Retry (`src/api/src/services/resilience.ts`):**
+- `withRetry()`: 3 attempts, exponential backoff (200ms base)
+- Retries 429, 503, transient network errors
+- Does NOT retry client errors (400/401/403/404)
+- Applied to all Cosmos calls in `loginOrCreate.ts` and `getGameState.ts`
+
+**Circuit Breaker Pattern:**
+- `withResilience()`: Trips after 5 consecutive failures, 30-second cooldown
+- `loginOrCreate`: Returns 503 "temporarily unavailable" when circuit is open
+- `getGameState`: Returns sensible defaults when circuit is open
+- In-memory state — resets on cold start (acceptable for SWA managed functions)
+
+**Health Check Endpoint (`GET /api/health`):**
+- Probes Cosmos DB connectivity
+- Returns 200/healthy or 503/unhealthy
+- Used by monitoring or frontend for proactive health detection
+
+**Trade-offs:**
+- Resilience state (circuit breaker, retry) is in-memory per instance. Acceptable for SWA managed functions scale.
+- No external APM (App Insights SDK) added — can be layered on later if needed.
+
+**Test Results:** 155 tests passing (all green).
+
+**Rationale:** Recurring API errors with opaque diagnostics required systematic approach. Correlation IDs enable end-to-end tracing. Retry logic handles transient Cosmos failures. Circuit breaker prevents cascading failures. In-memory state acceptable at MVP scale.
+
+---
+
+### ADR-043: Client-Side Logging & Self-Healing UI Pattern
+
+**Author:** Fry (Frontend Dev)  
+**Date:** 2026-04-17  
+**Status:** Implemented
+
+Frontend hardened with client-side logging, error recovery, and health monitoring to prevent invisible failures and improve user experience during network issues.
+
+**Console-Based Structured Logging (`src/frontend/src/services/logger.ts`):**
+- All client errors, events, and API calls logged as JSON to console
+- Not an external service — keeps bundle lightweight
+- Transport-agnostic design enables future App Insights upgrade by only changing `logger.ts`
+
+**Rate-Limited Error Dedup:**
+- Repeated errors within 2s are suppressed to avoid console flooding during reconnection storms
+
+**Instrumented Fetch Wrapper (`src/frontend/src/services/api.ts`):**
+- All API calls go through a single timing+logging wrapper
+- Less invasive than instrumenting each function individually
+- Logs request/response with correlation ID and duration
+- Reads `x-correlation-id` from response headers for log correlation with backend
+
+**Health-Check Polling in ConnectionStatus:**
+- Uses `/api/health` endpoint (from ADR-042) with adaptive polling
+- 30s when healthy, 5s when disconnected
+- Coexists with existing SignalR dot indicator
+
+**Auto-Retry in AuthGate:**
+- 3 automatic retries with 10s countdown before falling back to manual retry
+- Prevents transient errors from permanently blocking users
+
+**Team Impact:**
+- **Bender:** Frontend depends on `GET /api/health` returning 200 when API is up. Reads `x-correlation-id` response header on error responses.
+- **Everyone:** Console logs are structured JSON — upgrading to App Insights later only requires changing `logger.ts` transport.
+
+**Build Status:** Build clean. 0 errors, 0 warnings.
+
+**Rationale:** Users were hitting API errors and seeing blank/stuck screens. After ADR-042 fixed backend diagnostics, needed client-side resilience to prevent invisible failures. Auto-retry + health polling provide defense-in-depth recovery.
+
+---
+
+### ADR-044: GitHub Copilot Dev Days Visual Rebrand
+
+**Author:** Fry (Frontend Dev)  
+**Date:** 2026-04-17  
+**Status:** Implemented
+
+Quiz app rebranded from generic "Fastest Finger Quiz" identity to GitHub Copilot Dev Days event-specific look, matching Manchester event on April 24, 2026.
+
+**Color Palette (GitHub Dark Theme):**
+- **Primary:** `#3FB950` (GitHub green) — replaces `#4A90E2` (blue)
+- **Accent:** `#7EE787` (soft mint green) — replaces `#C5F542` (Electric Lime)
+- **Background:** `#0D1117` (GitHub dark) — replaces `#2A2D3A`
+- **Destructive:** `#F85149` (GitHub red) — replaces `#EF4444`
+
+**Visual Changes:**
+- Brand icon changed from Phosphor `Lightning` to `GithubLogo` on login screen
+- Header retains `Lightning` icon as quiz-specific symbol
+- Event-specific elements added to login: date/location badge ("April 24, 2026 • Manchester"), gradient background, glowing icon effect
+- All gameplay UI (timers, badges, leaderboard accents) automatically inherits new mint green accent — no per-component changes needed
+- Light theme also updated to GitHub's light palette for consistency
+
+**Consequences:**
+- The event badge date is hardcoded — future events need text update
+- `GithubLogo` requires ESM import from `@phosphor-icons/react` v2.1.10 (not CJS compatible)
+
+**Rationale:** Event-specific branding increases engagement for Manchester Dev Days. Reusing GitHub's palette creates visual coherence with Copilot platform. Semantic Tailwind classes mean new colors propagate automatically without per-component changes.
+
+---

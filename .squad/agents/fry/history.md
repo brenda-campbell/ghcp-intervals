@@ -243,3 +243,10 @@
 - **ConnectionStatus enhanced** (`src/components/ConnectionStatus.tsx`): Added HTTP health-check polling (`/api/health`). States: connected (hidden banner), checking (yellow pulse), disconnected (red fixed bar "API unreachable"). Polls every 30s normally, every 5s when disconnected. Preserves existing SignalR status dot.
 - **AuthGate auto-retry** (`src/components/AuthGate.tsx`): New `AuthGateError` sub-component with 10s countdown auto-retry on API errors. After 3 failed auto-retries, stops and shows manual "Retry Now" button. Logs retry events.
 - **Build:** Clean (`tsc -b && vite build` - 0 errors, 0 warnings).
+
+### fe-logging-selfheal-summary — Team Cross-Pollination (2026-04-18)
+- **Phase 3 completion:** Client-side logging, error recovery, and health monitoring hardened to prevent invisible failures.
+- **Decisions merged:** ADR-041 (Relative Speed-Based Scoring), ADR-042 (Backend Observability & Resilience), ADR-043 (Client-Side Logging & Self-Healing UI), ADR-044 (GitHub Copilot Dev Days Visual Rebrand).
+- **Backend dependency:** Frontend depends on `GET /api/health` endpoint returning 200 when API is up. All API calls now read and log `x-correlation-id` response header for end-to-end tracing with backend logs.
+- **Outcome:** Build clean. Health polling + auto-retry + structured logging provide defense-in-depth fault recovery. Console logs structured JSON ready for App Insights transport swap. Users can report errors with correlation IDs for backend diagnostic linking.
+

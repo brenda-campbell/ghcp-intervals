@@ -222,3 +222,9 @@
 - **Instrumented 5 critical endpoints:** `loginOrCreate.ts` (retry on all Cosmos calls + circuit breaker), `getGameState.ts` (full `withResilience` + fallback defaults), `submitAnswer.ts`, `getLeaderboard.ts`, `heartbeat.ts` — all with structured request/success/error logging and correlation ID propagation via `x-correlation-id` header (read from request or auto-generated UUID, returned in response).
 - **Request correlation:** Every response from instrumented endpoints returns `x-correlation-id` header. Frontend can include this in error reports for end-to-end tracing.
 - **All 155 existing tests pass** — no regressions.
+
+### be-logging-resilience-summary — Team Cross-Pollination (2026-04-18)
+- **Phase 3 completion:** Backend observability & resilience patterns implemented across 5 critical endpoints.
+- **Decisions merged:** ADR-041 (Relative Speed-Based Scoring), ADR-042 (Backend Observability & Resilience), ADR-043 (Client-Side Logging & Self-Healing UI), ADR-044 (GitHub Copilot Dev Days Visual Rebrand).
+- **Frontend dependency:** Fry's frontend now depends on `GET /api/health` endpoint returning 200 when API is up. Correlation IDs flow through request/response boundary via `x-correlation-id` header for end-to-end tracing.
+- **Outcome:** 155 backend tests passing. Users can now diagnose API failures via correlation IDs. Retry logic + circuit breaker prevent cascading failures. Health polling enables proactive connection detection on frontend.
