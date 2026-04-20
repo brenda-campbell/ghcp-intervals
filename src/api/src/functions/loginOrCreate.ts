@@ -4,7 +4,7 @@ import {
   HttpResponseInit,
   InvocationContext,
 } from "@azure/functions";
-import { randomUUID } from "crypto";
+import { randomUUID, timingSafeEqual } from "crypto";
 import { gameStateContainer, usersContainer } from "../services/cosmosClient";
 import { GameState, User } from "../models";
 import {
@@ -18,6 +18,18 @@ import { withRetry, isCircuitOpen, recordSuccess, recordFailure } from "../servi
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const CIRCUIT_NAME = "cosmos-loginOrCreate";
+const ADMIN_PASSCODE = process.env.ADMIN_PASSCODE ?? "CopilotDevDays2026";
+
+function constantTimeCompare(a: string, b: string): boolean {
+  const bufA = Buffer.from(a);
+  const bufB = Buffer.from(b);
+  if (bufA.length !== bufB.length) {
+    // Compare against self to keep constant time, then return false
+    timingSafeEqual(bufA, bufA);
+    return false;
+  }
+  return timingSafeEqual(bufA, bufB);
+}
 
 async function loginOrCreate(
   request: HttpRequest,
@@ -80,6 +92,25 @@ async function loginOrCreate(
       if (existing.isActive === false) {
         logSuccess(context, "loginOrCreate", correlationId, Date.now() - start, "inactive account");
         return { status: 403, headers, jsonBody: { error: "Account is inactive" } };
+      }
+
+      // Admin passcode gate
+      if (existing.isAdmin) {
+        const passcode = request.headers.get("x-admin-passcode");
+        if (!passcode) {
+          return {
+            status: 401,
+            headers,
+            jsonBody: { error: "Admin passcode required", code: "ADMIN_PASSCODE_REQUIRED" },
+          };
+        }
+        if (!constantTimeCompare(passcode, ADMIN_PASSCODE)) {
+          return {
+            status: 401,
+            headers,
+            jsonBody: { error: "Invalid admin passcode", code: "ADMIN_PASSCODE_INVALID" },
+          };
+        }
       }
 
       recordSuccess(CIRCUIT_NAME);

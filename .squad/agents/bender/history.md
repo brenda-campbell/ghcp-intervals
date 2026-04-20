@@ -228,3 +228,9 @@
 - **Decisions merged:** ADR-041 (Relative Speed-Based Scoring), ADR-042 (Backend Observability & Resilience), ADR-043 (Client-Side Logging & Self-Healing UI), ADR-044 (GitHub Copilot Dev Days Visual Rebrand).
 - **Frontend dependency:** Fry's frontend now depends on `GET /api/health` endpoint returning 200 when API is up. Correlation IDs flow through request/response boundary via `x-correlation-id` header for end-to-end tracing.
 - **Outcome:** 155 backend tests passing. Users can now diagnose API failures via correlation IDs. Retry logic + circuit breaker prevent cascading failures. Health polling enables proactive connection detection on frontend.
+
+### be-admin-passcode — Admin Passcode Validation on Login (2026-04-18)
+- **loginOrCreate.ts** — Added secondary passcode gate for admin users. After finding an existing user with `isAdmin: true`, checks `x-admin-passcode` header. Missing header → 401 `ADMIN_PASSCODE_REQUIRED`. Wrong passcode → 401 `ADMIN_PASSCODE_INVALID`. Correct → proceeds normally. Non-admin users are completely unaffected.
+- **Passcode source:** `ADMIN_PASSCODE` env var with hardcoded fallback `"CopilotDevDays2026"` for local dev / SWA simplicity.
+- **Security:** Uses `crypto.timingSafeEqual` via a `constantTimeCompare()` helper to prevent timing attacks. Handles unequal-length strings by comparing bufA against itself (constant time) then returning false.
+- **Tests:** 4 new tests added to `loginOrCreate.test.ts` — missing passcode, wrong passcode, correct passcode, non-admin unaffected. All 159 tests pass.

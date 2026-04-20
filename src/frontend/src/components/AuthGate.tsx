@@ -4,7 +4,7 @@ import { loginOrCreate, getGameState, ApiError, type User } from "@/services/api
 import { logEvent } from "@/services/logger";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { GithubLogo, ShieldSlash, SpinnerGap, ArrowClockwise } from "@phosphor-icons/react";
+import { GithubLogo, ShieldSlash, SpinnerGap, ArrowClockwise, Lock } from "@phosphor-icons/react";
 import { LogoutProvider } from "@/contexts/LogoutContext";
 
 const KEY_USER_ID = "ff_userId";
@@ -24,6 +24,10 @@ export function AuthGate({ children, onUserAuthenticated, onLogout }: AuthGatePr
   const [isLegacy, setIsLegacy] = useState(false);
   const [isDeactivated, setIsDeactivated] = useState(false);
   const [isRegistrationOpen, setIsRegistrationOpen] = useState<boolean | null>(null);
+  const [needsPasscode, setNeedsPasscode] = useState(false);
+  const [passcodeEmail, setPasscodeEmail] = useState("");
+  const [passcodeDisplayName, setPasscodeDisplayName] = useState("");
+  const [passcodeLegacyUserId, setPasscodeLegacyUserId] = useState<string | undefined>();
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const handleLogout = useCallback(() => {
@@ -34,6 +38,10 @@ export function AuthGate({ children, onUserAuthenticated, onLogout }: AuthGatePr
     setError(null);
     setIsLegacy(false);
     setIsDeactivated(false);
+    setNeedsPasscode(false);
+    setPasscodeEmail("");
+    setPasscodeDisplayName("");
+    setPasscodeLegacyUserId(undefined);
     onLogout?.();
   }, [onLogout]);
 
@@ -68,7 +76,11 @@ export function AuthGate({ children, onUserAuthenticated, onLogout }: AuthGatePr
           completeLogin(u);
         })
         .catch((err) => {
-          if (err instanceof ApiError && err.status === 403) {
+          if (err instanceof ApiError && err.status === 401 && err.code === "ADMIN_PASSCODE_REQUIRED") {
+            setNeedsPasscode(true);
+            setPasscodeEmail(storedEmail);
+            setPasscodeDisplayName(storedDisplayName || "");
+          } else if (err instanceof ApiError && err.status === 403) {
             // Check if it's a registration-closed error vs deactivated
             const msg = err.message?.toLowerCase() ?? "";
             if (msg.includes("registration")) {
@@ -139,6 +151,13 @@ export function AuthGate({ children, onUserAuthenticated, onLogout }: AuthGatePr
         completeLogin(u);
         setIsLegacy(false);
       } catch (err) {
+        if (err instanceof ApiError && err.status === 401 && err.code === "ADMIN_PASSCODE_REQUIRED") {
+          setNeedsPasscode(true);
+          setPasscodeEmail(email);
+          setPasscodeDisplayName(displayName);
+          setPasscodeLegacyUserId(legacyUserId);
+          return;
+        }
         if (err instanceof ApiError && err.status === 403) {
           const msg = err.message?.toLowerCase() ?? "";
           if (msg.includes("registration")) {
@@ -163,6 +182,30 @@ export function AuthGate({ children, onUserAuthenticated, onLogout }: AuthGatePr
           <p className="caption text-muted-foreground">Verifying account…</p>
         </div>
       </div>
+    );
+  }
+
+  // --- Passcode prompt for admin users ---
+  if (needsPasscode) {
+    return (
+      <AdminPasscodeDialog
+        onSubmit={async (passcode) => {
+          const u = await loginOrCreate(
+            passcodeEmail,
+            passcodeDisplayName,
+            passcodeLegacyUserId,
+            passcode,
+          );
+          completeLogin(u);
+          setNeedsPasscode(false);
+        }}
+        onCancel={() => {
+          setNeedsPasscode(false);
+          setPasscodeEmail("");
+          setPasscodeDisplayName("");
+          setPasscodeLegacyUserId(undefined);
+        }}
+      />
     );
   }
 
@@ -310,6 +353,95 @@ function AuthGateError({ error }: { error: string }) {
               <ArrowClockwise className="h-5 w-5" />
               Retry Now
             </Button>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+// --- Admin Passcode Dialog ---
+
+function AdminPasscodeDialog({
+  onSubmit,
+  onCancel,
+}: {
+  onSubmit: (passcode: string) => Promise<void>;
+  onCancel: () => void;
+}) {
+  const [passcode, setPasscode] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!passcode.trim() || isSubmitting) return;
+    setError(null);
+    setIsSubmitting(true);
+    try {
+      await onSubmit(passcode.trim());
+    } catch (err) {
+      if (err instanceof ApiError && err.code === "ADMIN_PASSCODE_INVALID") {
+        setError("Invalid passcode, try again");
+      } else if (err instanceof ApiError) {
+        setError(err.message);
+      } else {
+        setError("Verification failed. Please try again.");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="flex min-h-[100dvh] items-center justify-center p-4">
+      <div className="w-full max-w-md animate-fade-slide-in">
+        <Card className="border-border/50 bg-card shadow-lg">
+          <CardContent className="flex flex-col items-center gap-4 pt-6">
+            <Lock weight="fill" className="h-12 w-12 text-primary" />
+            <h2 className="h2 text-center">Admin Verification</h2>
+            <p className="caption text-muted-foreground text-center">
+              Enter your admin passcode to continue
+            </p>
+
+            <form onSubmit={handleSubmit} className="w-full flex flex-col gap-3">
+              <input
+                ref={inputRef}
+                type="password"
+                value={passcode}
+                onChange={(e) => setPasscode(e.target.value)}
+                placeholder="Passcode"
+                autoComplete="off"
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+              {error && (
+                <p className="text-sm text-destructive text-center">{error}</p>
+              )}
+              <Button
+                type="submit"
+                disabled={!passcode.trim() || isSubmitting}
+                className="min-h-[44px] bg-primary text-primary-foreground hover:bg-primary/90 transition-transform duration-150 hover:scale-[1.03] active:scale-[0.97]"
+              >
+                {isSubmitting ? (
+                  <SpinnerGap className="h-5 w-5 animate-spin" />
+                ) : (
+                  "Verify"
+                )}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="min-h-[44px] transition-transform duration-150 hover:scale-[1.03] active:scale-[0.97]"
+                onClick={onCancel}
+              >
+                Cancel
+              </Button>
+            </form>
           </CardContent>
         </Card>
       </div>

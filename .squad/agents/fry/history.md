@@ -250,3 +250,9 @@
 - **Backend dependency:** Frontend depends on `GET /api/health` endpoint returning 200 when API is up. All API calls now read and log `x-correlation-id` response header for end-to-end tracing with backend logs.
 - **Outcome:** Build clean. Health polling + auto-retry + structured logging provide defense-in-depth fault recovery. Console logs structured JSON ready for App Insights transport swap. Users can report errors with correlation IDs for backend diagnostic linking.
 
+### admin-passcode-prompt (2026-07-24)
+- **ApiError.code field:** `ApiError` class in `api.ts` now carries an optional `code` string parsed from the JSON error body `{ error, code }`. Enables frontend to branch on semantic error codes (e.g., `ADMIN_PASSCODE_REQUIRED`, `ADMIN_PASSCODE_INVALID`) rather than fragile message string matching.
+- **loginOrCreate passcode param:** `loginOrCreate()` accepts an optional 4th `adminPasscode` parameter, sent as `x-admin-passcode` header.
+- **AuthGate passcode flow:** When backend returns 401 + `ADMIN_PASSCODE_REQUIRED`, AuthGate enters a `needsPasscode` state and shows `AdminPasscodeDialog`. Works for both auto-login (returning admins with stored credentials) and manual login. Invalid passcode shows inline error; cancel returns to login screen.
+- **AdminPasscodeDialog component:** Local to `AuthGate.tsx`. Uses Lock icon, password input, Verify/Cancel buttons. Matches existing card styling (border-border/50, bg-card, shadow-lg). Dark/light mode compatible via Tailwind theme tokens.
+

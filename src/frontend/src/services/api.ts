@@ -76,13 +76,16 @@ export interface User {
 
 export class ApiError extends Error {
   status: number;
+  code?: string;
   constructor(
     status: number,
     message: string,
+    code?: string,
   ) {
     super(message);
     this.name = "ApiError";
     this.status = status;
+    this.code = code;
   }
 }
 
@@ -92,15 +95,17 @@ async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
     // Parse JSON body to get the actual error message from the API
     let message = `Server error (${response.status})`;
+    let code: string | undefined;
     try {
       const body = await response.json();
       if (body?.error) message = body.error;
+      if (body?.code) code = body.code;
     } catch {
       // Body wasn't JSON — use status code fallback
       if (response.statusText) message = `API error: ${response.statusText}`;
     }
     const correlationId = response.headers.get("x-correlation-id");
-    const err = new ApiError(response.status, message);
+    const err = new ApiError(response.status, message, code);
     logError("api.handleResponse", err, {
       endpoint: response.url,
       statusCode: String(response.status),
@@ -173,10 +178,12 @@ export async function loginOrCreate(
   email: string,
   displayName: string,
   legacyUserId?: string,
+  adminPasscode?: string,
 ): Promise<User> {
   return withRetry(async () => {
     const headers: Record<string, string> = { "Content-Type": "application/json" };
     if (legacyUserId) headers["x-legacy-user-id"] = legacyUserId;
+    if (adminPasscode) headers["x-admin-passcode"] = adminPasscode;
     const response = await instrumentedFetch("/api/users/login-or-create", {
       method: "POST",
       headers,

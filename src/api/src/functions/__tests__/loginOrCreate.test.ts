@@ -42,6 +42,15 @@ const EXISTING_USER = {
   updatedAt: "2024-01-02T00:00:00Z",
 };
 
+const ADMIN_USER = {
+  ...EXISTING_USER,
+  id: "user-admin",
+  userId: "user-admin",
+  email: "admin@example.com",
+  displayName: "AdminPlayer",
+  isAdmin: true,
+};
+
 const INACTIVE_USER = {
   ...EXISTING_USER,
   id: "user-inactive",
@@ -270,6 +279,65 @@ describe("loginOrCreate", () => {
     mockGameStateRead.mockResolvedValue({
       resource: { id: "current", isRegistrationOpen: false },
     });
+    const req = createMockRequest({
+      body: { email: "existing@example.com", displayName: "Whatever" },
+    });
+    const ctx = createMockContext();
+
+    const res = await handler(req, ctx);
+
+    expect(res.status).toBe(200);
+    expect((res.jsonBody as any).userId).toBe("user-existing");
+  });
+
+  // --- Admin passcode tests ---
+
+  it("returns 401 ADMIN_PASSCODE_REQUIRED when admin logs in without passcode header", async () => {
+    mockQuery.mockResolvedValue({ resources: [ADMIN_USER] });
+    const req = createMockRequest({
+      body: { email: "admin@example.com", displayName: "AdminPlayer" },
+    });
+    const ctx = createMockContext();
+
+    const res = await handler(req, ctx);
+
+    expect(res.status).toBe(401);
+    expect((res.jsonBody as any).code).toBe("ADMIN_PASSCODE_REQUIRED");
+    expect((res.jsonBody as any).error).toBe("Admin passcode required");
+  });
+
+  it("returns 401 ADMIN_PASSCODE_INVALID when admin provides wrong passcode", async () => {
+    mockQuery.mockResolvedValue({ resources: [ADMIN_USER] });
+    const req = createMockRequest({
+      body: { email: "admin@example.com", displayName: "AdminPlayer" },
+      headers: { "x-admin-passcode": "wrong-passcode" },
+    });
+    const ctx = createMockContext();
+
+    const res = await handler(req, ctx);
+
+    expect(res.status).toBe(401);
+    expect((res.jsonBody as any).code).toBe("ADMIN_PASSCODE_INVALID");
+    expect((res.jsonBody as any).error).toBe("Invalid admin passcode");
+  });
+
+  it("returns 200 when admin provides correct passcode", async () => {
+    mockQuery.mockResolvedValue({ resources: [ADMIN_USER] });
+    const req = createMockRequest({
+      body: { email: "admin@example.com", displayName: "AdminPlayer" },
+      headers: { "x-admin-passcode": "CopilotDevDays2026" },
+    });
+    const ctx = createMockContext();
+
+    const res = await handler(req, ctx);
+
+    expect(res.status).toBe(200);
+    expect((res.jsonBody as any).userId).toBe("user-admin");
+    expect((res.jsonBody as any).isAdmin).toBe(true);
+  });
+
+  it("does not require passcode for non-admin users", async () => {
+    mockQuery.mockResolvedValue({ resources: [EXISTING_USER] });
     const req = createMockRequest({
       body: { email: "existing@example.com", displayName: "Whatever" },
     });
