@@ -1,0 +1,12 @@
+node_modules
+dist
+local.settings.json
+.funcignore
+.git
+.gitignore
+*.md
+src/**/*.test.ts
+src/**/__tests__/
+vitest.config.ts
+coverage
+.vscode

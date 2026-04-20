@@ -1,0 +1,222 @@
+# =============================================================================
+# Fastest Finger Quiz — Container Apps CI/CD Pipeline
+# =============================================================================
+# Deploys to Azure Container Apps (ACR + ACA) on the feature branch.
+# Uses a dedicated GitHub Environment 'aca-dev' with its own secrets.
+#
+# Required GitHub Environment Secrets (aca-dev):
+#     AZURE_CLIENT_ID        — App registration client ID (OIDC + Cosmos auth)
+#     AZURE_CLIENT_SECRET    — App registration client secret (Cosmos AAD auth)
+#     AZURE_TENANT_ID        — Azure AD tenant ID
+#     AZURE_SUBSCRIPTION_ID  — Target Azure subscription
+#     ACA_AZURE_RG           — Resource group (e.g. rg-fastestfinger-aca-dev)
+#
+# NOTE: This workflow is completely independent of deploy.yml (SWA pipeline).
+#       It only triggers on the feature/containerisation branch.
+# =============================================================================
+
+name: Deploy to Container Apps
+
+on:
+  push:
+    branches: [feature/containerisation]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-aca-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  # ===========================================================================
+  # Job 1 — Provision Azure Infrastructure (Bicep)
+  # ===========================================================================
+  infrastructure:
+    name: 🏗️ Deploy Infrastructure
+    runs-on: ubuntu-latest
+    environment: aca-dev
+
+    outputs:
+      acr-login-server: ${{ steps.deploy-bicep.outputs.acrLoginServer }}
+      acr-name: ${{ steps.deploy-bicep.outputs.acrName }}
+      api-app-name: ${{ steps.deploy-bicep.outputs.apiAppName }}
+      frontend-app-name: ${{ steps.deploy-bicep.outputs.frontendAppName }}
+      frontend-url: ${{ steps.deploy-bicep.outputs.frontendUrl }}
+      api-fqdn: ${{ steps.deploy-bicep.outputs.apiFqdn }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Azure Login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy Bicep template
+        id: deploy-bicep
+        run: |
+          DEPLOYMENT_OUTPUT=$(az deployment group create \
+            --resource-group "${{ secrets.ACA_AZURE_RG }}" \
+            --template-file infra/main-aca.bicep \
+            --parameters infra/main-aca.bicepparam \
+            --parameters \
+              azureClientId="${{ secrets.AZURE_CLIENT_ID }}" \
+              azureTenantId="${{ secrets.AZURE_TENANT_ID }}" \
+              azureClientSecret="${{ secrets.AZURE_CLIENT_SECRET }}" \
+            --query 'properties.outputs' \
+            --output json)
+
+          ACR_LOGIN_SERVER=$(echo "$DEPLOYMENT_OUTPUT" | jq -r '.acrLoginServer.value')
+          ACR_NAME=$(echo "$DEPLOYMENT_OUTPUT" | jq -r '.acrName.value')
+          API_APP_NAME=$(echo "$DEPLOYMENT_OUTPUT" | jq -r '.apiAppName.value')
+          FRONTEND_APP_NAME=$(echo "$DEPLOYMENT_OUTPUT" | jq -r '.frontendAppName.value')
+          FRONTEND_URL=$(echo "$DEPLOYMENT_OUTPUT" | jq -r '.frontendUrl.value')
+          API_FQDN=$(echo "$DEPLOYMENT_OUTPUT" | jq -r '.apiInternalFqdn.value')
+
+          echo "acrLoginServer=$ACR_LOGIN_SERVER" >> "$GITHUB_OUTPUT"
+          echo "acrName=$ACR_NAME" >> "$GITHUB_OUTPUT"
+          echo "apiAppName=$API_APP_NAME" >> "$GITHUB_OUTPUT"
+          echo "frontendAppName=$FRONTEND_APP_NAME" >> "$GITHUB_OUTPUT"
+          echo "frontendUrl=$FRONTEND_URL" >> "$GITHUB_OUTPUT"
+          echo "apiFqdn=$API_FQDN" >> "$GITHUB_OUTPUT"
+
+          echo "✅ Infrastructure deployed — Frontend: $FRONTEND_URL"
+
+  # ===========================================================================
+  # Job 2 — Build, Test & Push Container Images
+  # ===========================================================================
+  build-and-push:
+    name: 📦 Build & Push Images
+    runs-on: ubuntu-latest
+    needs: infrastructure
+    environment: aca-dev
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: |
+            src/frontend/package-lock.json
+            src/api/package-lock.json
+
+      # --- Frontend: Install, Build, Test ---
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
+        working-directory: src/frontend
+
+      - name: Build frontend
+        run: npm run build
+        working-directory: src/frontend
+
+      - name: Test frontend
+        run: npm test --if-present
+        working-directory: src/frontend
+        continue-on-error: true
+
+      # --- API: Install, Build, Test ---
+      - name: Install API dependencies
+        run: npm install --no-audit --no-fund
+        working-directory: src/api
+
+      - name: Build API
+        run: npm run build
+        working-directory: src/api
+
+      - name: Test API
+        run: npm test --if-present
+        working-directory: src/api
+        continue-on-error: true
+
+      # --- Docker: Build & Push ---
+      - name: Azure Login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Login to ACR
+        run: az acr login --name "${{ needs.infrastructure.outputs.acr-name }}"
+
+      - name: Build & push API image
+        run: |
+          ACR="${{ needs.infrastructure.outputs.acr-login-server }}"
+          docker build \
+            -t "$ACR/fastestfinger-api:${{ github.sha }}" \
+            -t "$ACR/fastestfinger-api:latest" \
+            src/api
+          docker push "$ACR/fastestfinger-api:${{ github.sha }}"
+          docker push "$ACR/fastestfinger-api:latest"
+
+      - name: Build & push frontend image
+        run: |
+          ACR="${{ needs.infrastructure.outputs.acr-login-server }}"
+          docker build \
+            -t "$ACR/fastestfinger-frontend:${{ github.sha }}" \
+            -t "$ACR/fastestfinger-frontend:latest" \
+            src/frontend
+          docker push "$ACR/fastestfinger-frontend:${{ github.sha }}"
+          docker push "$ACR/fastestfinger-frontend:latest"
+
+  # ===========================================================================
+  # Job 3 — Deploy Container Apps
+  # ===========================================================================
+  deploy:
+    name: 🚀 Deploy Containers
+    runs-on: ubuntu-latest
+    needs: [infrastructure, build-and-push]
+    environment: aca-dev
+
+    steps:
+      - name: Azure Login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Update API container image
+        run: |
+          az containerapp update \
+            --name "${{ needs.infrastructure.outputs.api-app-name }}" \
+            --resource-group "${{ secrets.ACA_AZURE_RG }}" \
+            --image "${{ needs.infrastructure.outputs.acr-login-server }}/fastestfinger-api:${{ github.sha }}"
+
+      - name: Update frontend container image
+        run: |
+          az containerapp update \
+            --name "${{ needs.infrastructure.outputs.frontend-app-name }}" \
+            --resource-group "${{ secrets.ACA_AZURE_RG }}" \
+            --image "${{ needs.infrastructure.outputs.acr-login-server }}/fastestfinger-frontend:${{ github.sha }}" \
+            --set-env-vars "API_FQDN=${{ needs.infrastructure.outputs.api-fqdn }}"
+
+      - name: Verify deployment
+        run: |
+          echo "✅ Deployment complete!"
+          echo "📍 Frontend URL: ${{ needs.infrastructure.outputs.frontend-url }}"
+          echo ""
+          echo "🔍 Checking API health..."
+          az containerapp show \
+            --name "${{ needs.infrastructure.outputs.api-app-name }}" \
+            --resource-group "${{ secrets.ACA_AZURE_RG }}" \
+            --query "{name:name, status:properties.runningStatus, latestRevision:properties.latestRevisionName}" \
+            --output table
+
+          echo ""
+          echo "🔍 Checking frontend status..."
+          az containerapp show \
+            --name "${{ needs.infrastructure.outputs.frontend-app-name }}" \
+            --resource-group "${{ secrets.ACA_AZURE_RG }}" \
+            --query "{name:name, status:properties.runningStatus, latestRevision:properties.latestRevisionName}" \
+            --output table

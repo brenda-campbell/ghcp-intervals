@@ -12,3 +12,4 @@ node_modules/
 # Azure Functions
 src/api/dist/
 src/api/local.settings.json
+fedcred.json

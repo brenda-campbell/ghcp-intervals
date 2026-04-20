@@ -1,0 +1,33 @@
+# =============================================================================
+# Fastest Finger Quiz — Local Container Development
+# =============================================================================
+# Usage:
+#   1. Copy .env.example to .env and fill in connection strings
+#   2. docker-compose up --build
+#   3. Open http://localhost:8080
+# =============================================================================
+
+services:
+  api:
+    build:
+      context: ./src/api
+      dockerfile: Dockerfile
+    environment:
+      - AzureWebJobsStorage=
+      - FUNCTIONS_WORKER_RUNTIME=node
+      - CosmosDBConnectionString=${COSMOS_DB_CONNECTION_STRING}
+      - COSMOS_ENDPOINT=${COSMOS_ENDPOINT}
+      - AzureSignalRConnectionString=${AZURE_SIGNALR_CONNECTION_STRING}
+    ports:
+      - "7071:80"
+
+  frontend:
+    build:
+      context: ./src/frontend
+      dockerfile: Dockerfile
+    environment:
+      - API_FQDN=api
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
