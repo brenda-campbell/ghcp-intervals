@@ -4,7 +4,6 @@ param location = 'northeurope'
 param environmentName = 'dev'
 param appName = 'fastestfinger'
 
-// These are provided at deployment time via --parameters on the CLI
-// param azureClientId = ''
-// param azureTenantId = ''
-// param azureClientSecret = ''
+param azureClientId = readEnvironmentVariable('AZURE_CLIENT_ID')
+param azureTenantId = readEnvironmentVariable('AZURE_TENANT_ID')
+param azureClientSecret = readEnvironmentVariable('AZURE_CLIENT_SECRET')
