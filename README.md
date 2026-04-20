@@ -2,9 +2,10 @@
 
 A competitive speed-trivia game where players race to answer Azure and GitHub Copilot questions. The fastest correct answer wins — points accumulate across sessions, and a real-time leaderboard fuels the rivalry.
 
-![Azure](https://img.shields.io/badge/Azure-Static_Web_Apps-0078D4?logo=microsoftazure)
+![Azure](https://img.shields.io/badge/Azure-Container_Apps-0078D4?logo=microsoftazure)
 ![Functions](https://img.shields.io/badge/Azure-Functions_v4-0062AD?logo=azurefunctions)
 ![Cosmos DB](https://img.shields.io/badge/Azure-Cosmos_DB-0078D4?logo=azurecosmosdb)
+![Docker](https://img.shields.io/badge/Docker-Containerised-2496ED?logo=docker)
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5+-3178C6?logo=typescript)
 ![License](https://img.shields.io/badge/License-MIT-green)
@@ -20,12 +21,15 @@ A competitive speed-trivia game where players race to answer Azure and GitHub Co
 
 ```mermaid
 graph TB
-  subgraph "Azure Static Web App"
-    FE["React 19 + Vite<br/>Tailwind CSS v4<br/>shadcn/ui<br/>SignalR client"]
-  end
-  
-  subgraph "Azure Functions v4"
-    API["HTTP Triggers<br/>TypeScript"]
+  subgraph "Azure Container Apps Environment"
+    subgraph "Frontend Container (Nginx)"
+      FE["React 19 + Vite<br/>Tailwind CSS v4<br/>shadcn/ui<br/>SignalR client"]
+      NX["Nginx reverse proxy<br/>/api/* → API container"]
+    end
+    
+    subgraph "API Container (Azure Functions)"
+      API["Azure Functions v4<br/>Node.js 20<br/>HTTP Triggers"]
+    end
   end
   
   subgraph "Azure Cosmos DB"
@@ -36,10 +40,12 @@ graph TB
     State[("gameState")]
   end
   
+  ACR["Azure Container Registry"]
   SR["Azure SignalR Service"]
   GH["GitHub Actions CI/CD"]
   
-  FE -->|REST API| API
+  FE -->|/api/*| NX
+  NX -->|internal ingress| API
   API --> Users
   API --> Questions
   API --> Categories
@@ -47,52 +53,64 @@ graph TB
   API --> State
   API -->|Broadcast events| SR
   SR -->|Real-time updates| FE
-  GH -->|Deploy| FE
-  GH -->|Deploy| API
+  GH -->|Build & Push| ACR
+  ACR -->|Pull images| API
+  ACR -->|Pull images| FE
 ```
+
+The frontend container serves the React SPA and reverse-proxies `/api/*` requests to the API container (internal ingress only). This keeps everything same-origin — no CORS issues. SignalR negotiation flows through Nginx → API → returns SignalR Service URL → browser connects directly via WebSocket.
 
 ## Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
 | **Frontend** | React 19, Vite 8, TypeScript, Tailwind CSS v4, shadcn/ui, Phosphor Icons |
-| **Backend** | Azure Functions v4 (Node.js/TypeScript) |
+| **Backend** | Azure Functions v4 (Node.js 20 / TypeScript) |
 | **Database** | Azure Cosmos DB (serverless) |
 | **Real-time** | Azure SignalR Service (serverless) |
-| **Hosting** | Azure Static Web Apps (Free tier) |
-| **IaC** | Bicep (modular: SWA + Cosmos DB + SignalR) |
-| **CI/CD** | GitHub Actions (OIDC auth, single workflow) |
+| **Containers** | Docker, Azure Container Registry (ACR) |
+| **Hosting** | Azure Container Apps (Nginx frontend + Functions API) |
+| **IaC** | Bicep (modular: ACR + ACA Environment + Container Apps + Cosmos DB + SignalR) |
+| **CI/CD** | GitHub Actions (OIDC auth, 3-job pipeline: infra → build/push → deploy) |
 | **Testing** | Vitest, Testing Library (143 API + 10 E2E tests) |
 
 ## Project Structure
 
 ```
 ├── .github/workflows/
-│   └── deploy.yml              # CI/CD: infra → build → test → deploy
+│   ├── deploy.yml              # CI/CD: SWA pipeline (main branch)
+│   └── deploy-aca.yml          # CI/CD: Container Apps pipeline (feature branch)
 ├── docs/
 │   └── PRD.md                  # Product requirements document
+├── docker-compose.yml           # Local container development
 ├── infra/
-│   ├── main.bicep              # Orchestrator (all Azure resources)
-│   ├── main.bicepparam         # Environment parameters
+│   ├── main.bicep              # SWA orchestrator (legacy)
+│   ├── main-aca.bicep          # Container Apps orchestrator
+│   ├── main-aca.bicepparam     # ACA environment parameters
 │   └── modules/
-│       ├── staticWebApp.bicep  # SWA resource
-│       ├── cosmosDb.bicep      # Cosmos DB + containers
-│       └── signalr.bicep       # SignalR Service
+│       ├── containerRegistry.bicep       # Azure Container Registry
+│       ├── containerAppsEnvironment.bicep # ACA Environment + Log Analytics
+│       ├── containerApp-api.bicep        # API container (internal ingress)
+│       ├── containerApp-frontend.bicep   # Frontend container (external ingress)
+│       ├── cosmosDb.bicep                # Cosmos DB + containers
+│       └── signalr.bicep                 # SignalR Service
 ├── src/
 │   ├── api/                    # Azure Functions backend
+│   │   ├── Dockerfile          # Functions Node.js 20 container image
 │   │   └── src/
-│   │       ├── functions/      # API endpoints
+│   │       ├── functions/      # API endpoints (+ /api/health probe)
 │   │       ├── models/         # TypeScript interfaces
 │   │       ├── services/       # Cosmos, scoring, leaderboard, SignalR
 │   │       └── scripts/        # Seed questions script
 │   └── frontend/               # React SPA
+│       ├── Dockerfile          # Multi-stage build → Nginx Alpine
+│       ├── nginx.conf.template # SPA fallback + /api/* reverse proxy
 │       └── src/
 │           ├── components/     # UI components (quiz, timer, leaderboard)
 │           ├── contexts/       # UserContext, SignalRContext
 │           ├── hooks/          # useTimer, useSignalR
 │           ├── services/       # API client
 │           └── test/           # Component + integration tests
-└── staticwebapp.config.json    # SWA routing config
 ```
 
 ## Getting Started
@@ -100,16 +118,36 @@ graph TB
 ### Prerequisites
 
 - [Node.js](https://nodejs.org/) 20+
-- [Azure Functions Core Tools](https://learn.microsoft.com/azure/azure-functions/functions-run-local) v4
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (for container development)
+- [Azure Functions Core Tools](https://learn.microsoft.com/azure/azure-functions/functions-run-local) v4 (optional, for non-container dev)
 - [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli)
 
-### Local Development
+### Local Development (Containers)
+
+The recommended way to run locally — mirrors the deployed architecture:
 
 ```bash
 # Clone the repo
 git clone https://github.com/brenda-campbell/ghcp-intervals.git
 cd ghcp-intervals
 
+# Create .env with your connection strings
+cat > .env <<EOF
+COSMOS_DB_CONNECTION_STRING=your-cosmos-connection-string
+COSMOS_ENDPOINT=https://your-account.documents.azure.com:443/
+AZURE_SIGNALR_CONNECTION_STRING=Endpoint=https://your-signalr.service.signalr.net;AccessKey=...;Version=1.0;
+EOF
+
+# Build and run both containers
+docker-compose up --build
+
+# Frontend: http://localhost:8080
+# API:      http://localhost:7071 (direct) or http://localhost:8080/api/* (via Nginx proxy)
+```
+
+### Local Development (Without Containers)
+
+```bash
 # Backend
 cd src/api
 npm install
@@ -150,40 +188,59 @@ cd src/frontend && npm run test:e2e
 
 ### Azure Resources (IaC)
 
-Infrastructure is defined in Bicep and deployed via GitHub Actions:
+Infrastructure is defined in Bicep and deployed via GitHub Actions. The Container Apps stack provisions:
+
+- **Azure Container Registry** — Stores Docker images for API and frontend
+- **Container Apps Environment** — Hosting environment with Log Analytics
+- **API Container App** — Azure Functions (internal ingress, managed identity, health probes)
+- **Frontend Container App** — Nginx (external ingress, reverse proxy to API)
+- **Cosmos DB** — Serverless database (5 containers)
+- **SignalR Service** — Real-time messaging (serverless mode)
 
 ```bash
 # Manual deployment (if needed)
 az deployment group create \
-  --resource-group rg-fastestfinger-dev \
-  --template-file infra/main.bicep \
-  --parameters infra/main.bicepparam
+  --resource-group rg-fastestfinger-aca-dev \
+  --template-file infra/main-aca.bicep \
+  --parameters infra/main-aca.bicepparam \
+  --parameters azureClientId="<CLIENT_ID>" azureTenantId="<TENANT_ID>" azureClientSecret="<SECRET>"
 ```
 
 ### GitHub Actions CI/CD
 
-The workflow (`.github/workflows/deploy.yml`) runs on push to `main`:
+The Container Apps workflow (`.github/workflows/deploy-aca.yml`) runs on push to `feature/containerisation`:
 
-1. **Infra job** — Deploys Bicep templates (OIDC auth)
-2. **Build & Test job** — Installs, builds, tests both frontend and backend
-3. **Deploy job** — Publishes to Azure Static Web Apps
+1. **Infrastructure job** — Deploys Bicep (ACR, ACA Environment, Cosmos DB, SignalR, Container Apps)
+2. **Build & Push job** — Builds + tests frontend & API, Docker builds both images, pushes to ACR (tagged by commit SHA)
+3. **Deploy job** — Updates both container apps with new image tags
 
-#### Required Secrets
+All jobs use the `aca-dev` GitHub Environment for secret isolation.
+
+#### GitHub Environment: `aca-dev`
 
 | Secret | Description |
 |--------|-------------|
-| `AZURE_CLIENT_ID` | App registration client ID (OIDC) |
+| `AZURE_CLIENT_ID` | App registration client ID (OIDC + Cosmos AAD auth) |
+| `AZURE_CLIENT_SECRET` | App registration client secret (Cosmos AAD auth) |
 | `AZURE_TENANT_ID` | Azure AD tenant ID |
 | `AZURE_SUBSCRIPTION_ID` | Target Azure subscription |
-| `AZURE_RG` | Resource group name |
-| `AZURE_STATIC_WEB_APPS_API_TOKEN` | SWA deployment token |
+| `ACA_AZURE_RG` | Resource group name (e.g. `rg-fastestfinger-aca-dev`) |
 
 ### OIDC Setup
 
 1. Create an App Registration in Azure AD
-2. Add a Federated Credential (subject: `repo:brenda-campbell/ghcp-intervals:ref:refs/heads/main`)
+2. Add a Federated Credential with subject: `repo:brenda-campbell/ghcp-intervals:environment:aca-dev`
 3. Grant Contributor role on the resource group
-4. Store IDs as GitHub repository secrets
+4. Store credentials as GitHub Environment secrets (scoped to `aca-dev`)
+
+### Container Images
+
+| Image | Base | Serves |
+|-------|------|--------|
+| `fastestfinger-api` | `mcr.microsoft.com/azure-functions/node:4-node20` | 27 HTTP-triggered Functions + `/api/health` probe |
+| `fastestfinger-frontend` | `nginx:alpine` | React SPA + reverse proxy `/api/*` → API container |
+
+Images are tagged with both `latest` and the git commit SHA for rollback capability.
 
 ## API Endpoints
 
