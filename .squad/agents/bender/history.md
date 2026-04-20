@@ -234,3 +234,13 @@
 - **Passcode source:** `ADMIN_PASSCODE` env var with hardcoded fallback `"CopilotDevDays2026"` for local dev / SWA simplicity.
 - **Security:** Uses `crypto.timingSafeEqual` via a `constantTimeCompare()` helper to prevent timing attacks. Handles unequal-length strings by comparing bufA against itself (constant time) then returning false.
 - **Tests:** 4 new tests added to `loginOrCreate.test.ts` — missing passcode, wrong passcode, correct passcode, non-admin unaffected. All 159 tests pass.
+
+### be-admin-passcode (2026-04-20)
+- **Admin passcode validation:** Implemented secondary authentication gate for admin login in src/api/src/functions/users/loginOrCreate.ts.
+- **Timing-safe comparison:** Used crypto.timingSafeEqual for constant-time passcode verification to prevent timing attacks.
+- **Environment variable:** ADMIN_PASSCODE env var controls server-side passcode, fallback to hardcoded "CopilotDevDays2026".
+- **Error responses:** Returns 401 with code: "ADMIN_PASSCODE_REQUIRED" when admin lacks header, code: "ADMIN_PASSCODE_INVALID" for wrong passcode.
+- **Non-admin bypass:** Non-admin login flow completely unchanged — passcode check only applies to users with isAdmin: true.
+- **Test coverage:** 4 new test scenarios added to loginOrCreate.test.ts (159 total passing): missing passcode, wrong passcode, correct passcode, non-admin bypass.
+- **Deployment:** Set ADMIN_PASSCODE in Azure Static Web App application settings. Fallback to hardcoded value if env var not set.
+- **Trade-off:** Shared passcode simpler than per-user 2FA; acceptable for game app. Revisit if admin actions become more sensitive.

@@ -256,3 +256,13 @@
 - **AuthGate passcode flow:** When backend returns 401 + `ADMIN_PASSCODE_REQUIRED`, AuthGate enters a `needsPasscode` state and shows `AdminPasscodeDialog`. Works for both auto-login (returning admins with stored credentials) and manual login. Invalid passcode shows inline error; cancel returns to login screen.
 - **AdminPasscodeDialog component:** Local to `AuthGate.tsx`. Uses Lock icon, password input, Verify/Cancel buttons. Matches existing card styling (border-border/50, bg-card, shadow-lg). Dark/light mode compatible via Tailwind theme tokens.
 
+
+### fe-admin-passcode (2026-04-20)
+- **ApiError code field:** Extended src/utils/api.ts ApiError class with optional code field parsed from JSON error body. Enables semantic error branching instead of fragile string message matching.
+- **loginOrCreate enhancement:** Function now accepts optional dminPasscode parameter sent as x-admin-passcode HTTP header. Allows reuse of same login function for both admin and non-admin flows.
+- **AdminPasscodeDialog component:** New modal-style component in src/components/AdminPasscodeDialog.tsx with lock icon (lucide-react), show/hide password toggle, retry logic, and error message display.
+- **Dark/light mode support:** Dialog uses Tailwind semantic classes (bg-card, text-foreground, border-border) for full dark/light theme support. Tested in both modes.
+- **AuthGate integration:** Updated src/components/AuthGate.tsx to intercept 401 responses with code: "ADMIN_PASSCODE_REQUIRED". Shows passcode dialog, retries login on submission. Handles both auto-login (returning admins) and manual login flows.
+- **UX refinement:** Dialog styled to match existing card patterns and typography system. Spinner on retry, clear error messaging for invalid attempts.
+- **Error codes:** Frontend expects backend to return code: "ADMIN_PASSCODE_REQUIRED" for missing/expired passcode, code: "ADMIN_PASSCODE_INVALID" for wrong value.
+- **Scalability:** ApiError.code pattern allows future error-driven UI branching without touching message strings.

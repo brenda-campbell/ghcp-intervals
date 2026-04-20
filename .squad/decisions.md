@@ -358,6 +358,39 @@ Added `timerSeconds?: number` to GameState singleton (default 10, range 5-60).
 - `setCategory` preserves `timerSeconds` when switching categories
 - `getGameState` defaults `timerSeconds: 10` in all response paths
 
+---
+
+### ADR-035: Admin Passcode Validation on Login
+
+Admin users have elevated privileges (start/stop quiz, reset scores, manage questions). The login endpoint previously returned admin users with no additional verification. A compromised or guessed admin email could grant full admin access.
+
+Added a secondary passcode check to `loginOrCreate` for admin users only:
+- Admin login requires `x-admin-passcode` header with correct value
+- Passcode read from `ADMIN_PASSCODE` env var (fallback: `"CopilotDevDays2026"`)
+- Comparison uses `crypto.timingSafeEqual` to prevent timing attacks
+- Non-admin login flow is completely unchanged
+- Backend returns 401 with `code: "ADMIN_PASSCODE_REQUIRED"` if missing, `code: "ADMIN_PASSCODE_INVALID"` if incorrect
+
+**Frontend Impact:** Admin login UI sends `x-admin-passcode` header. Non-admin users need no changes.
+
+**Deployment:** Set `ADMIN_PASSCODE` in Azure Static Web App application settings for production. Falls back to hardcoded value if not set.
+
+**Trade-off:** A shared passcode is simpler than per-user 2FA but less secure. Acceptable for a game app; revisit if admin actions become more sensitive.
+
+---
+
+### ADR-036: Admin Passcode Prompt in Frontend Login Flow
+
+The backend now requires admin users to verify via a passcode during login, returning HTTP 401 with `code: "ADMIN_PASSCODE_REQUIRED"`. The frontend needed to detect this and prompt accordingly.
+
+Extended `ApiError` with an optional `code` field parsed from the JSON error body, enabling semantic error branching instead of fragile message string matching. `loginOrCreate()` now accepts an optional `adminPasscode` parameter sent as the `x-admin-passcode` header.
+
+`AuthGate` handles the passcode flow for both auto-login (returning admins) and manual login, using a local `AdminPasscodeDialog` component. The dialog is styled consistently with existing card patterns and supports dark/light mode.
+
+**Implications:** 
+- Backend must return `{ error: "...", code: "ADMIN_PASSCODE_REQUIRED" }` on 401 for admin users, and `{ error: "...", code: "ADMIN_PASSCODE_INVALID" }` for wrong passcodes.
+- Any future error-code-driven UI branching can now use `ApiError.code` instead of parsing message strings.
+
 **Rationale:** Follows identical pattern to ADR-033 (questionCount). Timer stored on GameState means config persists across rounds. 5-60 range prevents degenerate gameplay (too fast to read / too slow to stay engaged). Included in `quizStarted` broadcast so clients get the value without a separate fetch.
 
 ---
