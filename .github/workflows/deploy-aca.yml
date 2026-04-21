@@ -60,15 +60,14 @@ jobs:
 
       - name: Deploy Bicep template
         id: deploy-bicep
+        env:
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
         run: |
           DEPLOYMENT_OUTPUT=$(az deployment group create \
             --resource-group "${{ secrets.ACA_AZURE_RG }}" \
-            --template-file infra/main-aca.bicep \
             --parameters infra/main-aca.bicepparam \
-            --parameters \
-              azureClientId="${{ secrets.AZURE_CLIENT_ID }}" \
-              azureTenantId="${{ secrets.AZURE_TENANT_ID }}" \
-              azureClientSecret="${{ secrets.AZURE_CLIENT_SECRET }}" \
             --query 'properties.outputs' \
             --output json)
 
