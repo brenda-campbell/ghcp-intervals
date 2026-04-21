@@ -11,8 +11,11 @@ server {
     }
 
     # --- Reverse proxy: /api/* → API container ---
+    # Use a variable so nginx resolves DNS per-request (not just at startup)
     location /api/ {
-        proxy_pass         http://${API_FQDN}/api/;
+        resolver ${RESOLVER} valid=10s ipv6=off;
+        set $api_backend "${API_FQDN}";
+        proxy_pass         http://$api_backend;
         proxy_http_version 1.1;
 
         # WebSocket upgrade (required for SignalR negotiate → WebSocket fallback)
