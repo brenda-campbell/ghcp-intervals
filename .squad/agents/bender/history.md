@@ -244,3 +244,10 @@
 - **Test coverage:** 4 new test scenarios added to loginOrCreate.test.ts (159 total passing): missing passcode, wrong passcode, correct passcode, non-admin bypass.
 - **Deployment:** Set ADMIN_PASSCODE in Azure Static Web App application settings. Fallback to hardcoded value if env var not set.
 - **Trade-off:** Shared passcode simpler than per-user 2FA; acceptable for game app. Revisit if admin actions become more sensitive.
+
+### be-linear-scoring — Linear Time-Based Scoring Rewrite (2026-04-20)
+- **Replaced relative speed-based scoring** with linear time-based scoring. New formula: `score = max(0, round(200 × (1 - elapsedTimeMs / timeoutMs)))`. Instant answer = 200 pts, timeout = 0 pts.
+- **Deleted `fastestAnswerTracker.ts`** service and its test file — no longer needed without relative scoring.
+- **`submitAnswer.ts`:** Removed fastestAnswerTracker imports, changed `calculatePoints()` to accept `timeoutMs` instead of `questionId`, reads `timerSeconds` from GameState in Cosmos DB (default 10s), changed `MIN_POINTS` from 1 to 0.
+- **`stopQuiz.ts`:** Removed `_resetFastestTracker` import and call — nothing to reset between rounds now.
+- **GameState integration:** `timeoutMs` is derived from `gameState.timerSeconds` (configurable 5-60s) fetched per answer submission. Graceful fallback to 10s default if GameState unavailable.

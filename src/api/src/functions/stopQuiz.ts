@@ -10,7 +10,6 @@ import {
   usersContainer,
 } from "../services/cosmosClient.js";
 import { requireAdmin } from "../services/adminAuth.js";
-import { _resetFastestTracker } from "../services/fastestAnswerTracker.js";
 import type { GameState, User } from "../models/index.js";
 
 const signalROutput = output.generic({
@@ -66,9 +65,6 @@ async function stopQuiz(
     gameState.questionIds = [];
     gameState.updatedAt = new Date().toISOString();
     gameState.updatedBy = admin.userId;
-
-    // Clear fastest-answer tracker so next round starts fresh
-    _resetFastestTracker();
 
     const { resource: saved } = await gameStateContainer.items.upsert(gameState);
 
