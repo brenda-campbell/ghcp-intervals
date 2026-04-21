@@ -12,7 +12,7 @@ server {
 
     # --- Reverse proxy: /api/* → API container ---
     location /api/ {
-        proxy_pass         http://API_FQDN_PLACEHOLDER/api/;
+        proxy_pass         http://API_FQDN_PLACEHOLDER;
         proxy_http_version 1.1;
 
         # WebSocket upgrade (required for SignalR negotiate → WebSocket fallback)
