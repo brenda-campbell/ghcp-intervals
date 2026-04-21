@@ -5,15 +5,14 @@ import {
   InvocationContext,
   output,
 } from "@azure/functions";
-import { questionsContainer, categoryScoresContainer, usersContainer } from "../services/cosmosClient.js";
+import { questionsContainer, categoryScoresContainer, usersContainer, gameStateContainer } from "../services/cosmosClient.js";
 import {
   getDeliveryTimestamp,
   clearDelivery,
 } from "../services/questionDeliveryTracker.js";
 import { updateUserScore } from "../services/scoringService.js";
 import { getTopLeaderboard } from "../services/leaderboardService.js";
-import { recordCorrectAnswer, getFastestCorrectMs, _resetFastestTracker } from "../services/fastestAnswerTracker.js";
-import type { AnswerSubmission, AnswerResult, Question, LeaderboardEntry, CategoryScore } from "../models/index.js";
+import type { AnswerSubmission, AnswerResult, Question, LeaderboardEntry, CategoryScore, GameState } from "../models/index.js";
 import {
   getCorrelationId,
   logRequest,
@@ -35,7 +34,6 @@ export function _resetSubmitAnswerCaches(): void {
   questionCache.clear();
   lastLeaderboardBroadcast = 0;
   cachedLeaderboard = null;
-  _resetFastestTracker();
 }
 
 interface SignalRMessage {
@@ -51,22 +49,13 @@ const signalROutput = output.generic({
 });
 
 const MAX_POINTS = 200;
-const MIN_POINTS = 1;
+const MIN_POINTS = 0;
 
-function calculatePoints(correct: boolean, elapsedTimeMs: number, questionId: string): number {
+function calculatePoints(correct: boolean, elapsedTimeMs: number, timeoutMs: number): number {
   if (!correct) return 0;
 
-  // Ensure elapsedTimeMs is at least 1ms to avoid division by zero
-  const playerMs = Math.max(elapsedTimeMs, 1);
-
-  // Record this correct answer and potentially update the fastest time
-  recordCorrectAnswer(questionId, playerMs);
-
-  // Get the fastest correct answer for this question
-  const fastestMs = getFastestCorrectMs(questionId)!;
-
-  // score = round(200 × (fastestMs / playerMs)), capped 1-200
-  const raw = Math.round(MAX_POINTS * (fastestMs / playerMs));
+  // Linear time-based scoring: faster answers get more points
+  const raw = Math.round(MAX_POINTS * (1 - elapsedTimeMs / timeoutMs));
   return Math.min(MAX_POINTS, Math.max(MIN_POINTS, raw));
 }
 
@@ -156,7 +145,16 @@ async function submitAnswer(
   }
   elapsedTimeMs = Math.max(elapsedTimeMs, 0);
 
-  const pointsAwarded = calculatePoints(correct, elapsedTimeMs, questionId);
+  // Fetch timer config from GameState for linear scoring
+  let timeoutMs = 10_000; // default 10s
+  try {
+    const { resource: gameState } = await gameStateContainer.item("current", "current").read<GameState>();
+    timeoutMs = (gameState?.timerSeconds ?? 10) * 1000;
+  } catch {
+    // Fall back to default timeout if GameState unavailable
+  }
+
+  const pointsAwarded = calculatePoints(correct, elapsedTimeMs, timeoutMs);
 
   context.log(
     `Answer: user=${userId} q=${questionId} option=${selectedOption} ` +

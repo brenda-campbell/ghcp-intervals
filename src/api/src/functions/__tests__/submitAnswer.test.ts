@@ -20,6 +20,14 @@ vi.mock("../../services/cosmosClient.js", () => ({
     item: vi.fn(),
     items: { upsert: vi.fn() },
   },
+  gameStateContainer: {
+    item: vi.fn(() => ({
+      read: vi.fn().mockResolvedValue({
+        resource: { id: "current", partitionKey: "current", timerSeconds: 10 },
+      }),
+    })),
+    items: { upsert: vi.fn() },
+  },
   database: {},
 }));
 
@@ -38,7 +46,7 @@ vi.mock("../../services/leaderboardService.js", () => ({
 }));
 
 import { app } from "@azure/functions";
-import { questionsContainer } from "../../services/cosmosClient.js";
+import { questionsContainer, gameStateContainer } from "../../services/cosmosClient.js";
 import { getDeliveryTimestamp, clearDelivery } from "../../services/questionDeliveryTracker.js";
 import { updateUserScore } from "../../services/scoringService.js";
 import { getTopLeaderboard } from "../../services/leaderboardService.js";
@@ -74,6 +82,13 @@ describe("submitAnswer", () => {
     vi.mocked(getDeliveryTimestamp).mockReturnValue(undefined);
     vi.mocked(updateUserScore).mockResolvedValue(undefined);
     vi.mocked(getTopLeaderboard).mockResolvedValue([]);
+
+    // Default: gameState returns timerSeconds=10 (10s timeout → 10000ms)
+    vi.mocked(gameStateContainer.item).mockReturnValue({
+      read: vi.fn().mockResolvedValue({
+        resource: { id: "current", partitionKey: "current", timerSeconds: 10 },
+      }),
+    } as any);
   });
 
   afterEach(() => {
@@ -114,7 +129,8 @@ describe("submitAnswer", () => {
     expect((res.jsonBody as any).correctAnswer).toBe("Cloud");
   });
 
-  // === Point calculation ===
+  // === Point calculation (linear time-based scoring) ===
+  // Formula: score = max(0, round(200 × (1 - elapsedTimeMs / timeoutMs)))
 
   it("awards 0 points for incorrect answers", async () => {
     const req = createMockRequest({ body: validBody({ selectedOption: 3 }) });
@@ -125,7 +141,7 @@ describe("submitAnswer", () => {
     expect((res.jsonBody as any).pointsAwarded).toBe(0);
   });
 
-  it("awards 200 points for instant answer (0ms) — first correct", async () => {
+  it("awards 200 points for instant answer (0ms)", async () => {
     const now = 1700000000000;
     vi.spyOn(Date, "now").mockReturnValue(now);
     vi.mocked(getDeliveryTimestamp).mockReturnValue(now); // 0ms elapsed
@@ -135,65 +151,104 @@ describe("submitAnswer", () => {
 
     const res = await handler(req, ctx);
 
-    // First correct answer → 200 (fastest is own time, clamped to 1ms)
+    // 200 × (1 - 0/10000) = 200
     expect((res.jsonBody as any).pointsAwarded).toBe(200);
   });
 
-  it("awards 200 points for first correct answer regardless of elapsed time", async () => {
-    const now = 1700000010000;
+  it("awards 160 points for 2s answer with 10s timeout", async () => {
+    const now = 1700000002000;
     vi.spyOn(Date, "now").mockReturnValue(now);
-    vi.mocked(getDeliveryTimestamp).mockReturnValue(now - 10000); // 10000ms elapsed
+    vi.mocked(getDeliveryTimestamp).mockReturnValue(now - 2000); // 2000ms elapsed
 
     const req = createMockRequest({ body: validBody({ selectedOption: 0 }) });
     const ctx = createMockContext();
 
     const res = await handler(req, ctx);
 
-    // First correct answer always gets 200 (fastest so far = own time)
-    expect((res.jsonBody as any).pointsAwarded).toBe(200);
+    // 200 × (1 - 2000/10000) = 200 × 0.8 = 160
+    expect((res.jsonBody as any).pointsAwarded).toBe(160);
   });
 
-  it("awards proportional points when slower than fastest", async () => {
-    // First answer: 2000ms → gets 200 (sets fastest)
-    const now1 = 1700000002000;
-    vi.spyOn(Date, "now").mockReturnValue(now1);
-    vi.mocked(getDeliveryTimestamp).mockReturnValue(now1 - 2000);
+  it("awards 100 points for half-timeout answer", async () => {
+    const now = 1700000005000;
+    vi.spyOn(Date, "now").mockReturnValue(now);
+    vi.mocked(getDeliveryTimestamp).mockReturnValue(now - 5000); // 5000ms elapsed
 
-    const req1 = createMockRequest({ body: validBody({ selectedOption: 0, userId: "fast-user" }) });
-    const ctx1 = createMockContext();
-    const res1 = await handler(req1, ctx1);
-    expect((res1.jsonBody as any).pointsAwarded).toBe(200);
+    const req = createMockRequest({ body: validBody({ selectedOption: 0 }) });
+    const ctx = createMockContext();
 
-    // Second answer: 4000ms → round(200 × 2000/4000) = 100
-    const now2 = 1700000004000;
-    vi.spyOn(Date, "now").mockReturnValue(now2);
-    vi.mocked(getDeliveryTimestamp).mockReturnValue(now2 - 4000);
+    const res = await handler(req, ctx);
 
-    const req2 = createMockRequest({ body: validBody({ selectedOption: 0, userId: "slow-user" }) });
-    const ctx2 = createMockContext();
-    const res2 = await handler(req2, ctx2);
-    expect((res2.jsonBody as any).pointsAwarded).toBe(100);
+    // 200 × (1 - 5000/10000) = 200 × 0.5 = 100
+    expect((res.jsonBody as any).pointsAwarded).toBe(100);
   });
 
-  it("caps score at minimum 1 for very slow answers", async () => {
-    // First answer: 100ms → gets 200 (sets fastest)
-    const now1 = 1700000000100;
-    vi.spyOn(Date, "now").mockReturnValue(now1);
-    vi.mocked(getDeliveryTimestamp).mockReturnValue(now1 - 100);
+  it("awards 0 points at timeout boundary", async () => {
+    const now = 1700000010000;
+    vi.spyOn(Date, "now").mockReturnValue(now);
+    vi.mocked(getDeliveryTimestamp).mockReturnValue(now - 10000); // 10000ms elapsed = full timeout
 
-    const req1 = createMockRequest({ body: validBody({ selectedOption: 0, userId: "fast-user" }) });
-    const ctx1 = createMockContext();
-    await handler(req1, ctx1);
+    const req = createMockRequest({ body: validBody({ selectedOption: 0 }) });
+    const ctx = createMockContext();
 
-    // Second answer: 50000ms → round(200 × 100/50000) = 0 → capped to 1
-    const now2 = 1700000050000;
-    vi.spyOn(Date, "now").mockReturnValue(now2);
-    vi.mocked(getDeliveryTimestamp).mockReturnValue(now2 - 50000);
+    const res = await handler(req, ctx);
 
-    const req2 = createMockRequest({ body: validBody({ selectedOption: 0, userId: "slow-user" }) });
-    const ctx2 = createMockContext();
-    const res2 = await handler(req2, ctx2);
-    expect((res2.jsonBody as any).pointsAwarded).toBe(1);
+    // 200 × (1 - 10000/10000) = 200 × 0 = 0
+    expect((res.jsonBody as any).pointsAwarded).toBe(0);
+  });
+
+  it("awards 0 points when answer exceeds timeout", async () => {
+    const now = 1700000015000;
+    vi.spyOn(Date, "now").mockReturnValue(now);
+    vi.mocked(getDeliveryTimestamp).mockReturnValue(now - 15000); // 15000ms elapsed > timeout
+
+    const req = createMockRequest({ body: validBody({ selectedOption: 0 }) });
+    const ctx = createMockContext();
+
+    const res = await handler(req, ctx);
+
+    // max(0, 200 × (1 - 15000/10000)) = max(0, -100) = 0
+    expect((res.jsonBody as any).pointsAwarded).toBe(0);
+  });
+
+  it("respects custom timerSeconds from GameState", async () => {
+    // Override gameState to 30s timeout
+    vi.mocked(gameStateContainer.item).mockReturnValue({
+      read: vi.fn().mockResolvedValue({
+        resource: { id: "current", partitionKey: "current", timerSeconds: 30 },
+      }),
+    } as any);
+
+    const now = 1700000015000;
+    vi.spyOn(Date, "now").mockReturnValue(now);
+    vi.mocked(getDeliveryTimestamp).mockReturnValue(now - 15000); // 15000ms elapsed
+
+    const req = createMockRequest({ body: validBody({ selectedOption: 0 }) });
+    const ctx = createMockContext();
+
+    const res = await handler(req, ctx);
+
+    // 200 × (1 - 15000/30000) = 200 × 0.5 = 100
+    expect((res.jsonBody as any).pointsAwarded).toBe(100);
+  });
+
+  it("uses default 10s timeout when GameState unavailable", async () => {
+    // Simulate gameState read failure
+    vi.mocked(gameStateContainer.item).mockReturnValue({
+      read: vi.fn().mockRejectedValue(new Error("Not found")),
+    } as any);
+
+    const now = 1700000005000;
+    vi.spyOn(Date, "now").mockReturnValue(now);
+    vi.mocked(getDeliveryTimestamp).mockReturnValue(now - 5000); // 5000ms elapsed
+
+    const req = createMockRequest({ body: validBody({ selectedOption: 0 }) });
+    const ctx = createMockContext();
+
+    const res = await handler(req, ctx);
+
+    // Default 10s timeout: 200 × (1 - 5000/10000) = 100
+    expect((res.jsonBody as any).pointsAwarded).toBe(100);
   });
 
   // === Validation errors (400) ===
