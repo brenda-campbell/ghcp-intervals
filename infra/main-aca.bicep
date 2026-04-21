@@ -95,9 +95,10 @@ module frontendApp 'modules/containerApp-frontend.bicep' = {
 // --- Cosmos DB RBAC: Grant API managed identity data contributor role ---
 // Cosmos DB Built-in Data Contributor role ID
 var cosmosDataContributorRoleId = '00000000-0000-0000-0000-000000000002'
+var cosmosAccountName = '${appName}-${environmentName}-cosmos-${uniqueString(resourceGroup().id)}'
 
 resource cosmosAccount 'Microsoft.DocumentDB/databaseAccounts@2024-02-15-preview' existing = {
-  name: cosmosDb.outputs.accountName
+  name: cosmosAccountName
 }
 
 resource cosmosRoleAssignment 'Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignments@2024-02-15-preview' = {
