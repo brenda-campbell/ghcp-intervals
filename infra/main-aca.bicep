@@ -97,7 +97,7 @@ module frontendApp 'modules/containerApp-frontend.bicep' = {
 var cosmosDataContributorRoleId = '00000000-0000-0000-0000-000000000002'
 
 resource cosmosAccount 'Microsoft.DocumentDB/databaseAccounts@2024-02-15-preview' existing = {
-  name: '${appName}-${environmentName}-cosmos'
+  name: cosmosDb.outputs.accountName
 }
 
 resource cosmosRoleAssignment 'Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignments@2024-02-15-preview' = {
@@ -133,5 +133,6 @@ output apiInternalFqdn string = apiApp.outputs.fqdn
 @description('Cosmos DB endpoint')
 output cosmosDbEndpoint string = cosmosDb.outputs.endpoint
 
+@secure()
 @description('SignalR connection string')
 output signalRConnectionString string = signalR.outputs.connectionString

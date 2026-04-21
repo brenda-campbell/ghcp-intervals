@@ -7,7 +7,8 @@ param environmentName string
 @description('Application name prefix')
 param appName string
 
-var accountName = '${appName}-${environmentName}-cosmos'
+var uniqueSuffix = uniqueString(resourceGroup().id)
+var accountName = '${appName}-${environmentName}-cosmos-${uniqueSuffix}'
 var databaseName = 'fastestfinger'
 
 resource cosmosAccount 'Microsoft.DocumentDB/databaseAccounts@2024-02-15-preview' = {
