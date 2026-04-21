@@ -19,6 +19,9 @@ param acrName string
 @description('Internal FQDN of the API container app')
 param apiFqdn string
 
+@description('Container image to deploy (defaults to placeholder for initial provisioning)')
+param containerImage string = 'mcr.microsoft.com/azuredocs/containerapps-helloworld:latest'
+
 var appNameFull = '${appName}-${environmentName}-frontend'
 
 resource acr 'Microsoft.ContainerRegistry/registries@2023-07-01' existing = {
@@ -55,7 +58,7 @@ resource frontendContainerApp 'Microsoft.App/containerApps@2024-03-01' = {
       containers: [
         {
           name: 'frontend'
-          image: '${acrLoginServer}/${appName}-frontend:latest'
+          image: containerImage
           resources: {
             cpu: json('0.25')
             memory: '0.5Gi'
