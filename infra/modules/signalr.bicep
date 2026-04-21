@@ -7,7 +7,8 @@ param environmentName string
 @description('Application name prefix')
 param appName string
 
-var signalRName = '${appName}-${environmentName}-signalr'
+var uniqueSuffix = uniqueString(resourceGroup().id)
+var signalRName = '${appName}-${environmentName}-signalr-${uniqueSuffix}'
 
 resource signalR 'Microsoft.SignalRService/signalR@2024-03-01' = {
   name: signalRName
@@ -42,6 +43,7 @@ resource signalR 'Microsoft.SignalRService/signalR@2024-03-01' = {
 @description('SignalR Service hostname')
 output hostname string = signalR.properties.hostName
 
+@secure()
 @description('SignalR connection string')
 output connectionString string = signalR.listKeys().primaryConnectionString
 

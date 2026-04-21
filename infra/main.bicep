@@ -56,5 +56,6 @@ output staticWebAppName string = staticWebApp.outputs.name
 @description('Cosmos DB endpoint')
 output cosmosDbEndpoint string = cosmosDb.outputs.endpoint
 
+@secure()
 @description('SignalR connection string')
 output signalRConnectionString string = signalR.outputs.connectionString

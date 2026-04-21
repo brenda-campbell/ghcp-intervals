@@ -190,6 +190,7 @@ resource gameStateContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/
 @description('Cosmos DB account endpoint')
 output endpoint string = cosmosAccount.properties.documentEndpoint
 
+@secure()
 @description('Cosmos DB connection string')
 output connectionString string = cosmosAccount.listConnectionStrings().connectionStrings[0].connectionString
 
