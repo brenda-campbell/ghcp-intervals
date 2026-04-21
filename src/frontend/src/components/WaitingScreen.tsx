@@ -1,9 +1,21 @@
-import { Lightning, Users } from "@phosphor-icons/react";
+import { CalendarBlank, Lightning, Users } from "@phosphor-icons/react";
 
 interface WaitingScreenProps {
   categoryName: string | null;
   onlineCount: number;
 }
+
+const agenda = [
+  { time: "09:00", session: "Arrival & networking" },
+  { time: "09:15", session: "Welcome & the big picture", speakers: "Santosh Takoor" },
+  { time: "09:35", session: "Developer deep dives (Part 1)", speakers: "Dan Marzolini" },
+  { time: "10:15", session: "Live demo: GitHub Copilot in action", speakers: "Miru Kamal / Rayan Popat" },
+  { time: "10:45", session: "Break" },
+  { time: "11:00", session: "Developer deep dives (Part 2)", speakers: "Ryan Drewery / Jack Rawlings" },
+  { time: "11:40", session: "End-to-end developer workflow", speakers: "Siya Khumalo" },
+  { time: "12:15", session: "Scaling AI safely in enterprise codebases", speakers: "CAST Software - Marc Galin & Ralf Weiss" },
+  { time: "12:45", session: "Q&A, closing remarks & next steps" },
+];
 
 export function WaitingScreen({ categoryName, onlineCount }: WaitingScreenProps) {
   return (
@@ -40,6 +52,29 @@ export function WaitingScreen({ categoryName, onlineCount }: WaitingScreenProps)
           <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
         </div>
       )}
+
+      {/* Agenda card */}
+      <div className="mt-8 w-full max-w-md rounded-xl border border-border bg-card text-card-foreground p-4 shadow-sm">
+        <div className="flex items-center gap-2 mb-3">
+          <CalendarBlank weight="duotone" className="h-5 w-5 text-accent" />
+          <h3 className="text-sm font-semibold">Agenda — April 24, 2026</h3>
+        </div>
+        <div className="space-y-1">
+          {agenda.map((item) => (
+            <div key={item.time} className="flex gap-3 py-1 text-sm leading-snug">
+              <span className="shrink-0 w-11 font-mono text-xs text-muted-foreground pt-0.5">
+                {item.time}
+              </span>
+              <span>
+                {item.session}
+                {item.speakers && (
+                  <span className="text-muted-foreground"> ({item.speakers})</span>
+                )}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

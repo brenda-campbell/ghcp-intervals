@@ -266,3 +266,10 @@
 - **UX refinement:** Dialog styled to match existing card patterns and typography system. Spinner on retry, clear error messaging for invalid attempts.
 - **Error codes:** Frontend expects backend to return code: "ADMIN_PASSCODE_REQUIRED" for missing/expired passcode, code: "ADMIN_PASSCODE_INVALID" for wrong value.
 - **Scalability:** ApiError.code pattern allows future error-driven UI branching without touching message strings.
+
+### fe-agenda-card (2026-04-24)
+- **WaitingScreen.tsx** updated to show the GitHub Copilot Dev Days agenda below the waiting message area.
+- Added a `CalendarBlank` duotone icon from phosphor, agenda data as a typed array, rendered in a `bg-card text-card-foreground` card with `border-border` so it auto-themes for dark/light mode.
+- Time column uses `font-mono text-xs text-muted-foreground`; speaker names rendered in `text-muted-foreground` parenthetical spans.
+- Agenda only renders on the waiting screen — it's part of WaitingScreen component which is not shown during active quiz play.
+- Build: clean pass (tsc + vite, 0 errors).
