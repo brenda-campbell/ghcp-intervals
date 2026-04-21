@@ -102,7 +102,7 @@ resource apiContainerApp 'Microsoft.App/containerApps@2024-03-01' = {
             {
               type: 'Liveness'
               httpGet: {
-                path: '/api/health'
+                path: '/api/healthz'
                 port: 80
               }
               initialDelaySeconds: 30
@@ -111,7 +111,7 @@ resource apiContainerApp 'Microsoft.App/containerApps@2024-03-01' = {
             {
               type: 'Readiness'
               httpGet: {
-                path: '/api/health'
+                path: '/api/healthz'
                 port: 80
               }
               initialDelaySeconds: 10
@@ -121,7 +121,7 @@ resource apiContainerApp 'Microsoft.App/containerApps@2024-03-01' = {
         }
       ]
       scale: {
-        minReplicas: 0
+        minReplicas: 1
         maxReplicas: 5
         rules: [
           {

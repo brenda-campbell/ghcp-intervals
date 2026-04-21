@@ -12,6 +12,6 @@ async function health(
 app.http("health", {
   methods: ["GET"],
   authLevel: "anonymous",
-  route: "api/health",
+  route: "healthz",
   handler: health,
 });
