@@ -237,6 +237,20 @@
 - **Verification:** TypeScript compiles clean (`npx tsc --noEmit` — 0 errors).
 
 ### fe-logging-selfheal (2026-04-17)
+- **Previous entry here**
+
+### fe-agenda-card (2026-04-21)
+- **Agenda display:** Added GitHub Copilot Dev Days agenda card to WaitingScreen component
+- **Implementation:** Hardcoded agenda data (typed array) — one-off event, no API fetch required
+- **Styling:** Themed card using existing design tokens (`bg-card text-card-foreground border-border`)
+- **Icon:** `CalendarBlank` duotone from `@phosphor-icons/react` (existing dependency)
+- **Accessibility:** Supports dark and light mode automatically via theme tokens
+- **Scope:** Visible only on waiting screen; hidden when quiz play begins
+- **Files changed:** `src/components/WaitingScreen.tsx`
+- **Dependencies:** None (uses existing packages)
+- **Build status:** Clean
+- **Decision:** ADR-050 merged into decisions.md
+
 - **Logger service** (`src/services/logger.ts`): Structured JSON logging to console - `logError`, `logEvent`, `logApiCall`. Includes timestamp, session ID (from `ff_userId`), user agent, page URL. Rate-limits repeated errors (2s dedup window). Console-only for now; designed for easy App Insights upgrade later.
 - **ErrorBoundary** (`src/components/ErrorBoundary.tsx`): React class-based error boundary wrapping entire app in `main.tsx`. Shows dark card with Warning icon, error message, correlation ID, and Reload button. Logs crash via `logError` with component stack.
 - **API instrumentation** (`src/services/api.ts`): Added `instrumentedFetch` wrapper that times every API call and logs via `logApiCall`. All fetch calls routed through it. `handleResponse` now captures `x-correlation-id` header on errors. `withRetry` logs per-attempt timing.

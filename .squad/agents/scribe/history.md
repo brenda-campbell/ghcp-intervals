@@ -27,7 +27,13 @@ Scribe initialized. Team cast from Futurama universe: Leela (Lead), Fry (Fronten
   - Session log written to `.squad/log/`
   - Decision inbox merged into decisions.md and cleared
   - Test results: Backend 155 tests passing, Frontend build clean
-
+📌 Incident fix + agenda feature on 2026-04-21T13:06:49Z
+  - Coordinator: Fixed 503 login error — Cosmos DB publicNetworkAccess was Disabled, blocking Static Web App IP 74.178.151.48. Re-enabled public access and added IP firewall rule.
+  - Fry: Added GitHub Copilot Dev Days agenda card to WaitingScreen with CalendarBlank icon, dark/light mode support
+  - Decisions merged: ADR-050
+  - Orchestration logs written to `.squad/orchestration-log/2026-04-21T13-06-49Z-*`
+  - Session log written to `.squad/log/2026-04-21T13-06-49Z-session.md`
+  - Decision inbox merged into decisions.md and cleared
 
 ## Learnings
 

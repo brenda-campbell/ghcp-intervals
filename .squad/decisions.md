@@ -379,6 +379,34 @@ Added a secondary passcode check to `loginOrCreate` for admin users only:
 
 ---
 
+### ADR-050: GitHub Copilot Dev Days Agenda Card on WaitingScreen
+
+**Date:** 2026-04-21  
+**Author:** Fry (Frontend Dev)
+
+To increase player engagement while waiting for a quiz to start, the GitHub Copilot Dev Days agenda is displayed as a themed card on the WaitingScreen component.
+
+**Decision:**
+- Agenda data is hardcoded as a typed array in `WaitingScreen.tsx` (not fetched from API) since it's a one-off event
+- Styled as a themed card using existing design tokens (`bg-card text-card-foreground border-border`)
+- Uses `CalendarBlank` duotone icon from `@phosphor-icons/react` (already a project dependency)
+- Works automatically in both dark and light mode via existing theme tokens
+- Only visible on the waiting screen; disappears when quiz play begins (scoped to `WaitingScreen` component)
+
+**Rationale:**
+- No API changes needed for a single event
+- No new dependencies required
+- Hardcoding avoids database round-trips for static event data
+- For future events, update the `agenda` array directly in `WaitingScreen.tsx`
+
+**Impact:**
+- Frontend: WaitingScreen component enhanced with agenda display
+- Backend: No changes
+- Dependencies: None (uses existing `@phosphor-icons/react`)
+- Build status: Clean
+
+---
+
 ### ADR-036: Admin Passcode Prompt in Frontend Login Flow
 
 The backend now requires admin users to verify via a passcode during login, returning HTTP 401 with `code: "ADMIN_PASSCODE_REQUIRED"`. The frontend needed to detect this and prompt accordingly.
