@@ -130,7 +130,8 @@ describe("submitAnswer", () => {
   });
 
   // === Point calculation (linear time-based scoring) ===
-  // Formula: score = max(0, round(200 × (1 - elapsedTimeMs / timeoutMs)))
+  // Formula: score = max(20, round(200 - 180 × (elapsedMs / timeoutMs)))
+  // Correct answers always get at least 20 points
 
   it("awards 0 points for incorrect answers", async () => {
     const req = createMockRequest({ body: validBody({ selectedOption: 3 }) });
@@ -151,11 +152,11 @@ describe("submitAnswer", () => {
 
     const res = await handler(req, ctx);
 
-    // 200 × (1 - 0/10000) = 200
+    // 200 - 180 × (0/10000) = 200
     expect((res.jsonBody as any).pointsAwarded).toBe(200);
   });
 
-  it("awards 160 points for 2s answer with 10s timeout", async () => {
+  it("awards 164 points for 2s answer with 10s timeout", async () => {
     const now = 1700000002000;
     vi.spyOn(Date, "now").mockReturnValue(now);
     vi.mocked(getDeliveryTimestamp).mockReturnValue(now - 2000); // 2000ms elapsed
@@ -165,11 +166,11 @@ describe("submitAnswer", () => {
 
     const res = await handler(req, ctx);
 
-    // 200 × (1 - 2000/10000) = 200 × 0.8 = 160
-    expect((res.jsonBody as any).pointsAwarded).toBe(160);
+    // 200 - 180 × (2000/10000) = 200 - 36 = 164
+    expect((res.jsonBody as any).pointsAwarded).toBe(164);
   });
 
-  it("awards 100 points for half-timeout answer", async () => {
+  it("awards 110 points for half-timeout answer", async () => {
     const now = 1700000005000;
     vi.spyOn(Date, "now").mockReturnValue(now);
     vi.mocked(getDeliveryTimestamp).mockReturnValue(now - 5000); // 5000ms elapsed
@@ -179,11 +180,11 @@ describe("submitAnswer", () => {
 
     const res = await handler(req, ctx);
 
-    // 200 × (1 - 5000/10000) = 200 × 0.5 = 100
-    expect((res.jsonBody as any).pointsAwarded).toBe(100);
+    // 200 - 180 × (5000/10000) = 200 - 90 = 110
+    expect((res.jsonBody as any).pointsAwarded).toBe(110);
   });
 
-  it("awards 0 points at timeout boundary", async () => {
+  it("awards minimum 20 points at timeout boundary", async () => {
     const now = 1700000010000;
     vi.spyOn(Date, "now").mockReturnValue(now);
     vi.mocked(getDeliveryTimestamp).mockReturnValue(now - 10000); // 10000ms elapsed = full timeout
@@ -193,11 +194,11 @@ describe("submitAnswer", () => {
 
     const res = await handler(req, ctx);
 
-    // 200 × (1 - 10000/10000) = 200 × 0 = 0
-    expect((res.jsonBody as any).pointsAwarded).toBe(0);
+    // 200 - 180 × (10000/10000) = 200 - 180 = 20 (minimum)
+    expect((res.jsonBody as any).pointsAwarded).toBe(20);
   });
 
-  it("awards 0 points when answer exceeds timeout", async () => {
+  it("awards minimum 20 points when answer exceeds timeout", async () => {
     const now = 1700000015000;
     vi.spyOn(Date, "now").mockReturnValue(now);
     vi.mocked(getDeliveryTimestamp).mockReturnValue(now - 15000); // 15000ms elapsed > timeout
@@ -207,8 +208,8 @@ describe("submitAnswer", () => {
 
     const res = await handler(req, ctx);
 
-    // max(0, 200 × (1 - 15000/10000)) = max(0, -100) = 0
-    expect((res.jsonBody as any).pointsAwarded).toBe(0);
+    // max(20, 200 - 180 × 1.5) = max(20, -70) = 20
+    expect((res.jsonBody as any).pointsAwarded).toBe(20);
   });
 
   it("respects custom timerSeconds from GameState", async () => {
@@ -228,8 +229,8 @@ describe("submitAnswer", () => {
 
     const res = await handler(req, ctx);
 
-    // 200 × (1 - 15000/30000) = 200 × 0.5 = 100
-    expect((res.jsonBody as any).pointsAwarded).toBe(100);
+    // 200 - 180 × (15000/30000) = 200 - 90 = 110
+    expect((res.jsonBody as any).pointsAwarded).toBe(110);
   });
 
   it("uses default 10s timeout when GameState unavailable", async () => {
@@ -247,8 +248,8 @@ describe("submitAnswer", () => {
 
     const res = await handler(req, ctx);
 
-    // Default 10s timeout: 200 × (1 - 5000/10000) = 100
-    expect((res.jsonBody as any).pointsAwarded).toBe(100);
+    // Default 10s timeout: 200 - 180 × (5000/10000) = 110
+    expect((res.jsonBody as any).pointsAwarded).toBe(110);
   });
 
   // === Validation errors (400) ===
