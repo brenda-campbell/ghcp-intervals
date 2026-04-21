@@ -49,7 +49,7 @@ const signalROutput = output.generic({
 });
 
 const MAX_POINTS = 200;
-const MIN_POINTS = 20;
+const MIN_POINTS = 0;
 
 function calculatePoints(correct: boolean, elapsedTimeMs: number, timeoutMs: number): number {
   if (!correct) return 0;
