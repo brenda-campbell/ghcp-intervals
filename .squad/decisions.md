@@ -399,6 +399,58 @@ To increase player engagement while waiting for a quiz to start, the GitHub Copi
 - Hardcoding avoids database round-trips for static event data
 - For future events, update the `agenda` array directly in `WaitingScreen.tsx`
 
+---
+
+### ADR-051: Linear Time-Based Scoring
+
+**Date:** 2026-04-20  
+**Author:** Bender (Backend Dev)  
+**Status:** Implemented
+
+The previous relative speed-based scoring (`200 × fastestMs / playerMs`) had a fairness problem: early answerers were penalized retroactively when a faster answer arrived, and scores weren't deterministic at submission time.
+
+**Decision:**  
+Switched to linear time-based scoring: `score = max(0, round(200 × (1 - elapsedTimeMs / timeoutMs)))`. The timeout is read from `GameState.timerSeconds` (configurable 5-60s, default 10s).
+
+**Consequences:**
+- **Deterministic:** Score is known the instant you answer — no retroactive changes
+- **Fair:** Everyone is scored against the same timer, not against each other's speed
+- **Simpler:** Deleted `fastestAnswerTracker.ts` entirely; no in-memory state to track across instances
+- **Extra Cosmos read:** Each answer submission now reads GameState to get `timerSeconds` (cheap point-read by partition key)
+- **MIN_POINTS changed from 1 to 0:** Answering at or after timeout yields 0 points instead of 1
+
+**Files Changed:**
+- `src/api/src/functions/submitAnswer.ts` — new scoring formula, GameState fetch
+- `src/api/src/functions/stopQuiz.ts` — removed fastestAnswerTracker usage
+- `src/api/src/services/fastestAnswerTracker.ts` — deleted
+- `src/api/src/services/__tests__/fastestAnswerTracker.test.ts` — deleted
+
+---
+
+### ADR-052: Scoring Test Strategy Aligned to Linear Formula
+
+**Date:** 2026-04-15  
+**Author:** Amy (Tester)  
+**Status:** Accepted
+
+The scoring formula changed from relative (fastest-player-based) to linear time-based: `score = max(0, round(200 × (1 - elapsedTimeMs / timeoutMs)))`. This eliminated the fastestAnswerTracker module and introduced gameStateContainer dependency for reading timerSeconds.
+
+**Decision:**
+- Replaced 3 relative-scoring tests with 8 linear-formula tests covering boundary values (0ms, half-timeout, at-timeout, over-timeout) plus custom timer and fallback behavior
+- MIN_POINTS is now 0, not 1 — tests verify this at timeout and beyond
+- gameStateContainer mock added to cosmosClient mock in submitAnswer tests, following the `item().read()` pattern used by startQuiz/stopQuiz tests
+
+**Consequences:**
+- Tests no longer depend on order of correct answers (no multi-player relative scoring)
+- Each scoring test is independent — no state carried between test cases
+- 155 tests passing (up from 143)
+
+**Coverage Areas:**
+- Boundary values: early answer (0ms), mid-window, at-timeout, post-timeout
+- MIN_POINTS verification at timeout and beyond
+- Custom timer reading from GameState.timerSeconds (5-60s range)
+- gameStateContainer mocking following existing patterns
+
 **Impact:**
 - Frontend: WaitingScreen component enhanced with agenda display
 - Backend: No changes
