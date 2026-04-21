@@ -49,12 +49,11 @@ const signalROutput = output.generic({
 });
 
 const MAX_POINTS = 200;
-const MIN_POINTS = 0;
+const MIN_POINTS = 20;
 
 function calculatePoints(correct: boolean, elapsedTimeMs: number, timeoutMs: number): number {
   if (!correct) return 0;
 
-  // Linear time-based scoring: faster answers get more points (min 20 for correct)
   const ratio = elapsedTimeMs / timeoutMs;
   const score = Math.round(MAX_POINTS - (MAX_POINTS - MIN_POINTS) * ratio);
   return Math.max(MIN_POINTS, score);
