@@ -230,12 +230,15 @@ function App() {
           </button>
           <button
             ref={leaderboardTabRef}
+            disabled={isQuizStarted === true && !quizCompleted}
             onClick={() => setView("leaderboard")}
             className={cn(
               "relative z-10 flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors duration-200 sm:px-4",
-              view === "leaderboard"
-                ? "text-primary-foreground"
-                : "text-muted-foreground hover:text-foreground",
+              isQuizStarted && !quizCompleted
+                ? "pointer-events-none opacity-40"
+                : view === "leaderboard"
+                  ? "text-primary-foreground"
+                  : "text-muted-foreground hover:text-foreground",
             )}
           >
             <Trophy weight={view === "leaderboard" ? "fill" : "regular"} className="size-4" />

@@ -157,6 +157,10 @@ async function startQuiz(
     gameState.questionIds = pinned.map((q) => q.id);
     gameState.questionCount = questionCount;
     gameState.timerSeconds = timerSeconds;
+    // Auto-stop: total time = questions × (timer + 2s feedback) + 10s buffer
+    const FEEDBACK_SECONDS = 2;
+    const BUFFER_SECONDS = 10;
+    gameState.quizEndsAt = Date.now() + questionCount * (timerSeconds + FEEDBACK_SECONDS) * 1000 + BUFFER_SECONDS * 1000;
     gameState.updatedAt = new Date().toISOString();
     gameState.updatedBy = admin.userId;
 

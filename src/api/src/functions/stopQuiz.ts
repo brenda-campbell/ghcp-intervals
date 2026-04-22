@@ -63,6 +63,7 @@ async function stopQuiz(
     // Set isStarted to false and clear pinned questions
     gameState.isStarted = false;
     gameState.questionIds = [];
+    gameState.quizEndsAt = undefined;
     gameState.updatedAt = new Date().toISOString();
     gameState.updatedBy = admin.userId;
 

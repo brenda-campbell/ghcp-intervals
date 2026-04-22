@@ -144,11 +144,24 @@ async function submitAnswer(
   }
   elapsedTimeMs = Math.max(elapsedTimeMs, 0);
 
-  // Fetch timer config from GameState for linear scoring
+  // Fetch timer config from GameState for linear scoring + check auto-stop
   let timeoutMs = 10_000; // default 10s
+  let quizExpired = false;
   try {
     const { resource: gameState } = await gameStateContainer.item("current", "current").read<GameState>();
     timeoutMs = (gameState?.timerSeconds ?? 10) * 1000;
+
+    // Auto-stop: if quiz total time has expired, stop and broadcast
+    if (gameState?.isStarted && gameState.quizEndsAt && Date.now() > gameState.quizEndsAt) {
+      quizExpired = true;
+      gameState.isStarted = false;
+      gameState.questionIds = [];
+      gameState.quizEndsAt = undefined;
+      gameState.updatedAt = new Date().toISOString();
+      gameState.updatedBy = "system";
+      await gameStateContainer.items.upsert(gameState);
+      context.log("Quiz auto-stopped: total time expired");
+    }
   } catch {
     // Fall back to default timeout if GameState unavailable
   }
@@ -220,6 +233,14 @@ async function submitAnswer(
 
   // Broadcast real-time updates via SignalR (best-effort)
   const signalRMessages: SignalRMessage[] = [];
+
+  // If quiz expired, broadcast quizStopped so all clients return to waiting
+  if (quizExpired) {
+    signalRMessages.push({
+      target: "quizStopped",
+      arguments: [{ stoppedAt: new Date().toISOString(), stoppedBy: "system" }],
+    });
+  }
 
   // "playerAnswered" — let everyone see that someone answered (no answer details)
   signalRMessages.push({
