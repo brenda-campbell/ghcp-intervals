@@ -53,9 +53,12 @@ const MIN_POINTS = 20;
 
 function calculatePoints(correct: boolean, elapsedTimeMs: number, timeoutMs: number): number {
   if (!correct) return 0;
-
+  console.log(`Calculating points: elapsedTimeMs=${elapsedTimeMs} timeoutMs=${timeoutMs}`);
   const ratio = elapsedTimeMs / timeoutMs;
+  console.log(`Time ratio: ${ratio}`);
   const score = Math.round(MAX_POINTS - (MAX_POINTS - MIN_POINTS) * ratio);
+  console.log(`Raw score: ${score}`);
+  console.log(`Final score (after applying min): ${Math.max(MIN_POINTS, score)}`);
   return Math.max(MIN_POINTS, score);
 }
 
