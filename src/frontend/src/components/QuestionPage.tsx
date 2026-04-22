@@ -73,7 +73,7 @@ export function QuestionPage({ onNavigateToLeaderboard, isQuizStarted, timerSeco
     timedOutRef.current = false;
     setTimeUpNotice(false);
     try {
-      const qs = await fetchQuestions(QUESTION_COUNT, user?.userId);
+      const qs = await fetchQuestions(QUESTION_COUNT);
       setQuestions(qs);
       setCurrentIndex(0);
       setPhase("playing");

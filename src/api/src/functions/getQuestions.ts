@@ -6,7 +6,6 @@ import {
 } from "@azure/functions";
 import { randomUUID } from "crypto";
 import { questionsContainer, gameStateContainer } from "../services/cosmosClient.js";
-import { recordDelivery } from "../services/questionDeliveryTracker.js";
 import type { Question, QuestionResponse, GameState } from "../models/index.js";
 
 const MAX_QUESTIONS = 20;
@@ -37,8 +36,6 @@ async function getQuestions(
   context: InvocationContext
 ): Promise<HttpResponseInit> {
   context.log("getQuestions called");
-
-  const userId = request.query.get("userId") || undefined;
 
   try {
     // Check for pinned (synchronized) questions first
@@ -82,15 +79,6 @@ async function getQuestions(
       );
 
       const roundId = randomUUID();
-
-      // Record delivery timestamps for server-side elapsed-time calculation
-      if (userId) {
-        const now = Date.now();
-        for (const q of pinnedQuestions) {
-          recordDelivery(q.id, userId, now);
-        }
-      }
-
       return {
         status: 200,
         jsonBody: {
@@ -158,14 +146,6 @@ async function getQuestions(
 
     const selected = shuffleArray(questions).slice(0, count);
     const roundId = randomUUID();
-
-    // Record delivery timestamps for server-side elapsed-time calculation
-    if (userId) {
-      const now = Date.now();
-      for (const q of selected) {
-        recordDelivery(q.id, userId, now);
-      }
-    }
 
     return {
       status: 200,
