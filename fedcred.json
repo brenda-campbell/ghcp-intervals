@@ -1,0 +1,6 @@
+{
+  "name": "aca-dev-deploy",
+  "issuer": "https://token.actions.githubusercontent.com",
+  "subject": "repo:brenda-campbell/ghcp-intervals:environment:aca-dev",
+  "audiences": ["api://AzureADTokenExchange"]
+}

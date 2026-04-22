@@ -157,8 +157,10 @@ async function instrumentedFetch(input: RequestInfo | URL, init?: RequestInit): 
   }
 }
 
-export async function fetchQuestions(count: number): Promise<Question[]> {
-  const response = await instrumentedFetch(`/api/questions?count=${count}`);
+export async function fetchQuestions(count: number, userId?: string): Promise<Question[]> {
+  const params = new URLSearchParams({ count: String(count) });
+  if (userId) params.set("userId", userId);
+  const response = await instrumentedFetch(`/api/questions?${params}`);
   const data = await handleResponse<QuestionsResponse>(response);
   return data.questions;
 }

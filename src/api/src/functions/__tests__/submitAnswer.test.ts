@@ -50,7 +50,7 @@ import { questionsContainer, gameStateContainer } from "../../services/cosmosCli
 import { getDeliveryTimestamp, clearDelivery } from "../../services/questionDeliveryTracker.js";
 import { updateUserScore } from "../../services/scoringService.js";
 import { getTopLeaderboard } from "../../services/leaderboardService.js";
-import { _resetSubmitAnswerCaches } from "../submitAnswer.js";
+import { _resetSubmitAnswerCaches, calculatePoints, MAX_POINTS, MIN_POINTS } from "../submitAnswer.js";
 
 type Handler = (req: any, ctx: any) => Promise<HttpResponseInit>;
 let handler: Handler;
@@ -443,5 +443,50 @@ describe("submitAnswer", () => {
     const res = await handler(req, ctx);
 
     expect(res.status).toBe(500);
+  });
+});
+
+describe("calculatePoints", () => {
+  it("returns 0 for incorrect answers regardless of time", () => {
+    expect(calculatePoints(false, 0, 10000)).toBe(0);
+    expect(calculatePoints(false, 5000, 10000)).toBe(0);
+    expect(calculatePoints(false, 10000, 10000)).toBe(0);
+  });
+
+  it("awards MAX_POINTS for instant answer (0ms elapsed)", () => {
+    expect(calculatePoints(true, 0, 10000)).toBe(MAX_POINTS);
+  });
+
+  it("awards MIN_POINTS at full timeout", () => {
+    expect(calculatePoints(true, 10000, 10000)).toBe(MIN_POINTS);
+  });
+
+  it("awards MIN_POINTS when elapsed exceeds timeout", () => {
+    expect(calculatePoints(true, 15000, 10000)).toBe(MIN_POINTS);
+  });
+
+  it("linearly interpolates between MAX and MIN", () => {
+    // 50% elapsed → 200 - 180 × 0.5 = 110
+    expect(calculatePoints(true, 5000, 10000)).toBe(110);
+    // 20% elapsed → 200 - 180 × 0.2 = 164
+    expect(calculatePoints(true, 2000, 10000)).toBe(164);
+    // 80% elapsed → 200 - 180 × 0.8 = 56
+    expect(calculatePoints(true, 8000, 10000)).toBe(56);
+  });
+
+  it("rounds to nearest integer", () => {
+    // 33% elapsed → 200 - 180 × 0.33 = 200 - 59.4 = 140.6 → 141
+    expect(calculatePoints(true, 3300, 10000)).toBe(141);
+  });
+
+  it("works with different timeout values", () => {
+    // 30s timeout, 15s elapsed → 200 - 180 × 0.5 = 110
+    expect(calculatePoints(true, 15000, 30000)).toBe(110);
+    // 5s timeout, 1s elapsed → 200 - 180 × 0.2 = 164
+    expect(calculatePoints(true, 1000, 5000)).toBe(164);
+  });
+
+  it("never returns below MIN_POINTS for correct answers", () => {
+    expect(calculatePoints(true, 999999, 10000)).toBe(MIN_POINTS);
   });
 });

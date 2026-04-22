@@ -73,7 +73,7 @@ export function QuestionPage({ onNavigateToLeaderboard, isQuizStarted, timerSeco
     timedOutRef.current = false;
     setTimeUpNotice(false);
     try {
-      const qs = await fetchQuestions(QUESTION_COUNT);
+      const qs = await fetchQuestions(QUESTION_COUNT, user?.userId);
       setQuestions(qs);
       setCurrentIndex(0);
       setPhase("playing");
@@ -198,7 +198,9 @@ export function QuestionPage({ onNavigateToLeaderboard, isQuizStarted, timerSeco
     setSelectedIndex(optionIndex);
     setSubmitting(true);
 
-    const clientTimestamp = Date.now();
+    // Send the time the question was displayed, not the click time,
+    // so the backend can compute actual think-time (not just network latency).
+    const clientTimestamp = questionStartTime;
 
     try {
       const res = await submitAnswer({
