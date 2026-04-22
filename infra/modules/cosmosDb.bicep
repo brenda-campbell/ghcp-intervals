@@ -7,6 +7,9 @@ param environmentName string
 @description('Application name prefix')
 param appName string
 
+@description('Allowed IP addresses for Cosmos DB firewall (e.g. SWA outbound IPs)')
+param allowedIpAddresses array = []
+
 var accountName = '${appName}-${environmentName}-cosmos'
 var databaseName = 'fastestfinger'
 
@@ -17,6 +20,8 @@ resource cosmosAccount 'Microsoft.DocumentDB/databaseAccounts@2024-02-15-preview
   properties: {
     databaseAccountOfferType: 'Standard'
     publicNetworkAccess: 'Enabled'
+    ipRules: [for ip in allowedIpAddresses: { ipAddressOrRange: ip }]
+    networkAclBypass: 'AzureServices'
     capabilities: [
       { name: 'EnableServerless' }
     ]

@@ -30,6 +30,16 @@ module cosmosDb 'modules/cosmosDb.bicep' = {
     location: location
     environmentName: environmentName
     appName: appName
+    allowedIpAddresses: [
+      '20.13.101.151'    // SWA outbound IP (current)
+      '74.178.151.48'    // SWA outbound IP (previous)
+      '104.42.195.92'    // Azure portal
+      '40.76.54.131'     // Azure portal
+      '52.176.6.30'      // Azure portal
+      '52.169.50.45'     // Azure portal
+      '52.187.184.26'    // Azure portal
+      '0.0.0.0'          // Allow Azure services
+    ]
   }
 }
 
