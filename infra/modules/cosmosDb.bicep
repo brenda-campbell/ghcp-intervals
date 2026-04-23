@@ -17,6 +17,9 @@ resource cosmosAccount 'Microsoft.DocumentDB/databaseAccounts@2024-02-15-preview
   properties: {
     databaseAccountOfferType: 'Standard'
     publicNetworkAccess: 'Enabled'
+    ipRules: []
+    isVirtualNetworkFilterEnabled: false
+    virtualNetworkRules: []
     networkAclBypass: 'AzureServices'
     capabilities: [
       { name: 'EnableServerless' }

@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.40.2.10011",
-      "templateHash": "8049166478989681783"
+      "version": "0.42.1.51946",
+      "templateHash": "2145295828457235778"
     }
   },
   "parameters": {
@@ -73,8 +73,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.40.2.10011",
-              "templateHash": "3444129266342741260"
+              "version": "0.42.1.51946",
+              "templateHash": "13724623264376052744"
             }
           },
           "parameters": {
@@ -185,8 +185,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.40.2.10011",
-              "templateHash": "6943214680313725019"
+              "version": "0.42.1.51946",
+              "templateHash": "1884795996102368599"
             }
           },
           "parameters": {
@@ -223,6 +223,9 @@
               "properties": {
                 "databaseAccountOfferType": "Standard",
                 "publicNetworkAccess": "Enabled",
+                "ipRules": [],
+                "isVirtualNetworkFilterEnabled": false,
+                "virtualNetworkRules": [],
                 "networkAclBypass": "AzureServices",
                 "capabilities": [
                   {
@@ -527,8 +530,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.40.2.10011",
-              "templateHash": "12859310809403834294"
+              "version": "0.42.1.51946",
+              "templateHash": "777832962518315993"
             }
           },
           "parameters": {
@@ -677,8 +680,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.40.2.10011",
-              "templateHash": "15673913912783574247"
+              "version": "0.42.1.51946",
+              "templateHash": "4330861923700574512"
             }
           },
           "parameters": {
