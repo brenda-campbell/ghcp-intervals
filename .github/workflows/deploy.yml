@@ -63,8 +63,6 @@ jobs:
           SWA_NAME=$(echo "$DEPLOYMENT_OUTPUT" | jq -r '.staticWebAppName.value')
           COSMOS_ENDPOINT=$(echo "$DEPLOYMENT_OUTPUT" | jq -r '.cosmosDbEndpoint.value')
           SIGNALR_CONN=$(echo "$DEPLOYMENT_OUTPUT" | jq -r '.signalRConnectionString.value')
-          SWA_SUBNET_ID=$(echo "$DEPLOYMENT_OUTPUT" | jq -r '.swaSubnetId.value')
-
           echo "::add-mask::$SWA_TOKEN"
           echo "::add-mask::$SIGNALR_CONN"
 
@@ -80,13 +78,6 @@ jobs:
               AZURE_CLIENT_ID="${{ secrets.AZURE_CLIENT_ID }}" \
               AZURE_CLIENT_SECRET="${{ secrets.AZURE_CLIENT_SECRET }}" \
               AZURE_TENANT_ID="${{ secrets.AZURE_TENANT_ID }}" \
-            > /dev/null
-
-          # Configure SWA VNet integration for private endpoint access to Cosmos DB + SignalR
-          SWA_RESOURCE_ID=$(az staticwebapp show --name "$SWA_NAME" --resource-group "${{ secrets.AZURE_RG }}" --query id -o tsv)
-          az rest --method PATCH \
-            --url "https://management.azure.com${SWA_RESOURCE_ID}?api-version=2025-05-01" \
-            --body "{\"properties\":{\"networkConfigurations\":[{\"subnetId\":\"${SWA_SUBNET_ID}\"}]}}" \
             > /dev/null
 
           echo "✅ Infrastructure deployed — SWA: $SWA_HOSTNAME"

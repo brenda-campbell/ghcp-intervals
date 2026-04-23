@@ -9,29 +9,10 @@ param appName string
 
 var staticWebAppName = '${appName}-${environmentName}-swa'
 
-resource staticWebApp 'Microsoft.Web/staticSites@2023-12-01' = {
+// Reference existing SWA resource (avoids Conflict lock from in-progress ARM operations).
+// To restore full resource management, replace 'existing' with a full resource declaration.
+resource staticWebApp 'Microsoft.Web/staticSites@2023-12-01' existing = {
   name: staticWebAppName
-  location: location
-  sku: {
-    name: 'Standard'
-    tier: 'Standard'
-  }
-  identity: {
-    type: 'SystemAssigned'
-  }
-  properties: {
-    stagingEnvironmentPolicy: 'Enabled'
-    allowConfigFileUpdates: true
-    buildProperties: {
-      appLocation: '/client'
-      apiLocation: '/api'
-      outputLocation: 'dist'
-    }
-  }
-  tags: {
-    environment: environmentName
-    app: appName
-  }
 }
 
 @description('Default hostname of the Static Web App')
