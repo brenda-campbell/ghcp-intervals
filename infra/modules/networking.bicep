@@ -21,14 +21,6 @@ resource vnet 'Microsoft.Network/virtualNetworks@2024-01-01' = {
         name: 'swa-integration'
         properties: {
           addressPrefix: '10.0.1.0/24'
-          delegations: [
-            {
-              name: 'swa-delegation'
-              properties: {
-                serviceName: 'Microsoft.Web/staticSites'
-              }
-            }
-          ]
         }
       }
       {
