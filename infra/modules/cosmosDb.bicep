@@ -7,9 +7,6 @@ param environmentName string
 @description('Application name prefix')
 param appName string
 
-@description('Allowed IP addresses for Cosmos DB firewall (e.g. SWA outbound IPs)')
-param allowedIpAddresses array = []
-
 var accountName = '${appName}-${environmentName}-cosmos'
 var databaseName = 'fastestfinger'
 
@@ -19,8 +16,7 @@ resource cosmosAccount 'Microsoft.DocumentDB/databaseAccounts@2024-02-15-preview
   kind: 'GlobalDocumentDB'
   properties: {
     databaseAccountOfferType: 'Standard'
-    publicNetworkAccess: 'Enabled'
-    ipRules: [for ip in allowedIpAddresses: { ipAddressOrRange: ip }]
+    publicNetworkAccess: 'Disabled'
     networkAclBypass: 'AzureServices'
     capabilities: [
       { name: 'EnableServerless' }
@@ -194,6 +190,9 @@ resource gameStateContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/
 
 @description('Cosmos DB account endpoint')
 output endpoint string = cosmosAccount.properties.documentEndpoint
+
+@description('Cosmos DB account resource ID')
+output resourceId string = cosmosAccount.id
 
 @description('Cosmos DB connection string')
 output connectionString string = cosmosAccount.listConnectionStrings().connectionStrings[0].connectionString

@@ -20,6 +20,17 @@ module staticWebApp 'modules/staticWebApp.bicep' = {
     location: swaLocation
     environmentName: environmentName
     appName: appName
+    swaSubnetId: networking.outputs.swaSubnetId
+  }
+}
+
+// --- Networking (VNet + Subnets) ---
+module networking 'modules/networking.bicep' = {
+  name: 'deploy-networking'
+  params: {
+    location: swaLocation  // VNet must be in SWA region for VNet integration
+    environmentName: environmentName
+    appName: appName
   }
 }
 
@@ -30,26 +41,35 @@ module cosmosDb 'modules/cosmosDb.bicep' = {
     location: location
     environmentName: environmentName
     appName: appName
-    allowedIpAddresses: [
-      '20.13.101.151'    // SWA outbound IP (current)
-      '74.178.151.48'    // SWA outbound IP (previous)
-      '104.42.195.92'    // Azure portal
-      '40.76.54.131'     // Azure portal
-      '52.176.6.30'      // Azure portal
-      '52.169.50.45'     // Azure portal
-      '52.187.184.26'    // Azure portal
-      '0.0.0.0'          // Allow Azure services
-    ]
   }
 }
 
 // --- SignalR Service ---
+// Note: PE name is constructed deterministically to avoid circular dependency
+// (SignalR needs PE name for networkACLs, PEs need SignalR resource ID)
+var signalRPrivateEndpointName = '${appName}-${environmentName}-signalr-pe'
+
 module signalR 'modules/signalr.bicep' = {
   name: 'deploy-signalR'
   params: {
     location: location
     environmentName: environmentName
     appName: appName
+    privateEndpointName: signalRPrivateEndpointName
+  }
+}
+
+// --- Private Endpoints (Cosmos DB + SignalR) ---
+module privateEndpoints 'modules/privateEndpoints.bicep' = {
+  name: 'deploy-privateEndpoints'
+  params: {
+    location: swaLocation  // PEs in same region as VNet
+    environmentName: environmentName
+    appName: appName
+    privateEndpointSubnetId: networking.outputs.privateEndpointSubnetId
+    vnetId: networking.outputs.vnetId
+    cosmosDbAccountId: cosmosDb.outputs.resourceId
+    signalRId: signalR.outputs.resourceId
   }
 }
 
