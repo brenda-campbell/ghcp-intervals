@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.40.2.10011",
-      "templateHash": "13592192303071186978"
+      "templateHash": "8049166478989681783"
     }
   },
   "parameters": {
@@ -47,100 +47,6 @@
     "signalRPrivateEndpointName": "[format('{0}-{1}-signalr-pe', parameters('appName'), parameters('environmentName'))]"
   },
   "resources": [
-    {
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2025-04-01",
-      "name": "deploy-staticWebApp",
-      "properties": {
-        "expressionEvaluationOptions": {
-          "scope": "inner"
-        },
-        "mode": "Incremental",
-        "parameters": {
-          "location": {
-            "value": "[parameters('swaLocation')]"
-          },
-          "environmentName": {
-            "value": "[parameters('environmentName')]"
-          },
-          "appName": {
-            "value": "[parameters('appName')]"
-          }
-        },
-        "template": {
-          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-          "contentVersion": "1.0.0.0",
-          "metadata": {
-            "_generator": {
-              "name": "bicep",
-              "version": "0.40.2.10011",
-              "templateHash": "10905988198890137404"
-            }
-          },
-          "parameters": {
-            "location": {
-              "type": "string",
-              "metadata": {
-                "description": "Azure region for the Static Web App"
-              }
-            },
-            "environmentName": {
-              "type": "string",
-              "metadata": {
-                "description": "Environment name (dev, staging, prod)"
-              }
-            },
-            "appName": {
-              "type": "string",
-              "metadata": {
-                "description": "Application name prefix"
-              }
-            }
-          },
-          "variables": {
-            "staticWebAppName": "[format('{0}-{1}-swa', parameters('appName'), parameters('environmentName'))]"
-          },
-          "resources": [],
-          "outputs": {
-            "hostname": {
-              "type": "string",
-              "metadata": {
-                "description": "Default hostname of the Static Web App"
-              },
-              "value": "[reference(resourceId('Microsoft.Web/staticSites', variables('staticWebAppName')), '2023-12-01').defaultHostname]"
-            },
-            "resourceId": {
-              "type": "string",
-              "metadata": {
-                "description": "Resource ID of the Static Web App"
-              },
-              "value": "[resourceId('Microsoft.Web/staticSites', variables('staticWebAppName'))]"
-            },
-            "name": {
-              "type": "string",
-              "metadata": {
-                "description": "Name of the Static Web App"
-              },
-              "value": "[variables('staticWebAppName')]"
-            },
-            "principalId": {
-              "type": "string",
-              "metadata": {
-                "description": "Principal ID of the system-assigned managed identity"
-              },
-              "value": "[reference(resourceId('Microsoft.Web/staticSites', variables('staticWebAppName')), '2023-12-01', 'full').identity.principalId]"
-            },
-            "deploymentToken": {
-              "type": "string",
-              "metadata": {
-                "description": "Deployment token for CI/CD"
-              },
-              "value": "[listSecrets(resourceId('Microsoft.Web/staticSites', variables('staticWebAppName')), '2023-12-01').properties.apiKey]"
-            }
-          }
-        }
-      }
-    },
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-04-01",
@@ -984,27 +890,6 @@
     }
   ],
   "outputs": {
-    "staticWebAppHostname": {
-      "type": "string",
-      "metadata": {
-        "description": "Static Web App default hostname"
-      },
-      "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deploy-staticWebApp'), '2025-04-01').outputs.hostname.value]"
-    },
-    "staticWebAppDeploymentToken": {
-      "type": "string",
-      "metadata": {
-        "description": "Static Web App deployment token for CI/CD"
-      },
-      "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deploy-staticWebApp'), '2025-04-01').outputs.deploymentToken.value]"
-    },
-    "staticWebAppName": {
-      "type": "string",
-      "metadata": {
-        "description": "Static Web App name"
-      },
-      "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deploy-staticWebApp'), '2025-04-01').outputs.name.value]"
-    },
     "cosmosDbEndpoint": {
       "type": "string",
       "metadata": {

@@ -14,14 +14,9 @@ param environmentName string = 'dev'
 param appName string = 'fastestfinger'
 
 // --- Static Web App ---
-module staticWebApp 'modules/staticWebApp.bicep' = {
-  name: 'deploy-staticWebApp'
-  params: {
-    location: swaLocation
-    environmentName: environmentName
-    appName: appName
-  }
-}
+// SWA is managed outside Bicep while its ARM resource provider lock clears.
+// The SWA already exists and is deployed via the CI/CD workflow directly.
+// To restore: uncomment the module and its outputs below.
 
 // --- Networking (VNet + Subnets) ---
 module networking 'modules/networking.bicep' = {
@@ -73,15 +68,6 @@ module privateEndpoints 'modules/privateEndpoints.bicep' = {
 }
 
 // --- Outputs ---
-@description('Static Web App default hostname')
-output staticWebAppHostname string = staticWebApp.outputs.hostname
-
-@description('Static Web App deployment token for CI/CD')
-output staticWebAppDeploymentToken string = staticWebApp.outputs.deploymentToken
-
-@description('Static Web App name')
-output staticWebAppName string = staticWebApp.outputs.name
-
 @description('Cosmos DB endpoint')
 output cosmosDbEndpoint string = cosmosDb.outputs.endpoint
 

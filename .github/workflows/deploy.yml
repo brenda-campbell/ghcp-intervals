@@ -34,8 +34,7 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      swa-token: ${{ steps.deploy-bicep.outputs.swaToken }}
-      swa-hostname: ${{ steps.deploy-bicep.outputs.swaHostname }}
+      swa-hostname: ${{ steps.swa-info.outputs.swaHostname }}
 
     steps:
       - name: Checkout code
@@ -58,29 +57,39 @@ jobs:
             --query 'properties.outputs' \
             --output json)
 
-          SWA_TOKEN=$(echo "$DEPLOYMENT_OUTPUT" | jq -r '.staticWebAppDeploymentToken.value')
-          SWA_HOSTNAME=$(echo "$DEPLOYMENT_OUTPUT" | jq -r '.staticWebAppHostname.value')
-          SWA_NAME=$(echo "$DEPLOYMENT_OUTPUT" | jq -r '.staticWebAppName.value')
           COSMOS_ENDPOINT=$(echo "$DEPLOYMENT_OUTPUT" | jq -r '.cosmosDbEndpoint.value')
           SIGNALR_CONN=$(echo "$DEPLOYMENT_OUTPUT" | jq -r '.signalRConnectionString.value')
-          echo "::add-mask::$SWA_TOKEN"
           echo "::add-mask::$SIGNALR_CONN"
 
-          echo "swaToken=$SWA_TOKEN" >> "$GITHUB_OUTPUT"
+          echo "cosmosEndpoint=$COSMOS_ENDPOINT" >> "$GITHUB_OUTPUT"
+          echo "signalrConn=$SIGNALR_CONN" >> "$GITHUB_OUTPUT"
+
+          echo "✅ Infrastructure deployed"
+
+      # SWA config is separate from Bicep while the ARM lock clears
+      - name: Configure SWA app settings
+        id: swa-info
+        run: |
+          SWA_NAME="fastestfinger-dev-swa"
+
+          SWA_HOSTNAME=$(az staticwebapp show \
+            --name "$SWA_NAME" \
+            --resource-group "${{ secrets.AZURE_RG }}" \
+            --query defaultHostname -o tsv)
           echo "swaHostname=$SWA_HOSTNAME" >> "$GITHUB_OUTPUT"
 
-          # Configure SWA app settings (service principal for Cosmos AAD auth)
           az staticwebapp appsettings set \
             --name "$SWA_NAME" \
             --setting-names \
-              COSMOS_ENDPOINT="$COSMOS_ENDPOINT" \
-              AzureSignalRConnectionString="$SIGNALR_CONN" \
+              COSMOS_ENDPOINT="${{ steps.deploy-bicep.outputs.cosmosEndpoint }}" \
+              AzureSignalRConnectionString="${{ steps.deploy-bicep.outputs.signalrConn }}" \
               AZURE_CLIENT_ID="${{ secrets.AZURE_CLIENT_ID }}" \
               AZURE_CLIENT_SECRET="${{ secrets.AZURE_CLIENT_SECRET }}" \
               AZURE_TENANT_ID="${{ secrets.AZURE_TENANT_ID }}" \
             > /dev/null
 
-          echo "✅ Infrastructure deployed — SWA: $SWA_HOSTNAME"
+          echo "✅ SWA configured — $SWA_HOSTNAME"
+        continue-on-error: true
 
   # ===========================================================================
   # Job 2 — Build, Test & Deploy Application
@@ -135,7 +144,7 @@ jobs:
       - name: Deploy to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1
         with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN || needs.infrastructure.outputs.swa-token }}
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: upload
           app_location: src/frontend
