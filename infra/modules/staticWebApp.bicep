@@ -7,9 +7,6 @@ param environmentName string
 @description('Application name prefix')
 param appName string
 
-@description('Resource ID of the subnet for SWA VNet integration')
-param swaSubnetId string = ''
-
 var staticWebAppName = '${appName}-${environmentName}-swa'
 
 resource staticWebApp 'Microsoft.Web/staticSites@2023-12-01' = {
@@ -51,12 +48,3 @@ output principalId string = staticWebApp.identity.principalId
 
 @description('Deployment token for CI/CD')
 output deploymentToken string = staticWebApp.listSecrets().properties.apiKey
-
-// --- VNet Integration ---
-resource swaNetworkConfig 'Microsoft.Web/staticSites/networkConfig@2023-12-01' = if (!empty(swaSubnetId)) {
-  parent: staticWebApp
-  name: 'virtualNetwork'
-  properties: {
-    subnetResourceId: swaSubnetId
-  }
-}

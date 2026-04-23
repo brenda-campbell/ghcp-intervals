@@ -20,7 +20,6 @@ module staticWebApp 'modules/staticWebApp.bicep' = {
     location: swaLocation
     environmentName: environmentName
     appName: appName
-    swaSubnetId: networking.outputs.swaSubnetId
   }
 }
 
@@ -88,3 +87,6 @@ output cosmosDbEndpoint string = cosmosDb.outputs.endpoint
 
 @description('SignalR connection string')
 output signalRConnectionString string = signalR.outputs.connectionString
+
+@description('SWA VNet integration subnet ID')
+output swaSubnetId string = networking.outputs.swaSubnetId
