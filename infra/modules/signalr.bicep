@@ -7,9 +7,6 @@ param environmentName string
 @description('Application name prefix')
 param appName string
 
-@description('Name of the SignalR private endpoint (for networkACL reference)')
-param privateEndpointName string = ''
-
 var signalRName = '${appName}-${environmentName}-signalr'
 
 resource signalR 'Microsoft.SignalRService/signalR@2024-03-01' = {
@@ -36,18 +33,6 @@ resource signalR 'Microsoft.SignalRService/signalR@2024-03-01' = {
       allowedOrigins: ['*']
     }
     publicNetworkAccess: 'Enabled'
-    networkACLs: {
-      defaultAction: 'Deny'
-      publicNetwork: {
-        allow: ['ClientConnection']
-      }
-      privateEndpoints: !empty(privateEndpointName) ? [
-        {
-          name: privateEndpointName
-          allow: ['ServerConnection', 'ClientConnection']
-        }
-      ] : []
-    }
   }
   tags: {
     environment: environmentName
@@ -63,6 +48,3 @@ output connectionString string = signalR.listKeys().primaryConnectionString
 
 @description('SignalR resource name')
 output name string = signalR.name
-
-@description('SignalR resource ID')
-output resourceId string = signalR.id

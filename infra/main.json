@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.42.1.51946",
-      "templateHash": "2145295828457235778"
+      "templateHash": "15137471647547006913"
     }
   },
   "parameters": {
@@ -14,13 +14,6 @@
       "defaultValue": "northeurope",
       "metadata": {
         "description": "Azure region for all resources"
-      }
-    },
-    "swaLocation": {
-      "type": "string",
-      "defaultValue": "westeurope",
-      "metadata": {
-        "description": "Azure region for Static Web App (must be a supported SWA region)"
       }
     },
     "environmentName": {
@@ -43,122 +36,7 @@
       }
     }
   },
-  "variables": {
-    "signalRPrivateEndpointName": "[format('{0}-{1}-signalr-pe', parameters('appName'), parameters('environmentName'))]"
-  },
   "resources": [
-    {
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2025-04-01",
-      "name": "deploy-networking",
-      "properties": {
-        "expressionEvaluationOptions": {
-          "scope": "inner"
-        },
-        "mode": "Incremental",
-        "parameters": {
-          "location": {
-            "value": "[parameters('swaLocation')]"
-          },
-          "environmentName": {
-            "value": "[parameters('environmentName')]"
-          },
-          "appName": {
-            "value": "[parameters('appName')]"
-          }
-        },
-        "template": {
-          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-          "contentVersion": "1.0.0.0",
-          "metadata": {
-            "_generator": {
-              "name": "bicep",
-              "version": "0.42.1.51946",
-              "templateHash": "13724623264376052744"
-            }
-          },
-          "parameters": {
-            "location": {
-              "type": "string",
-              "metadata": {
-                "description": "Azure region for the VNet (must match SWA region for VNet integration)"
-              }
-            },
-            "environmentName": {
-              "type": "string",
-              "metadata": {
-                "description": "Environment name (dev, staging, prod)"
-              }
-            },
-            "appName": {
-              "type": "string",
-              "metadata": {
-                "description": "Application name prefix"
-              }
-            }
-          },
-          "variables": {
-            "vnetName": "[format('{0}-{1}-vnet', parameters('appName'), parameters('environmentName'))]"
-          },
-          "resources": [
-            {
-              "type": "Microsoft.Network/virtualNetworks",
-              "apiVersion": "2024-01-01",
-              "name": "[variables('vnetName')]",
-              "location": "[parameters('location')]",
-              "properties": {
-                "addressSpace": {
-                  "addressPrefixes": [
-                    "10.0.0.0/16"
-                  ]
-                },
-                "subnets": [
-                  {
-                    "name": "swa-integration",
-                    "properties": {
-                      "addressPrefix": "10.0.1.0/24"
-                    }
-                  },
-                  {
-                    "name": "private-endpoints",
-                    "properties": {
-                      "addressPrefix": "10.0.2.0/24"
-                    }
-                  }
-                ]
-              },
-              "tags": {
-                "environment": "[parameters('environmentName')]",
-                "app": "[parameters('appName')]"
-              }
-            }
-          ],
-          "outputs": {
-            "vnetId": {
-              "type": "string",
-              "metadata": {
-                "description": "Resource ID of the VNet"
-              },
-              "value": "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]"
-            },
-            "swaSubnetId": {
-              "type": "string",
-              "metadata": {
-                "description": "Resource ID of the SWA integration subnet"
-              },
-              "value": "[reference(resourceId('Microsoft.Network/virtualNetworks', variables('vnetName')), '2024-01-01').subnets[0].id]"
-            },
-            "privateEndpointSubnetId": {
-              "type": "string",
-              "metadata": {
-                "description": "Resource ID of the private endpoints subnet"
-              },
-              "value": "[reference(resourceId('Microsoft.Network/virtualNetworks', variables('vnetName')), '2024-01-01').subnets[1].id]"
-            }
-          }
-        }
-      }
-    },
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-04-01",
@@ -519,9 +397,6 @@
           },
           "appName": {
             "value": "[parameters('appName')]"
-          },
-          "privateEndpointName": {
-            "value": "[variables('signalRPrivateEndpointName')]"
           }
         },
         "template": {
@@ -531,7 +406,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.42.1.51946",
-              "templateHash": "777832962518315993"
+              "templateHash": "2305767756873705729"
             }
           },
           "parameters": {
@@ -551,13 +426,6 @@
               "type": "string",
               "metadata": {
                 "description": "Application name prefix"
-              }
-            },
-            "privateEndpointName": {
-              "type": "string",
-              "defaultValue": "",
-              "metadata": {
-                "description": "Name of the SignalR private endpoint (for networkACL reference)"
               }
             }
           },
@@ -592,16 +460,7 @@
                     "*"
                   ]
                 },
-                "publicNetworkAccess": "Enabled",
-                "networkACLs": {
-                  "defaultAction": "Deny",
-                  "publicNetwork": {
-                    "allow": [
-                      "ClientConnection"
-                    ]
-                  },
-                  "privateEndpoints": "[if(not(empty(parameters('privateEndpointName'))), createArray(createObject('name', parameters('privateEndpointName'), 'allow', createArray('ServerConnection', 'ClientConnection'))), createArray())]"
-                }
+                "publicNetworkAccess": "Enabled"
               },
               "tags": {
                 "environment": "[parameters('environmentName')]",
@@ -630,266 +489,10 @@
                 "description": "SignalR resource name"
               },
               "value": "[variables('signalRName')]"
-            },
-            "resourceId": {
-              "type": "string",
-              "metadata": {
-                "description": "SignalR resource ID"
-              },
-              "value": "[resourceId('Microsoft.SignalRService/signalR', variables('signalRName'))]"
             }
           }
         }
       }
-    },
-    {
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2025-04-01",
-      "name": "deploy-privateEndpoints",
-      "properties": {
-        "expressionEvaluationOptions": {
-          "scope": "inner"
-        },
-        "mode": "Incremental",
-        "parameters": {
-          "location": {
-            "value": "[parameters('swaLocation')]"
-          },
-          "environmentName": {
-            "value": "[parameters('environmentName')]"
-          },
-          "appName": {
-            "value": "[parameters('appName')]"
-          },
-          "privateEndpointSubnetId": {
-            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deploy-networking'), '2025-04-01').outputs.privateEndpointSubnetId.value]"
-          },
-          "vnetId": {
-            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deploy-networking'), '2025-04-01').outputs.vnetId.value]"
-          },
-          "cosmosDbAccountId": {
-            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deploy-cosmosDb'), '2025-04-01').outputs.resourceId.value]"
-          },
-          "signalRId": {
-            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deploy-signalR'), '2025-04-01').outputs.resourceId.value]"
-          }
-        },
-        "template": {
-          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-          "contentVersion": "1.0.0.0",
-          "metadata": {
-            "_generator": {
-              "name": "bicep",
-              "version": "0.42.1.51946",
-              "templateHash": "4330861923700574512"
-            }
-          },
-          "parameters": {
-            "location": {
-              "type": "string",
-              "metadata": {
-                "description": "Azure region for private endpoints (must match VNet region)"
-              }
-            },
-            "environmentName": {
-              "type": "string",
-              "metadata": {
-                "description": "Environment name (dev, staging, prod)"
-              }
-            },
-            "appName": {
-              "type": "string",
-              "metadata": {
-                "description": "Application name prefix"
-              }
-            },
-            "privateEndpointSubnetId": {
-              "type": "string",
-              "metadata": {
-                "description": "Resource ID of the subnet for private endpoints"
-              }
-            },
-            "vnetId": {
-              "type": "string",
-              "metadata": {
-                "description": "Resource ID of the VNet"
-              }
-            },
-            "cosmosDbAccountId": {
-              "type": "string",
-              "metadata": {
-                "description": "Resource ID of the Cosmos DB account"
-              }
-            },
-            "signalRId": {
-              "type": "string",
-              "metadata": {
-                "description": "Resource ID of the SignalR service"
-              }
-            }
-          },
-          "variables": {
-            "cosmosPrivateEndpointName": "[format('{0}-{1}-cosmos-pe', parameters('appName'), parameters('environmentName'))]",
-            "signalRPrivateEndpointName": "[format('{0}-{1}-signalr-pe', parameters('appName'), parameters('environmentName'))]"
-          },
-          "resources": [
-            {
-              "type": "Microsoft.Network/privateEndpoints",
-              "apiVersion": "2024-01-01",
-              "name": "[variables('cosmosPrivateEndpointName')]",
-              "location": "[parameters('location')]",
-              "properties": {
-                "subnet": {
-                  "id": "[parameters('privateEndpointSubnetId')]"
-                },
-                "privateLinkServiceConnections": [
-                  {
-                    "name": "[format('{0}-conn', variables('cosmosPrivateEndpointName'))]",
-                    "properties": {
-                      "privateLinkServiceId": "[parameters('cosmosDbAccountId')]",
-                      "groupIds": [
-                        "Sql"
-                      ]
-                    }
-                  }
-                ]
-              },
-              "tags": {
-                "environment": "[parameters('environmentName')]",
-                "app": "[parameters('appName')]"
-              }
-            },
-            {
-              "type": "Microsoft.Network/privateDnsZones",
-              "apiVersion": "2024-06-01",
-              "name": "privatelink.documents.azure.com",
-              "location": "global",
-              "tags": {
-                "environment": "[parameters('environmentName')]",
-                "app": "[parameters('appName')]"
-              }
-            },
-            {
-              "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
-              "apiVersion": "2024-06-01",
-              "name": "[format('{0}/{1}', 'privatelink.documents.azure.com', format('{0}-{1}-cosmos-vnet-link', parameters('appName'), parameters('environmentName')))]",
-              "location": "global",
-              "properties": {
-                "virtualNetwork": {
-                  "id": "[parameters('vnetId')]"
-                },
-                "registrationEnabled": false
-              },
-              "dependsOn": [
-                "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.documents.azure.com')]"
-              ]
-            },
-            {
-              "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
-              "apiVersion": "2024-01-01",
-              "name": "[format('{0}/{1}', variables('cosmosPrivateEndpointName'), 'cosmos-dns-group')]",
-              "properties": {
-                "privateDnsZoneConfigs": [
-                  {
-                    "name": "cosmos-dns-config",
-                    "properties": {
-                      "privateDnsZoneId": "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.documents.azure.com')]"
-                    }
-                  }
-                ]
-              },
-              "dependsOn": [
-                "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.documents.azure.com')]",
-                "[resourceId('Microsoft.Network/privateEndpoints', variables('cosmosPrivateEndpointName'))]"
-              ]
-            },
-            {
-              "type": "Microsoft.Network/privateEndpoints",
-              "apiVersion": "2024-01-01",
-              "name": "[variables('signalRPrivateEndpointName')]",
-              "location": "[parameters('location')]",
-              "properties": {
-                "subnet": {
-                  "id": "[parameters('privateEndpointSubnetId')]"
-                },
-                "privateLinkServiceConnections": [
-                  {
-                    "name": "[format('{0}-conn', variables('signalRPrivateEndpointName'))]",
-                    "properties": {
-                      "privateLinkServiceId": "[parameters('signalRId')]",
-                      "groupIds": [
-                        "signalr"
-                      ]
-                    }
-                  }
-                ]
-              },
-              "tags": {
-                "environment": "[parameters('environmentName')]",
-                "app": "[parameters('appName')]"
-              }
-            },
-            {
-              "type": "Microsoft.Network/privateDnsZones",
-              "apiVersion": "2024-06-01",
-              "name": "privatelink.service.signalr.net",
-              "location": "global",
-              "tags": {
-                "environment": "[parameters('environmentName')]",
-                "app": "[parameters('appName')]"
-              }
-            },
-            {
-              "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
-              "apiVersion": "2024-06-01",
-              "name": "[format('{0}/{1}', 'privatelink.service.signalr.net', format('{0}-{1}-signalr-vnet-link', parameters('appName'), parameters('environmentName')))]",
-              "location": "global",
-              "properties": {
-                "virtualNetwork": {
-                  "id": "[parameters('vnetId')]"
-                },
-                "registrationEnabled": false
-              },
-              "dependsOn": [
-                "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.service.signalr.net')]"
-              ]
-            },
-            {
-              "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
-              "apiVersion": "2024-01-01",
-              "name": "[format('{0}/{1}', variables('signalRPrivateEndpointName'), 'signalr-dns-group')]",
-              "properties": {
-                "privateDnsZoneConfigs": [
-                  {
-                    "name": "signalr-dns-config",
-                    "properties": {
-                      "privateDnsZoneId": "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.service.signalr.net')]"
-                    }
-                  }
-                ]
-              },
-              "dependsOn": [
-                "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.service.signalr.net')]",
-                "[resourceId('Microsoft.Network/privateEndpoints', variables('signalRPrivateEndpointName'))]"
-              ]
-            }
-          ],
-          "outputs": {
-            "signalRPrivateEndpointName": {
-              "type": "string",
-              "metadata": {
-                "description": "Name of the SignalR private endpoint (needed for networkACL reference)"
-              },
-              "value": "[variables('signalRPrivateEndpointName')]"
-            }
-          }
-        }
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.Resources/deployments', 'deploy-cosmosDb')]",
-        "[resourceId('Microsoft.Resources/deployments', 'deploy-networking')]",
-        "[resourceId('Microsoft.Resources/deployments', 'deploy-signalR')]"
-      ]
     }
   ],
   "outputs": {

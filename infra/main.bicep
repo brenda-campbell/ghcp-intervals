@@ -3,9 +3,6 @@ targetScope = 'resourceGroup'
 @description('Azure region for all resources')
 param location string = 'northeurope'
 
-@description('Azure region for Static Web App (must be a supported SWA region)')
-param swaLocation string = 'westeurope'
-
 @description('Environment name (dev, staging, prod)')
 @allowed(['dev', 'staging', 'prod'])
 param environmentName string = 'dev'
@@ -18,16 +15,6 @@ param appName string = 'fastestfinger'
 // The SWA already exists and is deployed via the CI/CD workflow directly.
 // To restore: uncomment the module and its outputs below.
 
-// --- Networking (VNet + Subnets) ---
-module networking 'modules/networking.bicep' = {
-  name: 'deploy-networking'
-  params: {
-    location: swaLocation  // VNet must be in SWA region for VNet integration
-    environmentName: environmentName
-    appName: appName
-  }
-}
-
 // --- Cosmos DB ---
 module cosmosDb 'modules/cosmosDb.bicep' = {
   name: 'deploy-cosmosDb'
@@ -39,31 +26,12 @@ module cosmosDb 'modules/cosmosDb.bicep' = {
 }
 
 // --- SignalR Service ---
-// Note: PE name is constructed deterministically to avoid circular dependency
-// (SignalR needs PE name for networkACLs, PEs need SignalR resource ID)
-var signalRPrivateEndpointName = '${appName}-${environmentName}-signalr-pe'
-
 module signalR 'modules/signalr.bicep' = {
   name: 'deploy-signalR'
   params: {
     location: location
     environmentName: environmentName
     appName: appName
-    privateEndpointName: signalRPrivateEndpointName
-  }
-}
-
-// --- Private Endpoints (Cosmos DB + SignalR) ---
-module privateEndpoints 'modules/privateEndpoints.bicep' = {
-  name: 'deploy-privateEndpoints'
-  params: {
-    location: swaLocation  // PEs in same region as VNet
-    environmentName: environmentName
-    appName: appName
-    privateEndpointSubnetId: networking.outputs.privateEndpointSubnetId
-    vnetId: networking.outputs.vnetId
-    cosmosDbAccountId: cosmosDb.outputs.resourceId
-    signalRId: signalR.outputs.resourceId
   }
 }
 
