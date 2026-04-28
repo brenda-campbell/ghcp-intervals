@@ -8,11 +8,11 @@ interface WaitingScreenProps {
 const agenda = [
   { time: "09:00", session: "Arrival & networking" },
   { time: "09:15", session: "Welcome & the big picture", speakers: "Santosh Takoor" },
-  { time: "09:35", session: "Developer deep dives (Part 1)", speakers: "Dan Marzolini" },
+  { time: "09:35", session: "Developer deep dives (Part 1)", speakers: "Gary Lumsden / Richard Carberry" },
   { time: "10:15", session: "Live demo: GitHub Copilot in action", speakers: "Miru Kamal / Rayan Popat" },
   { time: "10:45", session: "Break" },
-  { time: "11:00", session: "Developer deep dives (Part 2)", speakers: "Ryan Drewery / Jack Rawlings" },
-  { time: "11:40", session: "End-to-end developer workflow", speakers: "Siya Khumalo" },
+  { time: "11:00", session: "Developer deep dives (Part 2)", speakers: "Brenda Campbell" },
+  { time: "11:40", session: "End-to-end developer workflow", speakers: "Joshua Chalcraft" },
   { time: "12:15", session: "Scaling AI safely in enterprise codebases", speakers: "CAST Software - Marc Galin & Ralf Weiss" },
   { time: "12:45", session: "Q&A, closing remarks & next steps" },
 ];
