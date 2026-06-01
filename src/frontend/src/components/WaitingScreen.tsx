@@ -6,15 +6,14 @@ interface WaitingScreenProps {
 }
 
 const agenda = [
-  { time: "09:00", session: "Arrival & networking" },
-  { time: "09:15", session: "Welcome & the big picture", speakers: "Santosh Takoor" },
-  { time: "09:35", session: "Developer deep dives (Part 1)", speakers: "Gary Lumsden / Richard Carberry" },
-  { time: "10:15", session: "Live demo: GitHub Copilot in action", speakers: "Miru Kamal / Rayan Popat" },
-  { time: "10:45", session: "Break" },
-  { time: "11:00", session: "Developer deep dives (Part 2)", speakers: "Brenda Campbell" },
-  { time: "11:40", session: "End-to-end developer workflow", speakers: "Joshua Chalcraft" },
-  { time: "12:15", session: "Scaling AI safely in enterprise codebases", speakers: "CAST Software - Marc Galin & Ralf Weiss" },
-  { time: "12:45", session: "Q&A, closing remarks & next steps" },
+  { time: "12:00", session: "Arrive, networking and lunch" },
+  { time: "13:00", session: "Introduction to the event" },
+  { time: "13:15", session: "Engineering, Reimagined: The Developer role in the world of Agents" },
+  { time: "14:00", session: "Bringing it to Life: Demoing the end-to-end agentic vision in GitHub Copilot" },
+  { time: "15:00", session: "Break and Networking" },
+  { time: "15:30", session: "Fireside Chat with 3 FSI organisations from Banking, Insurance and Building Society" },
+  { time: "16:30", session: "Making It Real: Steps to start your agentic developer journey" },
+  { time: "17:15", session: "Close" },
 ];
 
 export function WaitingScreen({ categoryName, onlineCount }: WaitingScreenProps) {
@@ -57,7 +56,7 @@ export function WaitingScreen({ categoryName, onlineCount }: WaitingScreenProps)
       <div className="mt-8 w-full max-w-md rounded-xl border border-border bg-card text-card-foreground p-4 shadow-sm">
         <div className="flex items-center gap-2 mb-3">
           <CalendarBlank weight="duotone" className="h-5 w-5 text-accent" />
-          <h3 className="text-sm font-semibold">Agenda — April 24, 2026</h3>
+          <h3 className="text-sm font-semibold">Agenda</h3>
         </div>
         <div className="space-y-1">
           {agenda.map((item) => (
@@ -67,9 +66,6 @@ export function WaitingScreen({ categoryName, onlineCount }: WaitingScreenProps)
               </span>
               <span>
                 {item.session}
-                {item.speakers && (
-                  <span className="text-muted-foreground"> ({item.speakers})</span>
-                )}
               </span>
             </div>
           ))}
