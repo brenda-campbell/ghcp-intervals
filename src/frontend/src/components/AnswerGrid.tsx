@@ -1,9 +1,30 @@
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { QuestionType } from "@/services/api";
 
 const MC_LABELS = ["A", "B", "C", "D"] as const;
 const TF_LABELS = ["✓", "✗"] as const;
+
+// Keyboard shortcuts per option index. Matched case-insensitively.
+const MC_KEYS = [
+  ["1", "a"],
+  ["2", "b"],
+  ["3", "c"],
+  ["4", "d"],
+] as const;
+const TF_KEYS = [
+  ["1", "t"],
+  ["2", "f"],
+] as const;
+
+/** True when focus sits in a field where typing should not trigger shortcuts. */
+function isEditableTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+  const tag = target.tagName;
+  if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return true;
+  return target.isContentEditable;
+}
 
 interface AnswerGridProps {
   options: string[];
@@ -31,6 +52,31 @@ export function AnswerGrid({
   const labels = isTrueFalse ? TF_LABELS : MC_LABELS;
   const gridCols = isTrueFalse ? "grid-cols-2" : "grid-cols-1 sm:grid-cols-2";
 
+  const keyMap = isTrueFalse ? TF_KEYS : MC_KEYS;
+  const optionCount = options.length;
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Only accept input while the question is active and unanswered.
+      if (disabled || selectedIndex !== null) return;
+      // Ignore auto-repeat from a held key so an answer can't submit twice.
+      if (event.repeat) return;
+      // Let keyboard shortcuts/combos and editable fields work as usual.
+      if (event.ctrlKey || event.metaKey || event.altKey) return;
+      if (isEditableTarget(event.target)) return;
+
+      const key = event.key.toLowerCase();
+      const index = keyMap.findIndex((keys) => (keys as readonly string[]).includes(key));
+      if (index === -1 || index >= optionCount) return;
+
+      event.preventDefault();
+      onSelect(index);
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [disabled, selectedIndex, onSelect, keyMap, optionCount]);
+
   return (
     <div className={cn("grid gap-4", gridCols)}>
       {options.map((option, i) => {
@@ -47,12 +93,24 @@ export function AnswerGrid({
               : "border-red-500/30 hover:border-red-500/50"
             : "";
 
+        const optionKeys = (keyMap[i] as readonly string[] | undefined) ?? [];
+        const ariaKeyshortcuts = optionKeys
+          .map((k) => k.toUpperCase())
+          .join(" ");
+        // The MC label badge already shows the letter shortcut (A–D), so the
+        // hint just adds the number. For T/F there is no letter label, so show
+        // both keys (e.g. "1 / T").
+        const shortcutHint = isTrueFalse
+          ? optionKeys.map((k) => k.toUpperCase()).join(" / ")
+          : optionKeys[0];
+
         return (
           <Button
             key={i}
             variant="outline"
             disabled={disabled}
             onClick={() => onSelect(i)}
+            aria-keyshortcuts={ariaKeyshortcuts || undefined}
             style={{ animationDelay: `${i * 75}ms` }}
             className={cn(
               "h-auto cursor-pointer justify-start px-3 py-3 text-left",
@@ -102,6 +160,14 @@ export function AnswerGrid({
               {labels[i]}
             </span>
             <span className="flex-1">{option}</span>
+            {shortcutHint && !hasResult && (
+              <span
+                aria-hidden="true"
+                className="ui-label ml-2 hidden shrink-0 rounded border border-border/60 bg-muted/60 px-1.5 py-0.5 text-xs text-muted-foreground sm:inline-block"
+              >
+                {shortcutHint}
+              </span>
+            )}
           </Button>
         );
       })}
