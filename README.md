@@ -12,9 +12,15 @@ A competitive speed-trivia game where players race to answer Azure and GitHub Co
 ## How It Works
 
 1. **Open the game link** — a round of 1–3 Azure/Copilot questions loads
-2. **Timer starts immediately** — answer as fast as you can
+2. **Timer starts immediately** — answer as fast as you can (mouse, touch, or keyboard)
 3. **Get instant feedback** — correct answer reveal, points awarded with speed bonus
 4. **Leaderboard updates in real-time** — see where you rank via SignalR
+
+> **⌨️ Keyboard shortcuts** — On desktop, answer without the mouse. For
+> multiple-choice questions press `1`–`4` or `A`–`D`; for true/false questions
+> press `1`/`T` for True and `2`/`F` for False. Shortcuts only apply while a
+> question is active and unanswered, are ignored while typing in a form field,
+> and a held key won't submit twice.
 
 ## Architecture
 
@@ -221,6 +227,7 @@ The workflow (`.github/workflows/deploy.yml`) runs on push to `main`:
 ## Game Features
 
 - **🎯 Quiz Flow** — 1–3 questions per round, 2×2 answer grid, progress tracking
+- **⌨️ Keyboard Shortcuts** — Desktop players can answer with `1`–`4`/`A`–`D` (multiple-choice) or `1`/`T` and `2`/`F` (true/false); hints and `aria-keyshortcuts` keep them discoverable and accessible
 - **🔒 Synchronized Questions** — Same questions for all players, ensuring competitive fairness
 - **⏸️ Admin-Controlled Quiz** — Waiting room + admin start/stop with real-time player sync
 - **⏱️ Countdown Timer** — Per-question countdown (default 10s, admin-configurable 5-60s) with color-coded progress bar, auto-timeout marks unanswered as incorrect

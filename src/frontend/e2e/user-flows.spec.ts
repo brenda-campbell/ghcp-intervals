@@ -607,3 +607,69 @@ test('Test 10: Configurable question count selector', async ({ page }) => {
   const selectedValue = await questionCountSelect.inputValue();
   expect(selectedValue).toBe('5');
 });
+
+// =============================================================
+// Test 11: Keyboard answer selection
+// =============================================================
+test('Test 11: Player can answer a question using the keyboard', async ({ page }) => {
+  await page.goto('/');
+  await clearAppStorage(page);
+  await page.reload();
+  await page.waitForLoadState('networkidle');
+
+  // Login as admin so we can start the quiz
+  await loginAs(page, 'brencampbell@microsoft.com', 'Brenda');
+  await waitForAppShell(page);
+
+  // Go to Admin tab
+  const adminTab = page.locator('button', { hasText: 'Admin' });
+  await expect(adminTab).toBeVisible({ timeout: 10000 });
+  await adminTab.click();
+  await page.waitForTimeout(3000);
+
+  // Ensure a clean start
+  const stopBtn = page.getByText('Stop Quiz', { exact: false });
+  if (await stopBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
+    await stopBtn.click();
+    await page.waitForTimeout(2000);
+  }
+
+  // Start the quiz
+  const startBtn = page.getByText('Start Quiz', { exact: false });
+  await expect(startBtn).toBeVisible({ timeout: 10000 });
+  await startBtn.click();
+  await page.waitForTimeout(3000);
+
+  // Switch to the Quiz tab
+  const quizTab = page.getByRole('button', { name: 'Quiz', exact: true });
+  await quizTab.click();
+  await page.waitForTimeout(3000);
+
+  // Wait for the answer options to render
+  const answerButtons = page.locator('.grid button');
+  const firstAnswer = answerButtons.first();
+  await expect(firstAnswer).toBeVisible({ timeout: 10000 });
+
+  // The shortcut should be discoverable via accessible metadata
+  await expect(firstAnswer).toHaveAttribute('aria-keyshortcuts', /\w/);
+
+  // Answer using the keyboard instead of clicking. "1" selects the first
+  // option for both multiple-choice and true/false questions.
+  await page.keyboard.press('1');
+
+  // Feedback should appear, confirming the keyboard answer was submitted
+  const feedback = page.getByText(/Correct!|Incorrect|Answer submitted/i);
+  await expect(feedback).toBeVisible({ timeout: 10000 });
+
+  // Screenshot: keyboard answer feedback
+  await page.screenshot({ path: `${SCREENSHOTS_DIR}/16-keyboard-answer.png`, fullPage: true });
+
+  // Clean up: go back to Admin and stop the quiz
+  await adminTab.click();
+  await page.waitForTimeout(2000);
+  const stopBtnFinal = page.getByRole('button', { name: /stop quiz/i });
+  if (await stopBtnFinal.isVisible().catch(() => false)) {
+    await stopBtnFinal.click();
+    await page.waitForTimeout(2000);
+  }
+});
