@@ -15,6 +15,10 @@ interface AnswerGridProps {
   /** Whether the user's selected answer was correct */
   isCorrect?: boolean | null;
   questionType?: QuestionType;
+  /** Keyboard shortcut hints for each option (e.g., ["1", "2", "3", "4"] or ["Y", "N"]) */
+  keyboardHints?: string[];
+  /** Currently active (pressed) keyboard key */
+  activeKey?: string | null;
 }
 
 export function AnswerGrid({
@@ -25,6 +29,8 @@ export function AnswerGrid({
   correctIndex = null,
   isCorrect = null,
   questionType = "multiple-choice",
+  keyboardHints = [],
+  activeKey = null,
 }: AnswerGridProps) {
   const hasResult = correctIndex !== null && isCorrect !== null;
   const isTrueFalse = questionType === "true-false";
@@ -38,6 +44,8 @@ export function AnswerGrid({
         const hasSelection = selectedIndex !== null;
         const isCorrectOption = hasResult && i === correctIndex;
         const isWrongSelected = hasResult && isSelected && !isCorrect;
+        const keyboardHint = keyboardHints[i];
+        const isKeyActive = activeKey && keyboardHint && activeKey.toUpperCase() === keyboardHint.toUpperCase();
 
         // Subtle tint for T/F buttons in default (pre-selection) state
         const tfDefaultTint =
@@ -47,22 +55,31 @@ export function AnswerGrid({
               : "border-red-500/30 hover:border-red-500/50"
             : "";
 
+        // ARIA label with keyboard hint
+        const ariaLabel = keyboardHint
+          ? `${labels[i]}: ${option} (press ${keyboardHint})`
+          : `${labels[i]}: ${option}`;
+
         return (
           <Button
             key={i}
             variant="outline"
             disabled={disabled}
             onClick={() => onSelect(i)}
+            aria-label={ariaLabel}
             style={{ animationDelay: `${i * 75}ms` }}
             className={cn(
               "h-auto cursor-pointer justify-start px-3 py-3 text-left",
-              "body-mono whitespace-normal",
+              "body-mono whitespace-normal relative",
               "animate-[option-stagger-in_300ms_ease-out_backwards]",
               "transition-all duration-150",
               isTrueFalse ? "min-h-[64px] sm:min-h-[72px]" : "min-h-[48px] sm:min-h-14 sm:px-4",
 
               // T/F default tint
               tfDefaultTint,
+
+              // Keyboard active (key pressed but not yet submitted)
+              !hasResult && isKeyActive && "ring-2 ring-primary ring-offset-2",
 
               // Pre-result: selected state
               !hasResult && isSelected &&
@@ -102,6 +119,22 @@ export function AnswerGrid({
               {labels[i]}
             </span>
             <span className="flex-1">{option}</span>
+            {keyboardHint && (
+              <span
+                className={cn(
+                  "ml-2 shrink-0 inline-flex h-6 w-6 items-center justify-center rounded border text-xs font-mono transition-colors duration-150",
+                  isCorrectOption
+                    ? "border-green-400/50 bg-green-500/20 text-green-300"
+                    : isWrongSelected
+                      ? "border-destructive/50 bg-destructive/20 text-destructive"
+                      : isSelected
+                        ? "border-primary-foreground/50 bg-white/20 text-primary-foreground"
+                        : "border-muted-foreground/30 bg-muted/30 text-muted-foreground",
+                )}
+              >
+                {keyboardHint}
+              </span>
+            )}
           </Button>
         );
       })}
