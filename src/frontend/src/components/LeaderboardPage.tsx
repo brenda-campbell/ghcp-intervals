@@ -4,6 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Leaderboard } from "@/components/Leaderboard";
+import { HowScoringWorksDialog } from "@/components/HowScoringWorksDialog";
 import { getLeaderboard, listCategories, type LeaderboardEntry, type Category } from "@/services/api";
 import { useSignalRContext } from "@/contexts/SignalRContext";
 
@@ -139,6 +140,7 @@ export function LeaderboardPage({ userId }: LeaderboardPageProps) {
           )}
         </div>
         <div className="flex items-center gap-3">
+          <HowScoringWorksDialog />
           <div className="flex items-center gap-2">
             <select
               value={selectedCategoryId ?? ""}

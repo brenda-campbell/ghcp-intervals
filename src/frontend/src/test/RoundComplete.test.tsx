@@ -17,6 +17,11 @@ vi.mock("@phosphor-icons/react", () => ({
     React.createElement("span", { "data-testid": "x-icon", ...props }),
 }))
 
+vi.mock("@/components/HowScoringWorksDialog", () => ({
+  HowScoringWorksDialog: () =>
+    React.createElement("button", { "data-testid": "how-scoring-trigger" }, "How scoring works"),
+}))
+
 vi.mock("@/components/ui/card", () => ({
   Card: ({ children, className }: { children: React.ReactNode; className?: string }) =>
     React.createElement("div", { "data-testid": "card", className }, children),
@@ -177,5 +182,16 @@ describe("RoundComplete", () => {
       />,
     )
     expect(screen.queryByText(/Perfect Score/)).not.toBeInTheDocument()
+  })
+
+  it("shows 'How scoring works' trigger button", () => {
+    render(
+      <RoundComplete
+        results={mixedResults}
+        onPlayAgain={() => {}}
+        onViewLeaderboard={() => {}}
+      />,
+    )
+    expect(screen.getByTestId("how-scoring-trigger")).toBeInTheDocument()
   })
 })
