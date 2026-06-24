@@ -147,4 +147,96 @@ describe("AnswerGrid", () => {
     // Other options should be faded
     expect(buttons[2].className).toContain("opacity-30")
   })
+
+  describe("Keyboard Shortcuts", () => {
+    it("renders keyboard hints for multiple-choice questions", () => {
+      render(
+        <AnswerGrid
+          options={options}
+          selectedIndex={null}
+          disabled={false}
+          onSelect={() => {}}
+          keyboardHints={["1", "2", "3", "4"]}
+        />,
+      )
+      
+      expect(screen.getByText("1")).toBeInTheDocument()
+      expect(screen.getByText("2")).toBeInTheDocument()
+      expect(screen.getByText("3")).toBeInTheDocument()
+      expect(screen.getByText("4")).toBeInTheDocument()
+    })
+
+    it("renders keyboard hints for true-false questions", () => {
+      const tfOptions = ["True", "False"]
+      render(
+        <AnswerGrid
+          options={tfOptions}
+          selectedIndex={null}
+          disabled={false}
+          onSelect={() => {}}
+          questionType="true-false"
+          keyboardHints={["Y", "N"]}
+        />,
+      )
+      
+      expect(screen.getByText("Y")).toBeInTheDocument()
+      expect(screen.getByText("N")).toBeInTheDocument()
+    })
+
+    it("includes keyboard hints in aria-labels", () => {
+      render(
+        <AnswerGrid
+          options={options}
+          selectedIndex={null}
+          disabled={false}
+          onSelect={() => {}}
+          keyboardHints={["1", "2", "3", "4"]}
+        />,
+      )
+      
+      const buttons = screen.getAllByRole("button")
+      expect(buttons[0]).toHaveAttribute("aria-label", expect.stringContaining("press 1"))
+      expect(buttons[1]).toHaveAttribute("aria-label", expect.stringContaining("press 2"))
+      expect(buttons[2]).toHaveAttribute("aria-label", expect.stringContaining("press 3"))
+      expect(buttons[3]).toHaveAttribute("aria-label", expect.stringContaining("press 4"))
+    })
+
+    it("highlights button when corresponding key is active", () => {
+      render(
+        <AnswerGrid
+          options={options}
+          selectedIndex={null}
+          disabled={false}
+          onSelect={() => {}}
+          keyboardHints={["1", "2", "3", "4"]}
+          activeKey="2"
+        />,
+      )
+      
+      const buttons = screen.getAllByRole("button")
+      // Button at index 1 (key "2") should have ring styling
+      expect(buttons[1].className).toContain("ring-2")
+      expect(buttons[1].className).toContain("ring-primary")
+    })
+
+    it("does not render keyboard hints when not provided", () => {
+      render(
+        <AnswerGrid
+          options={options}
+          selectedIndex={null}
+          disabled={false}
+          onSelect={() => {}}
+        />,
+      )
+      
+      // The hint badges (1, 2, 3, 4) should not be present
+      // We check that no elements with text "1", "2", "3", "4" exist
+      // (The "A", "B", "C", "D" labels are still there)
+      const buttons = screen.getAllByRole("button")
+      buttons.forEach((button) => {
+        // Aria label should not contain "press"
+        expect(button).toHaveAttribute("aria-label", expect.not.stringContaining("press"))
+      })
+    })
+  })
 })

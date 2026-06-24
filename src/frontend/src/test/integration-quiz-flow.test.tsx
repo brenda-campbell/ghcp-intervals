@@ -7,10 +7,12 @@ import type { Question, AnswerResult } from "@/services/api"
 // Mock API module
 const mockFetchQuestions = vi.fn()
 const mockSubmitAnswer = vi.fn()
+const mockMarkRoundComplete = vi.fn()
 
 vi.mock("@/services/api", () => ({
   fetchQuestions: (...args: unknown[]) => mockFetchQuestions(...args),
   submitAnswer: (...args: unknown[]) => mockSubmitAnswer(...args),
+  markRoundComplete: (...args: unknown[]) => mockMarkRoundComplete(...args),
   ApiError: class ApiError extends Error {
     status: number
     constructor(status: number, message: string) {
@@ -38,6 +40,7 @@ vi.mock("@/contexts/SignalRContext", () => ({
 }))
 
 vi.mock("@phosphor-icons/react", () => ({
+  Timer: (props: Record<string, unknown>) => React.createElement("span", { "data-testid": "timer-icon", ...props }),
   Clock: (props: Record<string, unknown>) => React.createElement("span", { "data-testid": "clock-icon", ...props }),
   ArrowClockwise: (props: Record<string, unknown>) => React.createElement("span", { ...props }),
   UsersThree: (props: Record<string, unknown>) => React.createElement("span", { ...props }),
@@ -154,6 +157,8 @@ const correctResult: AnswerResult = {
 describe("Integration: Quiz Flow", () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    // Setup default mock implementations
+    mockMarkRoundComplete.mockResolvedValue({})
     // Mock requestAnimationFrame for RoundComplete's animated score.
     // Pass performance.now() + 2000 so elapsed always exceeds the 1000ms
     // animation duration, preventing infinite recursion.
@@ -355,5 +360,205 @@ describe("Integration: Quiz Flow", () => {
     expect(mockSubmitAnswer).toHaveBeenCalledWith(
       expect.objectContaining({ selectedOption: 0 }),
     )
+  })
+
+  describe("Keyboard Shortcuts", () => {
+    it("submits answer when keyboard shortcut is pressed", async () => {
+      mockFetchQuestions.mockResolvedValue(testQuestions)
+      mockSubmitAnswer.mockResolvedValue(correctResult)
+
+      await act(async () => {
+        render(<QuestionPage />)
+      })
+
+      await waitFor(() => {
+        expect(screen.getByText("What is Azure Functions?")).toBeInTheDocument()
+      })
+
+      // Press "1" to select first answer
+      await act(async () => {
+        fireEvent.keyDown(window, { key: "1" })
+      })
+
+      await waitFor(() => {
+        expect(mockSubmitAnswer).toHaveBeenCalledWith(
+          expect.objectContaining({ selectedOption: 0 }),
+        )
+      })
+
+      await waitFor(() => {
+        expect(screen.getByText("Correct!")).toBeInTheDocument()
+      })
+    })
+
+    it("prevents duplicate submissions when key is held down", async () => {
+      mockFetchQuestions.mockResolvedValue(testQuestions)
+      mockSubmitAnswer.mockImplementation(
+        () => new Promise((resolve) => setTimeout(() => resolve(correctResult), 100)),
+      )
+
+      await act(async () => {
+        render(<QuestionPage />)
+      })
+
+      await waitFor(() => {
+        expect(screen.getByText("What is Azure Functions?")).toBeInTheDocument()
+      })
+
+      // Simulate holding down "1" key (multiple keydown events)
+      await act(async () => {
+        fireEvent.keyDown(window, { key: "1" })
+      })
+      await act(async () => {
+        fireEvent.keyDown(window, { key: "1" })
+      })
+      await act(async () => {
+        fireEvent.keyDown(window, { key: "1" })
+      })
+
+      // Wait for submission to complete
+      await waitFor(() => {
+        expect(screen.getByText("Correct!")).toBeInTheDocument()
+      })
+
+      // Should only have submitted once despite multiple keydown events
+      expect(mockSubmitAnswer).toHaveBeenCalledTimes(1)
+    })
+
+    it("prevents rapid successive presses from submitting twice", async () => {
+      mockFetchQuestions.mockResolvedValue(testQuestions)
+      mockSubmitAnswer.mockResolvedValue(correctResult)
+
+      await act(async () => {
+        render(<QuestionPage />)
+      })
+
+      await waitFor(() => {
+        expect(screen.getByText("What is Azure Functions?")).toBeInTheDocument()
+      })
+
+      // Press "1", release, and immediately press "2"
+      await act(async () => {
+        fireEvent.keyDown(window, { key: "1" })
+      })
+      await act(async () => {
+        fireEvent.keyUp(window, { key: "1" })
+      })
+      await act(async () => {
+        fireEvent.keyDown(window, { key: "2" })
+      })
+
+      // Wait for submission
+      await waitFor(() => {
+        expect(screen.getByText("Correct!")).toBeInTheDocument()
+      })
+
+      // Should only have submitted once (Layer 2: submitted flag)
+      expect(mockSubmitAnswer).toHaveBeenCalledTimes(1)
+      expect(mockSubmitAnswer).toHaveBeenCalledWith(
+        expect.objectContaining({ selectedOption: 0 }), // First press (key "1")
+      )
+    })
+
+    it("disables keyboard during feedback phase", async () => {
+      mockFetchQuestions.mockResolvedValue(testQuestions)
+      mockSubmitAnswer.mockResolvedValue(correctResult)
+
+      await act(async () => {
+        render(<QuestionPage />)
+      })
+
+      await waitFor(() => {
+        expect(screen.getByText("What is Azure Functions?")).toBeInTheDocument()
+      })
+
+      // Press "1" to select first answer
+      await act(async () => {
+        fireEvent.keyDown(window, { key: "1" })
+      })
+
+      await waitFor(() => {
+        expect(screen.getByText("Correct!")).toBeInTheDocument()
+      })
+
+      mockSubmitAnswer.mockClear()
+
+      // Try pressing another key during feedback phase
+      await act(async () => {
+        fireEvent.keyDown(window, { key: "2" })
+      })
+
+      // Should not have submitted again
+      expect(mockSubmitAnswer).not.toHaveBeenCalled()
+    })
+
+    it("re-enables keyboard for next question", async () => {
+      mockFetchQuestions.mockResolvedValue(testQuestions)
+      mockSubmitAnswer.mockResolvedValue(correctResult)
+
+      await act(async () => {
+        render(<QuestionPage />)
+      })
+
+      await waitFor(() => {
+        expect(screen.getByText("What is Azure Functions?")).toBeInTheDocument()
+      })
+
+      // Answer first question with keyboard
+      await act(async () => {
+        fireEvent.keyDown(window, { key: "1" })
+      })
+
+      await waitFor(() => {
+        expect(screen.getByText("Correct!")).toBeInTheDocument()
+      })
+
+      // Advance to next question
+      fireEvent.click(screen.getByText("Next →"))
+
+      await waitFor(() => {
+        expect(screen.getByText("What does CI/CD stand for?")).toBeInTheDocument()
+      }, { timeout: 2000 })
+
+      mockSubmitAnswer.mockClear()
+
+      // Should be able to use keyboard again
+      await act(async () => {
+        fireEvent.keyDown(window, { key: "2" })
+      })
+
+      await waitFor(() => {
+        expect(mockSubmitAnswer).toHaveBeenCalledWith(
+          expect.objectContaining({ selectedOption: 1 }),
+        )
+      })
+    })
+
+    it("ignores keyboard shortcuts with modifier keys", async () => {
+      mockFetchQuestions.mockResolvedValue(testQuestions)
+      mockSubmitAnswer.mockResolvedValue(correctResult)
+
+      await act(async () => {
+        render(<QuestionPage />)
+      })
+
+      await waitFor(() => {
+        expect(screen.getByText("What is Azure Functions?")).toBeInTheDocument()
+      })
+
+      // Try Ctrl+1, Cmd+1, Alt+1
+      await act(async () => {
+        fireEvent.keyDown(window, { key: "1", ctrlKey: true })
+      })
+      await act(async () => {
+        fireEvent.keyDown(window, { key: "1", metaKey: true })
+      })
+      await act(async () => {
+        fireEvent.keyDown(window, { key: "1", altKey: true })
+      })
+
+      // Should not have submitted
+      expect(mockSubmitAnswer).not.toHaveBeenCalled()
+    })
   })
 })

@@ -9,6 +9,7 @@ import { Timer, Clock, ArrowClockwise, UsersThree } from "@phosphor-icons/react"
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/contexts/UserContext";
 import { useSignalRContext } from "@/contexts/SignalRContext";
+import { useQuestionKeyboard } from "@/hooks/useQuestionKeyboard";
 import { cn } from "@/lib/utils";
 import {
   fetchQuestions,
@@ -60,6 +61,21 @@ export function QuestionPage({ onNavigateToLeaderboard, isQuizStarted, timerSeco
   const [timeUpNotice, setTimeUpNotice] = useState(false);
 
   const currentQuestion: Question | undefined = questions[currentIndex];
+
+  // Activate keyboard shortcuts only during playing phase
+  const keyboardEnabled =
+    phase === "playing" &&
+    !submitting &&
+    selectedIndex === null &&
+    !timedOutRef.current;
+
+  const { activeKey, keyboardHints } = useQuestionKeyboard({
+    questionType: currentQuestion?.type || "multiple-choice",
+    optionCount: currentQuestion?.options.length || 4,
+    enabled: keyboardEnabled,
+    onSelect: (index: number) => void handleSelect(index),
+    questionId: currentQuestion?.id,
+  });
 
   const loadQuestions = useCallback(async () => {
     setPhase("loading");
@@ -445,6 +461,8 @@ export function QuestionPage({ onNavigateToLeaderboard, isQuizStarted, timerSeco
           correctIndex={result ? result.correctIndex : null}
           isCorrect={result ? result.correct : null}
           questionType={currentQuestion.type || "multiple-choice"}
+          keyboardHints={keyboardHints}
+          activeKey={activeKey}
         />
 
         {phase === "feedback" && result && (
