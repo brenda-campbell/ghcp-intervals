@@ -607,3 +607,62 @@ test('Test 10: Configurable question count selector', async ({ page }) => {
   const selectedValue = await questionCountSelect.inputValue();
   expect(selectedValue).toBe('5');
 });
+
+// =============================================================
+// Test 11: "How scoring works" dialog on Leaderboard
+// =============================================================
+test('Test 11: How scoring works dialog opens on Leaderboard', async ({ page }) => {
+  await page.goto('/');
+  await clearAppStorage(page);
+  await page.reload();
+  await page.waitForLoadState('networkidle');
+
+  const testEmail = `e2e-scoring-${Date.now()}@test.com`;
+  await loginAs(page, testEmail, 'Scoring Tester');
+
+  try {
+    await waitForAppShell(page);
+  } catch (e) {
+    await captureDebugInfo(page, 'scoring-dialog-login');
+    throw e;
+  }
+  await captureTestUserId(page);
+
+  // Navigate to Leaderboard tab
+  await page.locator('button', { hasText: 'Leaderboard' }).click();
+  await page.waitForTimeout(2000);
+
+  // The "How scoring works" trigger button should be visible
+  const scoringBtn = page.getByRole('button', { name: /how scoring works/i });
+  await expect(scoringBtn).toBeVisible({ timeout: 10000 });
+
+  // Screenshot: leaderboard with scoring button
+  await page.screenshot({ path: `${SCREENSHOTS_DIR}/16-leaderboard-scoring-btn.png`, fullPage: true });
+
+  // Click the trigger button
+  await scoringBtn.click();
+
+  // Dialog should open
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toBeVisible({ timeout: 5000 });
+
+  // Verify dialog title
+  await expect(page.getByRole('heading', { name: /how scoring works/i })).toBeVisible();
+
+  // Verify key scoring content
+  await expect(page.getByText(/200 points/i)).toBeVisible();
+  await expect(page.getByText(/fastest correct answer/i)).toBeVisible();
+  await expect(page.getByText(/1\.5 seconds/i)).toBeVisible();
+
+  // Screenshot: dialog open
+  await page.screenshot({ path: `${SCREENSHOTS_DIR}/17-scoring-dialog-open.png`, fullPage: true });
+
+  // Close the dialog using the "Got it" button
+  await page.getByRole('button', { name: /got it/i }).click();
+
+  // Dialog should be gone
+  await expect(dialog).not.toBeVisible({ timeout: 5000 });
+
+  // Screenshot: dialog closed
+  await page.screenshot({ path: `${SCREENSHOTS_DIR}/18-scoring-dialog-closed.png`, fullPage: true });
+});

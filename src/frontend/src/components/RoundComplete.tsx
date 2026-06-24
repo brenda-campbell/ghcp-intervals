@@ -9,6 +9,7 @@ import {
   XCircle,
 } from "@phosphor-icons/react";
 import type { AnswerResult } from "@/services/api";
+import { HowScoringWorksDialog } from "@/components/HowScoringWorksDialog";
 
 interface QuestionResult {
   questionText: string;
@@ -166,6 +167,8 @@ export function RoundComplete({
               Play Again
             </Button>
           </div>
+
+          <HowScoringWorksDialog />
         </CardContent>
       </Card>
     </div>
