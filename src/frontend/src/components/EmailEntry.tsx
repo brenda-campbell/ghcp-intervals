@@ -72,7 +72,7 @@ export function EmailEntry({ onLogin, isLoading, error }: EmailEntryProps) {
               <h1 className="h2">GitHub Copilot Dev Days</h1>
               <p className="text-lg font-medium text-foreground mt-1">Fastest Finger Quiz</p>
               <p className="text-sm text-muted-foreground text-center max-w-sm leading-relaxed mt-2">
-                A quick quiz game to play during the interval between sessions. Built with the GitHub Copilot squad in CLI, deployed with GitHub Actions, and hosted on Azure.
+                An interactive quiz game built with the GitHub Copilot squad in CLI, deployed with GitHub Actions, and hosted on Azure using Cosmos DB, SignalR, Blob Storage, Azure Functions, Static Web Apps and Private Endpoints.
               </p>
             </div>
 

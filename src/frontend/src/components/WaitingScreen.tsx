@@ -1,20 +1,9 @@
-import { CalendarBlank, Lightning, Users } from "@phosphor-icons/react";
+import { Lightning, Users } from "@phosphor-icons/react";
 
 interface WaitingScreenProps {
   categoryName: string | null;
   onlineCount: number;
 }
-
-const agenda = [
-  { time: "12:00", session: "Arrive, networking and lunch" },
-  { time: "13:00", session: "Introduction to the event" },
-  { time: "13:15", session: "Engineering, Reimagined: The Developer role in the world of Agents" },
-  { time: "14:00", session: "Bringing it to Life: Demoing the end-to-end agentic vision in GitHub Copilot" },
-  { time: "15:00", session: "Break and Networking" },
-  { time: "15:30", session: "Fireside Chat with 3 FSI organisations from Banking, Insurance and Building Society" },
-  { time: "16:30", session: "Making It Real: Steps to start your agentic developer journey" },
-  { time: "17:15", session: "Close" },
-];
 
 export function WaitingScreen({ categoryName, onlineCount }: WaitingScreenProps) {
   return (
@@ -51,26 +40,6 @@ export function WaitingScreen({ categoryName, onlineCount }: WaitingScreenProps)
           <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
         </div>
       )}
-
-      {/* Agenda card */}
-      <div className="mt-8 w-full max-w-md rounded-xl border border-border bg-card text-card-foreground p-4 shadow-sm">
-        <div className="flex items-center gap-2 mb-3">
-          <CalendarBlank weight="duotone" className="h-5 w-5 text-accent" />
-          <h3 className="text-sm font-semibold">Agenda</h3>
-        </div>
-        <div className="space-y-1">
-          {agenda.map((item) => (
-            <div key={item.time} className="flex gap-3 py-1 text-sm leading-snug">
-              <span className="shrink-0 w-11 font-mono text-xs text-muted-foreground pt-0.5">
-                {item.time}
-              </span>
-              <span>
-                {item.session}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }
