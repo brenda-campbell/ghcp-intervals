@@ -17,6 +17,9 @@ param appName string = 'fastestfinger'
 @secure()
 param adminPasscode string = 'CopilotDevDays2026'
 
+@description('Whether to (re)deploy RBAC role assignments. Set to false in CI when the deploying SP lacks Microsoft.Authorization/roleAssignments/write. Role assignments are idempotent once applied.')
+param deployRoleAssignments bool = true
+
 // --- Static Web App ---
 // SWA is managed outside Bicep while its ARM resource provider lock clears.
 // The SWA already exists and is deployed via the CI/CD workflow directly.
@@ -109,7 +112,7 @@ module functionApp 'modules/functionApp.bicep' = {
 // -----------------------------------------------------------------------------
 // Role assignments — grant the Function App UAMI access to Cosmos, SignalR, Storage
 // -----------------------------------------------------------------------------
-module roleAssignments 'modules/roleAssignments.bicep' = {
+module roleAssignments 'modules/roleAssignments.bicep' = if (deployRoleAssignments) {
   name: 'deploy-roleAssignments'
   params: {
     principalId: functionApp.outputs.uamiPrincipalId

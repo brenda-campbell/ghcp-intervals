@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.45.15.27210",
-      "templateHash": "9131754571966043694"
+      "templateHash": "3284390383985425857"
     }
   },
   "parameters": {
@@ -47,6 +47,13 @@
       "defaultValue": "CopilotDevDays2026",
       "metadata": {
         "description": "Admin passcode used by the loginOrCreate API for elevated login"
+      }
+    },
+    "deployRoleAssignments": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Whether to (re)deploy RBAC role assignments. Set to false in CI when the deploying SP lacks Microsoft.Authorization/roleAssignments/write. Role assignments are idempotent once applied."
       }
     }
   },
@@ -1391,6 +1398,7 @@
       ]
     },
     {
+      "condition": "[parameters('deployRoleAssignments')]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-04-01",
       "name": "deploy-roleAssignments",
