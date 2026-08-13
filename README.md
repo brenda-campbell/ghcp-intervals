@@ -47,7 +47,7 @@ graph TB
   STG[("Storage account<br/>(westeurope)<br/>publicNetworkAccess: Disabled<br/>Blob container: app-package")]
 
   Browser -->|HTTPS| FE
-  FE -->|/api/* (linked backend)| FUNC
+  FE -- "/api/* linked backend" --> FUNC
   Browser -->|WebSocket| SR
   FUNC -->|Private link| PECOS --> COSMOS
   FUNC -->|Private link| PESR --> SR
