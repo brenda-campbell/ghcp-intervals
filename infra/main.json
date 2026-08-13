@@ -4,16 +4,23 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.42.1.51946",
-      "templateHash": "15137471647547006913"
+      "version": "0.45.15.27210",
+      "templateHash": "9131754571966043694"
     }
   },
   "parameters": {
     "location": {
       "type": "string",
+      "defaultValue": "westeurope",
+      "metadata": {
+        "description": "Azure region for the Function App, VNet, storage and private endpoints"
+      }
+    },
+    "cosmosLocation": {
+      "type": "string",
       "defaultValue": "northeurope",
       "metadata": {
-        "description": "Azure region for all resources"
+        "description": "Azure region for Cosmos DB and SignalR (kept separate to avoid moving existing data)"
       }
     },
     "environmentName": {
@@ -34,6 +41,13 @@
       "metadata": {
         "description": "Application name prefix used for all resources"
       }
+    },
+    "adminPasscode": {
+      "type": "securestring",
+      "defaultValue": "CopilotDevDays2026",
+      "metadata": {
+        "description": "Admin passcode used by the loginOrCreate API for elevated login"
+      }
     }
   },
   "resources": [
@@ -48,7 +62,7 @@
         "mode": "Incremental",
         "parameters": {
           "location": {
-            "value": "[parameters('location')]"
+            "value": "[parameters('cosmosLocation')]"
           },
           "environmentName": {
             "value": "[parameters('environmentName')]"
@@ -63,8 +77,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.42.1.51946",
-              "templateHash": "1884795996102368599"
+              "version": "0.45.15.27210",
+              "templateHash": "5300814615919362780"
             }
           },
           "parameters": {
@@ -100,7 +114,8 @@
               "kind": "GlobalDocumentDB",
               "properties": {
                 "databaseAccountOfferType": "Standard",
-                "publicNetworkAccess": "Enabled",
+                "publicNetworkAccess": "Disabled",
+                "disableLocalAuth": true,
                 "ipRules": [],
                 "isVirtualNetworkFilterEnabled": false,
                 "virtualNetworkRules": [],
@@ -354,13 +369,6 @@
               },
               "value": "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('accountName'))]"
             },
-            "connectionString": {
-              "type": "string",
-              "metadata": {
-                "description": "Cosmos DB connection string"
-              },
-              "value": "[listConnectionStrings(resourceId('Microsoft.DocumentDB/databaseAccounts', variables('accountName')), '2024-02-15-preview').connectionStrings[0].connectionString]"
-            },
             "accountName": {
               "type": "string",
               "metadata": {
@@ -390,7 +398,7 @@
         "mode": "Incremental",
         "parameters": {
           "location": {
-            "value": "[parameters('location')]"
+            "value": "[parameters('cosmosLocation')]"
           },
           "environmentName": {
             "value": "[parameters('environmentName')]"
@@ -405,8 +413,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.42.1.51946",
-              "templateHash": "2305767756873705729"
+              "version": "0.45.15.27210",
+              "templateHash": "9807039437264141881"
             }
           },
           "parameters": {
@@ -489,10 +497,1003 @@
                 "description": "SignalR resource name"
               },
               "value": "[variables('signalRName')]"
+            },
+            "resourceId": {
+              "type": "string",
+              "metadata": {
+                "description": "SignalR resource ID"
+              },
+              "value": "[resourceId('Microsoft.SignalRService/signalR', variables('signalRName'))]"
             }
           }
         }
       }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "deploy-networking",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "environmentName": {
+            "value": "[parameters('environmentName')]"
+          },
+          "appName": {
+            "value": "[parameters('appName')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.45.15.27210",
+              "templateHash": "3019199888932430666"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string",
+              "metadata": {
+                "description": "Azure region for the VNet (must match Function App region for VNet integration)"
+              }
+            },
+            "environmentName": {
+              "type": "string",
+              "metadata": {
+                "description": "Environment name (dev, staging, prod)"
+              }
+            },
+            "appName": {
+              "type": "string",
+              "metadata": {
+                "description": "Application name prefix"
+              }
+            }
+          },
+          "variables": {
+            "vnetName": "[format('{0}-{1}-vnet', parameters('appName'), parameters('environmentName'))]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Network/virtualNetworks",
+              "apiVersion": "2024-01-01",
+              "name": "[variables('vnetName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "addressSpace": {
+                  "addressPrefixes": [
+                    "10.0.0.0/16"
+                  ]
+                },
+                "subnets": [
+                  {
+                    "name": "swa-integration",
+                    "properties": {
+                      "addressPrefix": "10.0.1.0/24"
+                    }
+                  },
+                  {
+                    "name": "private-endpoints",
+                    "properties": {
+                      "addressPrefix": "10.0.2.0/24",
+                      "privateEndpointNetworkPolicies": "Disabled"
+                    }
+                  },
+                  {
+                    "name": "func-integration",
+                    "properties": {
+                      "addressPrefix": "10.0.3.0/24",
+                      "delegations": [
+                        {
+                          "name": "Microsoft.App.environments",
+                          "properties": {
+                            "serviceName": "Microsoft.App/environments"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "tags": {
+                "environment": "[parameters('environmentName')]",
+                "app": "[parameters('appName')]"
+              }
+            }
+          ],
+          "outputs": {
+            "vnetId": {
+              "type": "string",
+              "metadata": {
+                "description": "Resource ID of the VNet"
+              },
+              "value": "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]"
+            },
+            "privateEndpointSubnetId": {
+              "type": "string",
+              "metadata": {
+                "description": "Resource ID of the private endpoints subnet"
+              },
+              "value": "[reference(resourceId('Microsoft.Network/virtualNetworks', variables('vnetName')), '2024-01-01').subnets[1].id]"
+            },
+            "functionSubnetId": {
+              "type": "string",
+              "metadata": {
+                "description": "Resource ID of the Function App VNet-integration subnet"
+              },
+              "value": "[reference(resourceId('Microsoft.Network/virtualNetworks', variables('vnetName')), '2024-01-01').subnets[2].id]"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "deploy-storage",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "environmentName": {
+            "value": "[parameters('environmentName')]"
+          },
+          "appName": {
+            "value": "[parameters('appName')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.45.15.27210",
+              "templateHash": "11078314887135694652"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string",
+              "metadata": {
+                "description": "Azure region for the storage account"
+              }
+            },
+            "environmentName": {
+              "type": "string",
+              "metadata": {
+                "description": "Environment name (dev, staging, prod)"
+              }
+            },
+            "appName": {
+              "type": "string",
+              "metadata": {
+                "description": "Application name prefix"
+              }
+            }
+          },
+          "variables": {
+            "storageName": "[toLower(replace(format('{0}{1}st{2}', parameters('appName'), parameters('environmentName'), uniqueString(resourceGroup().id)), '-', ''))]",
+            "deploymentContainerName": "app-package"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Storage/storageAccounts",
+              "apiVersion": "2024-01-01",
+              "name": "[if(greater(length(variables('storageName')), 24), substring(variables('storageName'), 0, 24), variables('storageName'))]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "Standard_LRS"
+              },
+              "kind": "StorageV2",
+              "properties": {
+                "accessTier": "Hot",
+                "allowBlobPublicAccess": false,
+                "allowSharedKeyAccess": true,
+                "minimumTlsVersion": "TLS1_2",
+                "supportsHttpsTrafficOnly": true,
+                "publicNetworkAccess": "Enabled",
+                "networkAcls": {
+                  "defaultAction": "Allow",
+                  "bypass": "AzureServices"
+                }
+              },
+              "tags": {
+                "environment": "[parameters('environmentName')]",
+                "app": "[parameters('appName')]"
+              }
+            },
+            {
+              "type": "Microsoft.Storage/storageAccounts/blobServices",
+              "apiVersion": "2024-01-01",
+              "name": "[format('{0}/{1}', if(greater(length(variables('storageName')), 24), substring(variables('storageName'), 0, 24), variables('storageName')), 'default')]",
+              "properties": {},
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', if(greater(length(variables('storageName')), 24), substring(variables('storageName'), 0, 24), variables('storageName')))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+              "apiVersion": "2024-01-01",
+              "name": "[format('{0}/{1}/{2}', if(greater(length(variables('storageName')), 24), substring(variables('storageName'), 0, 24), variables('storageName')), 'default', variables('deploymentContainerName'))]",
+              "properties": {
+                "publicAccess": "None"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', if(greater(length(variables('storageName')), 24), substring(variables('storageName'), 0, 24), variables('storageName')), 'default')]"
+              ]
+            }
+          ],
+          "outputs": {
+            "name": {
+              "type": "string",
+              "metadata": {
+                "description": "Storage account name"
+              },
+              "value": "[if(greater(length(variables('storageName')), 24), substring(variables('storageName'), 0, 24), variables('storageName'))]"
+            },
+            "resourceId": {
+              "type": "string",
+              "metadata": {
+                "description": "Storage account resource ID"
+              },
+              "value": "[resourceId('Microsoft.Storage/storageAccounts', if(greater(length(variables('storageName')), 24), substring(variables('storageName'), 0, 24), variables('storageName')))]"
+            },
+            "blobEndpoint": {
+              "type": "string",
+              "metadata": {
+                "description": "Blob service primary endpoint (e.g. https://<acct>.blob.core.windows.net/)"
+              },
+              "value": "[reference(resourceId('Microsoft.Storage/storageAccounts', if(greater(length(variables('storageName')), 24), substring(variables('storageName'), 0, 24), variables('storageName'))), '2024-01-01').primaryEndpoints.blob]"
+            },
+            "deploymentContainerUrl": {
+              "type": "string",
+              "metadata": {
+                "description": "Deployment blob container URL for Flex Consumption app package"
+              },
+              "value": "[format('{0}{1}', reference(resourceId('Microsoft.Storage/storageAccounts', if(greater(length(variables('storageName')), 24), substring(variables('storageName'), 0, 24), variables('storageName'))), '2024-01-01').primaryEndpoints.blob, variables('deploymentContainerName'))]"
+            },
+            "deploymentContainerName": {
+              "type": "string",
+              "metadata": {
+                "description": "Deployment blob container name"
+              },
+              "value": "[variables('deploymentContainerName')]"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "deploy-privateEndpoints",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "environmentName": {
+            "value": "[parameters('environmentName')]"
+          },
+          "appName": {
+            "value": "[parameters('appName')]"
+          },
+          "vnetId": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deploy-networking'), '2025-04-01').outputs.vnetId.value]"
+          },
+          "privateEndpointSubnetId": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deploy-networking'), '2025-04-01').outputs.privateEndpointSubnetId.value]"
+          },
+          "cosmosDbAccountId": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deploy-cosmosDb'), '2025-04-01').outputs.resourceId.value]"
+          },
+          "signalRId": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deploy-signalR'), '2025-04-01').outputs.resourceId.value]"
+          },
+          "storageAccountId": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deploy-storage'), '2025-04-01').outputs.resourceId.value]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.45.15.27210",
+              "templateHash": "16453262501928916762"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string",
+              "metadata": {
+                "description": "Azure region for private endpoints (must match VNet region)"
+              }
+            },
+            "environmentName": {
+              "type": "string",
+              "metadata": {
+                "description": "Environment name (dev, staging, prod)"
+              }
+            },
+            "appName": {
+              "type": "string",
+              "metadata": {
+                "description": "Application name prefix"
+              }
+            },
+            "privateEndpointSubnetId": {
+              "type": "string",
+              "metadata": {
+                "description": "Resource ID of the subnet for private endpoints"
+              }
+            },
+            "vnetId": {
+              "type": "string",
+              "metadata": {
+                "description": "Resource ID of the VNet"
+              }
+            },
+            "cosmosDbAccountId": {
+              "type": "string",
+              "metadata": {
+                "description": "Resource ID of the Cosmos DB account"
+              }
+            },
+            "signalRId": {
+              "type": "string",
+              "metadata": {
+                "description": "Resource ID of the SignalR service"
+              }
+            },
+            "storageAccountId": {
+              "type": "string",
+              "metadata": {
+                "description": "Resource ID of the storage account (for Flex Consumption deployment container)"
+              }
+            }
+          },
+          "variables": {
+            "cosmosPrivateEndpointName": "[format('{0}-{1}-cosmos-pe', parameters('appName'), parameters('environmentName'))]",
+            "signalRPrivateEndpointName": "[format('{0}-{1}-signalr-pe', parameters('appName'), parameters('environmentName'))]",
+            "storagePrivateEndpointName": "[format('{0}-{1}-storage-pe', parameters('appName'), parameters('environmentName'))]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Network/privateEndpoints",
+              "apiVersion": "2024-01-01",
+              "name": "[variables('cosmosPrivateEndpointName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "subnet": {
+                  "id": "[parameters('privateEndpointSubnetId')]"
+                },
+                "privateLinkServiceConnections": [
+                  {
+                    "name": "[format('{0}-conn', variables('cosmosPrivateEndpointName'))]",
+                    "properties": {
+                      "privateLinkServiceId": "[parameters('cosmosDbAccountId')]",
+                      "groupIds": [
+                        "Sql"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "tags": {
+                "environment": "[parameters('environmentName')]",
+                "app": "[parameters('appName')]"
+              }
+            },
+            {
+              "type": "Microsoft.Network/privateDnsZones",
+              "apiVersion": "2024-06-01",
+              "name": "privatelink.documents.azure.com",
+              "location": "global",
+              "tags": {
+                "environment": "[parameters('environmentName')]",
+                "app": "[parameters('appName')]"
+              }
+            },
+            {
+              "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+              "apiVersion": "2024-06-01",
+              "name": "[format('{0}/{1}', 'privatelink.documents.azure.com', format('{0}-{1}-cosmos-vnet-link', parameters('appName'), parameters('environmentName')))]",
+              "location": "global",
+              "properties": {
+                "virtualNetwork": {
+                  "id": "[parameters('vnetId')]"
+                },
+                "registrationEnabled": false
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.documents.azure.com')]"
+              ]
+            },
+            {
+              "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
+              "apiVersion": "2024-01-01",
+              "name": "[format('{0}/{1}', variables('cosmosPrivateEndpointName'), 'cosmos-dns-group')]",
+              "properties": {
+                "privateDnsZoneConfigs": [
+                  {
+                    "name": "cosmos-dns-config",
+                    "properties": {
+                      "privateDnsZoneId": "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.documents.azure.com')]"
+                    }
+                  }
+                ]
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.documents.azure.com')]",
+                "[resourceId('Microsoft.Network/privateEndpoints', variables('cosmosPrivateEndpointName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Network/privateEndpoints",
+              "apiVersion": "2024-01-01",
+              "name": "[variables('signalRPrivateEndpointName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "subnet": {
+                  "id": "[parameters('privateEndpointSubnetId')]"
+                },
+                "privateLinkServiceConnections": [
+                  {
+                    "name": "[format('{0}-conn', variables('signalRPrivateEndpointName'))]",
+                    "properties": {
+                      "privateLinkServiceId": "[parameters('signalRId')]",
+                      "groupIds": [
+                        "signalr"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "tags": {
+                "environment": "[parameters('environmentName')]",
+                "app": "[parameters('appName')]"
+              }
+            },
+            {
+              "type": "Microsoft.Network/privateDnsZones",
+              "apiVersion": "2024-06-01",
+              "name": "privatelink.service.signalr.net",
+              "location": "global",
+              "tags": {
+                "environment": "[parameters('environmentName')]",
+                "app": "[parameters('appName')]"
+              }
+            },
+            {
+              "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+              "apiVersion": "2024-06-01",
+              "name": "[format('{0}/{1}', 'privatelink.service.signalr.net', format('{0}-{1}-signalr-vnet-link', parameters('appName'), parameters('environmentName')))]",
+              "location": "global",
+              "properties": {
+                "virtualNetwork": {
+                  "id": "[parameters('vnetId')]"
+                },
+                "registrationEnabled": false
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.service.signalr.net')]"
+              ]
+            },
+            {
+              "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
+              "apiVersion": "2024-01-01",
+              "name": "[format('{0}/{1}', variables('signalRPrivateEndpointName'), 'signalr-dns-group')]",
+              "properties": {
+                "privateDnsZoneConfigs": [
+                  {
+                    "name": "signalr-dns-config",
+                    "properties": {
+                      "privateDnsZoneId": "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.service.signalr.net')]"
+                    }
+                  }
+                ]
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.service.signalr.net')]",
+                "[resourceId('Microsoft.Network/privateEndpoints', variables('signalRPrivateEndpointName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Network/privateEndpoints",
+              "apiVersion": "2024-01-01",
+              "name": "[variables('storagePrivateEndpointName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "subnet": {
+                  "id": "[parameters('privateEndpointSubnetId')]"
+                },
+                "privateLinkServiceConnections": [
+                  {
+                    "name": "[format('{0}-conn', variables('storagePrivateEndpointName'))]",
+                    "properties": {
+                      "privateLinkServiceId": "[parameters('storageAccountId')]",
+                      "groupIds": [
+                        "blob"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "tags": {
+                "environment": "[parameters('environmentName')]",
+                "app": "[parameters('appName')]"
+              }
+            },
+            {
+              "type": "Microsoft.Network/privateDnsZones",
+              "apiVersion": "2024-06-01",
+              "name": "[format('privatelink.blob.{0}', environment().suffixes.storage)]",
+              "location": "global",
+              "tags": {
+                "environment": "[parameters('environmentName')]",
+                "app": "[parameters('appName')]"
+              }
+            },
+            {
+              "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+              "apiVersion": "2024-06-01",
+              "name": "[format('{0}/{1}', format('privatelink.blob.{0}', environment().suffixes.storage), format('{0}-{1}-storage-vnet-link', parameters('appName'), parameters('environmentName')))]",
+              "location": "global",
+              "properties": {
+                "virtualNetwork": {
+                  "id": "[parameters('vnetId')]"
+                },
+                "registrationEnabled": false
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/privateDnsZones', format('privatelink.blob.{0}', environment().suffixes.storage))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
+              "apiVersion": "2024-01-01",
+              "name": "[format('{0}/{1}', variables('storagePrivateEndpointName'), 'storage-dns-group')]",
+              "properties": {
+                "privateDnsZoneConfigs": [
+                  {
+                    "name": "storage-blob-dns-config",
+                    "properties": {
+                      "privateDnsZoneId": "[resourceId('Microsoft.Network/privateDnsZones', format('privatelink.blob.{0}', environment().suffixes.storage))]"
+                    }
+                  }
+                ]
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/privateDnsZones', format('privatelink.blob.{0}', environment().suffixes.storage))]",
+                "[resourceId('Microsoft.Network/privateEndpoints', variables('storagePrivateEndpointName'))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "signalRPrivateEndpointName": {
+              "type": "string",
+              "metadata": {
+                "description": "Name of the SignalR private endpoint (needed for networkACL reference)"
+              },
+              "value": "[variables('signalRPrivateEndpointName')]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'deploy-cosmosDb')]",
+        "[resourceId('Microsoft.Resources/deployments', 'deploy-networking')]",
+        "[resourceId('Microsoft.Resources/deployments', 'deploy-signalR')]",
+        "[resourceId('Microsoft.Resources/deployments', 'deploy-storage')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "deploy-functionApp",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "environmentName": {
+            "value": "[parameters('environmentName')]"
+          },
+          "appName": {
+            "value": "[parameters('appName')]"
+          },
+          "functionSubnetId": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deploy-networking'), '2025-04-01').outputs.functionSubnetId.value]"
+          },
+          "storageAccountName": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deploy-storage'), '2025-04-01').outputs.name.value]"
+          },
+          "deploymentContainerUrl": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deploy-storage'), '2025-04-01').outputs.deploymentContainerUrl.value]"
+          },
+          "cosmosEndpoint": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deploy-cosmosDb'), '2025-04-01').outputs.endpoint.value]"
+          },
+          "signalRName": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deploy-signalR'), '2025-04-01').outputs.name.value]"
+          },
+          "adminPasscode": {
+            "value": "[parameters('adminPasscode')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.45.15.27210",
+              "templateHash": "9394789813202254850"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string",
+              "metadata": {
+                "description": "Azure region for the Function App"
+              }
+            },
+            "environmentName": {
+              "type": "string",
+              "metadata": {
+                "description": "Environment name (dev, staging, prod)"
+              }
+            },
+            "appName": {
+              "type": "string",
+              "metadata": {
+                "description": "Application name prefix"
+              }
+            },
+            "functionSubnetId": {
+              "type": "string",
+              "metadata": {
+                "description": "Resource ID of the subnet to use for VNet integration (must be delegated to Microsoft.App/environments)"
+              }
+            },
+            "storageAccountName": {
+              "type": "string",
+              "metadata": {
+                "description": "Storage account name for the Function App runtime + deployment package"
+              }
+            },
+            "deploymentContainerUrl": {
+              "type": "string",
+              "metadata": {
+                "description": "Deployment blob container URL (e.g. https://<acct>.blob.core.windows.net/app-package)"
+              }
+            },
+            "cosmosEndpoint": {
+              "type": "string",
+              "metadata": {
+                "description": "Cosmos DB endpoint (used as COSMOS_ENDPOINT app setting)"
+              }
+            },
+            "signalRName": {
+              "type": "string",
+              "metadata": {
+                "description": "SignalR service hostname (used as AzureSignalRConnectionString-style app setting)"
+              }
+            },
+            "adminPasscode": {
+              "type": "securestring",
+              "defaultValue": "CopilotDevDays2026",
+              "metadata": {
+                "description": "Admin passcode used by loginOrCreate for elevated login"
+              }
+            }
+          },
+          "variables": {
+            "functionAppName": "[format('{0}-{1}-func', parameters('appName'), parameters('environmentName'))]",
+            "planName": "[format('{0}-{1}-plan', parameters('appName'), parameters('environmentName'))]",
+            "uamiName": "[format('{0}-{1}-func-mi', parameters('appName'), parameters('environmentName'))]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+              "apiVersion": "2023-07-31-preview",
+              "name": "[variables('uamiName')]",
+              "location": "[parameters('location')]",
+              "tags": {
+                "environment": "[parameters('environmentName')]",
+                "app": "[parameters('appName')]"
+              }
+            },
+            {
+              "type": "Microsoft.Web/serverfarms",
+              "apiVersion": "2024-04-01",
+              "name": "[variables('planName')]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "FC1",
+                "tier": "FlexConsumption"
+              },
+              "kind": "functionapp",
+              "properties": {
+                "reserved": true
+              },
+              "tags": {
+                "environment": "[parameters('environmentName')]",
+                "app": "[parameters('appName')]"
+              }
+            },
+            {
+              "type": "Microsoft.Web/sites",
+              "apiVersion": "2024-04-01",
+              "name": "[variables('functionAppName')]",
+              "location": "[parameters('location')]",
+              "kind": "functionapp,linux",
+              "identity": {
+                "type": "UserAssigned",
+                "userAssignedIdentities": {
+                  "[format('{0}', resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('uamiName')))]": {}
+                }
+              },
+              "properties": {
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('planName'))]",
+                "httpsOnly": true,
+                "virtualNetworkSubnetId": "[parameters('functionSubnetId')]",
+                "vnetRouteAllEnabled": true,
+                "publicNetworkAccess": "Enabled",
+                "keyVaultReferenceIdentity": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('uamiName'))]",
+                "functionAppConfig": {
+                  "deployment": {
+                    "storage": {
+                      "type": "blobContainer",
+                      "value": "[parameters('deploymentContainerUrl')]",
+                      "authentication": {
+                        "type": "UserAssignedIdentity",
+                        "userAssignedIdentityResourceId": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('uamiName'))]"
+                      }
+                    }
+                  },
+                  "scaleAndConcurrency": {
+                    "maximumInstanceCount": 40,
+                    "instanceMemoryMB": 2048
+                  },
+                  "runtime": {
+                    "name": "node",
+                    "version": "20"
+                  }
+                },
+                "siteConfig": {
+                  "appSettings": [
+                    {
+                      "name": "AzureWebJobsStorage__accountName",
+                      "value": "[parameters('storageAccountName')]"
+                    },
+                    {
+                      "name": "AzureWebJobsStorage__credential",
+                      "value": "managedidentity"
+                    },
+                    {
+                      "name": "AzureWebJobsStorage__clientId",
+                      "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('uamiName')), '2023-07-31-preview').clientId]"
+                    },
+                    {
+                      "name": "COSMOS_ENDPOINT",
+                      "value": "[parameters('cosmosEndpoint')]"
+                    },
+                    {
+                      "name": "AZURE_CLIENT_ID",
+                      "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('uamiName')), '2023-07-31-preview').clientId]"
+                    },
+                    {
+                      "name": "AzureSignalRConnectionString",
+                      "value": "[format('Endpoint=https://{0};AuthType=aad;ClientId={1};Version=1.0;', reference(resourceId('Microsoft.SignalRService/signalR', parameters('signalRName')), '2024-03-01').hostName, reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('uamiName')), '2023-07-31-preview').clientId)]"
+                    },
+                    {
+                      "name": "ADMIN_PASSCODE",
+                      "value": "[parameters('adminPasscode')]"
+                    }
+                  ],
+                  "cors": {
+                    "allowedOrigins": [
+                      "https://portal.azure.com"
+                    ],
+                    "supportCredentials": false
+                  },
+                  "ftpsState": "Disabled",
+                  "minTlsVersion": "1.2"
+                }
+              },
+              "tags": {
+                "environment": "[parameters('environmentName')]",
+                "app": "[parameters('appName')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('planName'))]",
+                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('uamiName'))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "name": {
+              "type": "string",
+              "metadata": {
+                "description": "Function App name"
+              },
+              "value": "[variables('functionAppName')]"
+            },
+            "hostname": {
+              "type": "string",
+              "metadata": {
+                "description": "Function App default hostname"
+              },
+              "value": "[reference(resourceId('Microsoft.Web/sites', variables('functionAppName')), '2024-04-01').defaultHostName]"
+            },
+            "resourceId": {
+              "type": "string",
+              "metadata": {
+                "description": "Function App resource ID"
+              },
+              "value": "[resourceId('Microsoft.Web/sites', variables('functionAppName'))]"
+            },
+            "uamiPrincipalId": {
+              "type": "string",
+              "metadata": {
+                "description": "Principal ID of the user-assigned managed identity used by the Function App"
+              },
+              "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('uamiName')), '2023-07-31-preview').principalId]"
+            },
+            "uamiClientId": {
+              "type": "string",
+              "metadata": {
+                "description": "Client ID of the user-assigned managed identity"
+              },
+              "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('uamiName')), '2023-07-31-preview').clientId]"
+            },
+            "uamiResourceId": {
+              "type": "string",
+              "metadata": {
+                "description": "Resource ID of the user-assigned managed identity"
+              },
+              "value": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('uamiName'))]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'deploy-cosmosDb')]",
+        "[resourceId('Microsoft.Resources/deployments', 'deploy-networking')]",
+        "[resourceId('Microsoft.Resources/deployments', 'deploy-signalR')]",
+        "[resourceId('Microsoft.Resources/deployments', 'deploy-storage')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "deploy-roleAssignments",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "principalId": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deploy-functionApp'), '2025-04-01').outputs.uamiPrincipalId.value]"
+          },
+          "cosmosAccountName": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deploy-cosmosDb'), '2025-04-01').outputs.accountName.value]"
+          },
+          "signalRName": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deploy-signalR'), '2025-04-01').outputs.name.value]"
+          },
+          "storageAccountName": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deploy-storage'), '2025-04-01').outputs.name.value]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.45.15.27210",
+              "templateHash": "8277046618593819062"
+            }
+          },
+          "parameters": {
+            "principalId": {
+              "type": "string",
+              "metadata": {
+                "description": "Principal ID of the identity to grant roles to (Function App UAMI)"
+              }
+            },
+            "cosmosAccountName": {
+              "type": "string",
+              "metadata": {
+                "description": "Cosmos DB account name (data-plane role via Cosmos SQL RBAC)"
+              }
+            },
+            "signalRName": {
+              "type": "string",
+              "metadata": {
+                "description": "SignalR service name (control/data plane roles)"
+              }
+            },
+            "storageAccountName": {
+              "type": "string",
+              "metadata": {
+                "description": "Storage account name (blob roles for deployment container + AzureWebJobsStorage)"
+              }
+            }
+          },
+          "variables": {
+            "cosmosDataContributorRoleDefinitionId": "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlRoleDefinitions', parameters('cosmosAccountName'), '00000000-0000-0000-0000-000000000002')]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignments",
+              "apiVersion": "2024-02-15-preview",
+              "name": "[format('{0}/{1}', parameters('cosmosAccountName'), guid(resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('cosmosAccountName')), parameters('principalId'), 'data-contributor'))]",
+              "properties": {
+                "roleDefinitionId": "[variables('cosmosDataContributorRoleDefinitionId')]",
+                "principalId": "[parameters('principalId')]",
+                "scope": "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('cosmosAccountName'))]"
+              }
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "scope": "[resourceId('Microsoft.SignalRService/signalR', parameters('signalRName'))]",
+              "name": "[guid(resourceId('Microsoft.SignalRService/signalR', parameters('signalRName')), parameters('principalId'), 'signalr-service-owner')]",
+              "properties": {
+                "principalId": "[parameters('principalId')]",
+                "principalType": "ServicePrincipal",
+                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '7e4f1700-ea5a-4f59-8f37-079cfe29dce3')]"
+              }
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "scope": "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]",
+              "name": "[guid(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), parameters('principalId'), 'blob-data-owner')]",
+              "properties": {
+                "principalId": "[parameters('principalId')]",
+                "principalType": "ServicePrincipal",
+                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b7e6dc6d-f1e8-4753-8033-0f276bb0955b')]"
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'deploy-cosmosDb')]",
+        "[resourceId('Microsoft.Resources/deployments', 'deploy-functionApp')]",
+        "[resourceId('Microsoft.Resources/deployments', 'deploy-signalR')]",
+        "[resourceId('Microsoft.Resources/deployments', 'deploy-storage')]"
+      ]
     }
   ],
   "outputs": {
@@ -503,12 +1504,33 @@
       },
       "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deploy-cosmosDb'), '2025-04-01').outputs.endpoint.value]"
     },
-    "signalRConnectionString": {
+    "functionAppName": {
       "type": "string",
       "metadata": {
-        "description": "SignalR connection string"
+        "description": "Function App name (used by CI/CD to deploy code and link to SWA)"
       },
-      "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deploy-signalR'), '2025-04-01').outputs.connectionString.value]"
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deploy-functionApp'), '2025-04-01').outputs.name.value]"
+    },
+    "functionAppHostname": {
+      "type": "string",
+      "metadata": {
+        "description": "Function App default hostname (used by SWA linked backend + smoke tests)"
+      },
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deploy-functionApp'), '2025-04-01').outputs.hostname.value]"
+    },
+    "functionAppResourceId": {
+      "type": "string",
+      "metadata": {
+        "description": "Function App resource ID (used by SWA linked backend command)"
+      },
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deploy-functionApp'), '2025-04-01').outputs.resourceId.value]"
+    },
+    "functionAppUamiClientId": {
+      "type": "string",
+      "metadata": {
+        "description": "User-assigned managed identity client ID (for AZURE_CLIENT_ID app setting)"
+      },
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deploy-functionApp'), '2025-04-01').outputs.uamiClientId.value]"
     }
   }
 }

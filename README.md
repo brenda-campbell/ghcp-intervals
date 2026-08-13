@@ -18,50 +18,68 @@ A competitive speed-trivia game where players race to answer Azure and GitHub Co
 
 ## Architecture
 
+The deployed architecture uses a **linked BYO (bring-your-own) Function App** on the Flex Consumption plan, VNet-integrated with private endpoints for the data tier. This satisfies the MCAPS `CosmosDB_PublicNetwork_Modify` Azure Policy which auto-disables public network access on Cosmos DB accounts.
+
 ```mermaid
 graph TB
-  subgraph "Azure Static Web App"
-    FE["React 19 + Vite<br/>Tailwind CSS v4<br/>shadcn/ui<br/>SignalR client"]
+  Browser[["Player Browser"]]
+
+  subgraph swa["Azure Static Web App (Standard, westeurope)"]
+    FE["React 19 + Vite<br/>Tailwind CSS v4<br/>shadcn/ui"]
   end
-  
-  subgraph "Azure Functions v4"
-    API["HTTP Triggers<br/>TypeScript"]
+
+  subgraph vnet["VNet — fastestfinger-dev-vnet (westeurope, 10.0.0.0/16)"]
+    subgraph funcsubnet["func-integration subnet<br/>10.0.3.0/24 (delegated: Microsoft.App/environments)"]
+      FUNC["Azure Functions v4<br/>Flex Consumption (FC1)<br/>Linux · Node 20<br/>User-assigned MI"]
+    end
+    subgraph pesubnet["private-endpoints subnet · 10.0.2.0/24"]
+      PECOS(["Cosmos PE"])
+      PESR(["SignalR PE"])
+      PEST(["Storage blob PE"])
+    end
   end
-  
-  subgraph "Azure Cosmos DB"
-    Users[("users")]
-    Questions[("questions")]
-    Categories[("categories")]
-    Scores[("categoryScores")]
-    State[("gameState")]
+
+  subgraph data["Data tier (northeurope)"]
+    COSMOS[("Azure Cosmos DB<br/>publicNetworkAccess: Disabled<br/>disableLocalAuth: true (AAD only)")]
+    SR["Azure SignalR Service<br/>Serverless · public inbound<br/>(clients need it)"]
   end
-  
-  SR["Azure SignalR Service"]
-  GH["GitHub Actions CI/CD"]
-  
-  FE -->|REST API| API
-  API --> Users
-  API --> Questions
-  API --> Categories
-  API --> Scores
-  API --> State
-  API -->|Broadcast events| SR
-  SR -->|Real-time updates| FE
-  GH -->|Deploy| FE
-  GH -->|Deploy| API
+
+  STG[("Storage account<br/>(westeurope)<br/>publicNetworkAccess: Disabled<br/>Blob container: app-package")]
+
+  Browser -->|HTTPS| FE
+  FE -->|/api/* (linked backend)| FUNC
+  Browser -->|WebSocket| SR
+  FUNC -->|Private link| PECOS --> COSMOS
+  FUNC -->|Private link| PESR --> SR
+  FUNC -->|Private link| PEST --> STG
+  FUNC -.->|AAD token<br/>Managed Identity| COSMOS
+  FUNC -.->|AAD token<br/>Managed Identity| SR
+  FUNC -.->|AAD token<br/>Managed Identity| STG
+
+  classDef pe fill:#0078D4,stroke:#004578,color:#fff
+  class PECOS,PESR,PEST pe
 ```
+
+### Why this shape?
+
+- **SWA-managed Functions can't reach a private-endpoint Cosmos DB.** The MCAPS Azure Policy `CosmosDB_PublicNetwork_Modify` continuously sets `publicNetworkAccess: Disabled` and `disableLocalAuth: true` on any Cosmos account. Managed Functions egress from a shared IP pool with no VNet integration, so all `login-or-create` / `saveScore` / `getGameState` calls returned HTTP 503.
+- **Linked BYO Function App** on Flex Consumption is VNet-integrated via a delegated subnet, so it reaches Cosmos, SignalR, and the deployment blob storage through private endpoints and authenticates with a User-Assigned Managed Identity (AAD-only, no keys).
+- **Storage PE is mandatory.** The same MCAPS policy family (`StorageAccount_PublicNetwork_Modify`) sets `publicNetworkAccess: Disabled` on the storage account holding the app package. Without a blob-subresource private endpoint the SCM plane can't upload the package during deploy and Flex fails with `BlobUploadFailedException: 403`.
+- **SignalR keeps public inbound** because browser clients connect to it directly; the Function App still uses the private endpoint for negotiate and broadcast.
+- **Deploys use OneDeploy** (`POST /api/publish`) not the classic `zipdeploy` — Kudu on Flex Consumption has a validation bug on the standard `Azure/functions-action` path that spuriously flags `WEBSITE_RUN_FROM_PACKAGE`. OneDeploy bypasses that validator.
 
 ## Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
 | **Frontend** | React 19, Vite 8, TypeScript, Tailwind CSS v4, shadcn/ui, Phosphor Icons |
-| **Backend** | Azure Functions v4 (Node.js/TypeScript) |
-| **Database** | Azure Cosmos DB (serverless) |
-| **Real-time** | Azure SignalR Service (serverless) |
-| **Hosting** | Azure Static Web Apps (Free tier) |
-| **IaC** | Bicep (modular: SWA + Cosmos DB + SignalR) |
-| **CI/CD** | GitHub Actions (OIDC auth, single workflow) |
+| **Backend** | Azure Functions v4 · Flex Consumption (FC1) · Linux Node 20 · User-Assigned Managed Identity |
+| **Database** | Azure Cosmos DB (serverless) · private endpoint · AAD auth (SQL Role: Data Contributor) |
+| **Real-time** | Azure SignalR Service (serverless) · private endpoint for server · public for clients · AAD auth (Service Owner) |
+| **Networking** | VNet 10.0.0.0/16 · `private-endpoints` and `func-integration` subnets (delegated `Microsoft.App/environments`) |
+| **Hosting** | Azure Static Web Apps (Standard) with linked BYO Function App backend (`az staticwebapp backends link`) |
+| **IaC** | Bicep — `main.bicep` composes `cosmosDb` + `signalr` + `networking` + `privateEndpoints` + `storage` + `functionApp` + `roleAssignments` |
+| **CI/CD** | GitHub Actions (OIDC) — 4 jobs: `infrastructure` → `deploy-api` → `deploy-frontend` → `smoke-test` |
 | **Testing** | Vitest, Testing Library (143 API + 10 E2E tests) |
 
 ## Project Structure
@@ -72,12 +90,16 @@ graph TB
 ├── docs/
 │   └── PRD.md                  # Product requirements document
 ├── infra/
-│   ├── main.bicep              # Orchestrator (all Azure resources)
-│   ├── main.bicepparam         # Environment parameters
+│   ├── main.bicep              # Orchestrator (composes all modules)
+│   ├── main.bicepparam         # location=westeurope, cosmosLocation=northeurope
 │   └── modules/
-│       ├── staticWebApp.bicep  # SWA resource
-│       ├── cosmosDb.bicep      # Cosmos DB + containers
-│       └── signalr.bicep       # SignalR Service
+│       ├── networking.bicep    # VNet + subnets (PE + delegated func-integration)
+│       ├── privateEndpoints.bicep  # Cosmos PE + SignalR PE + Storage blob PE + DNS zones
+│       ├── storage.bicep       # Storage acct for Flex Consumption package
+│       ├── functionApp.bicep   # Flex plan + Function App + UAMI
+│       ├── roleAssignments.bicep   # Cosmos SQL + SignalR + Storage RBAC
+│       ├── cosmosDb.bicep      # Cosmos + containers (public access disabled)
+│       └── signalr.bicep       # SignalR Service (public inbound for clients)
 ├── src/
 │   ├── api/                    # Azure Functions backend
 │   │   └── src/

@@ -48,3 +48,6 @@ output connectionString string = signalR.listKeys().primaryConnectionString
 
 @description('SignalR resource name')
 output name string = signalR.name
+
+@description('SignalR resource ID')
+output resourceId string = signalR.id

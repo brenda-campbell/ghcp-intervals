@@ -1,4 +1,4 @@
-@description('Azure region for the VNet (must match SWA region for VNet integration)')
+@description('Azure region for the VNet (must match Function App region for VNet integration)')
 param location string
 
 @description('Environment name (dev, staging, prod)')
@@ -18,6 +18,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2024-01-01' = {
     }
     subnets: [
       {
+        // Legacy subnet — retained to avoid disturbing existing state; unused.
         name: 'swa-integration'
         properties: {
           addressPrefix: '10.0.1.0/24'
@@ -27,6 +28,22 @@ resource vnet 'Microsoft.Network/virtualNetworks@2024-01-01' = {
         name: 'private-endpoints'
         properties: {
           addressPrefix: '10.0.2.0/24'
+          privateEndpointNetworkPolicies: 'Disabled'
+        }
+      }
+      {
+        // Delegated subnet for Function App (Flex Consumption) VNet integration.
+        name: 'func-integration'
+        properties: {
+          addressPrefix: '10.0.3.0/24'
+          delegations: [
+            {
+              name: 'Microsoft.App.environments'
+              properties: {
+                serviceName: 'Microsoft.App/environments'
+              }
+            }
+          ]
         }
       }
     ]
@@ -40,8 +57,8 @@ resource vnet 'Microsoft.Network/virtualNetworks@2024-01-01' = {
 @description('Resource ID of the VNet')
 output vnetId string = vnet.id
 
-@description('Resource ID of the SWA integration subnet')
-output swaSubnetId string = vnet.properties.subnets[0].id
-
 @description('Resource ID of the private endpoints subnet')
 output privateEndpointSubnetId string = vnet.properties.subnets[1].id
+
+@description('Resource ID of the Function App VNet-integration subnet')
+output functionSubnetId string = vnet.properties.subnets[2].id

@@ -16,7 +16,13 @@ resource cosmosAccount 'Microsoft.DocumentDB/databaseAccounts@2024-02-15-preview
   kind: 'GlobalDocumentDB'
   properties: {
     databaseAccountOfferType: 'Standard'
-    publicNetworkAccess: 'Enabled'
+    // Public network access is disabled by MCAPS policy `CosmosDB_PublicNetwork_Modify`.
+    // Cosmos is reached exclusively through the private endpoint deployed by
+    // `privateEndpoints.bicep`.
+    publicNetworkAccess: 'Disabled'
+    // Local (key/connection-string) auth is disabled by MCAPS policy
+    // `CosmosDB_LocalAuth_Modify`. Clients must use Entra ID (managed identity).
+    disableLocalAuth: true
     ipRules: []
     isVirtualNetworkFilterEnabled: false
     virtualNetworkRules: []
@@ -196,9 +202,6 @@ output endpoint string = cosmosAccount.properties.documentEndpoint
 
 @description('Cosmos DB account resource ID')
 output resourceId string = cosmosAccount.id
-
-@description('Cosmos DB connection string')
-output connectionString string = cosmosAccount.listConnectionStrings().connectionStrings[0].connectionString
 
 @description('Cosmos DB account name')
 output accountName string = cosmosAccount.name

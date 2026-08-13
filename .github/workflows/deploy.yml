@@ -1,13 +1,20 @@
 # =============================================================================
 # Fastest Finger Quiz — CI/CD Pipeline
 # =============================================================================
+# Deploys the app in three phases:
+#   1. Infrastructure — Bicep (Cosmos + SignalR + VNet + PEs + Storage +
+#      Flex Consumption Function App + role assignments)
+#   2. API — build + zip src/api and deploy to the standalone Function App
+#   3. Frontend — build src/frontend and deploy to Static Web App; link
+#      the Function App as SWA's backend for /api/* routing
+#
 # Required GitHub Repository Secrets:
-#     AZURE_CLIENT_ID        — App registration client ID (OIDC + Cosmos auth)
-#     AZURE_CLIENT_SECRET    — App registration client secret (Cosmos AAD auth)
+#     AZURE_CLIENT_ID        — App registration client ID (OIDC for `azure/login`)
 #     AZURE_TENANT_ID        — Azure AD tenant ID
 #     AZURE_SUBSCRIPTION_ID  — Target Azure subscription
 #     AZURE_RG               — Resource group name (e.g. rg-fastestfinger-dev)
-#     AZURE_STATIC_WEB_APPS_API_TOKEN — (optional) SWA deployment token override
+#     AZURE_STATIC_WEB_APPS_API_TOKEN — SWA deployment token
+#     ADMIN_PASSCODE         — (optional) Passcode for admin login
 # =============================================================================
 
 name: Deploy Fastest Finger Quiz
@@ -34,7 +41,10 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      swa-hostname: ${{ steps.swa-info.outputs.swaHostname }}
+      functionAppName: ${{ steps.deploy-bicep.outputs.functionAppName }}
+      functionAppHostname: ${{ steps.deploy-bicep.outputs.functionAppHostname }}
+      functionAppResourceId: ${{ steps.deploy-bicep.outputs.functionAppResourceId }}
+      swaHostname: ${{ steps.swa-info.outputs.swaHostname }}
 
     steps:
       - name: Checkout code
@@ -50,52 +60,41 @@ jobs:
       - name: Deploy Bicep template
         id: deploy-bicep
         run: |
+          set -euo pipefail
+
           DEPLOYMENT_OUTPUT=$(az deployment group create \
             --resource-group "${{ secrets.AZURE_RG }}" \
             --template-file infra/main.bicep \
             --parameters infra/main.bicepparam \
+            --parameters adminPasscode='${{ secrets.ADMIN_PASSCODE }}' \
             --query 'properties.outputs' \
             --output json)
 
-          COSMOS_ENDPOINT=$(echo "$DEPLOYMENT_OUTPUT" | jq -r '.cosmosDbEndpoint.value')
-          SIGNALR_CONN=$(echo "$DEPLOYMENT_OUTPUT" | jq -r '.signalRConnectionString.value')
-          echo "::add-mask::$SIGNALR_CONN"
+          FUNC_NAME=$(echo "$DEPLOYMENT_OUTPUT" | jq -r '.functionAppName.value')
+          FUNC_HOST=$(echo "$DEPLOYMENT_OUTPUT" | jq -r '.functionAppHostname.value')
+          FUNC_ID=$(echo "$DEPLOYMENT_OUTPUT" | jq -r '.functionAppResourceId.value')
 
-          echo "cosmosEndpoint=$COSMOS_ENDPOINT" >> "$GITHUB_OUTPUT"
-          echo "signalrConn=$SIGNALR_CONN" >> "$GITHUB_OUTPUT"
+          echo "functionAppName=$FUNC_NAME"     >> "$GITHUB_OUTPUT"
+          echo "functionAppHostname=$FUNC_HOST" >> "$GITHUB_OUTPUT"
+          echo "functionAppResourceId=$FUNC_ID" >> "$GITHUB_OUTPUT"
 
-          echo "✅ Infrastructure deployed"
+          echo "✅ Infrastructure deployed — Function App: $FUNC_NAME"
 
-      # SWA config is separate from Bicep while the ARM lock clears
-      - name: Configure SWA app settings
+      - name: Read Static Web App hostname
         id: swa-info
         run: |
-          SWA_NAME="fastestfinger-dev-swa"
-
+          set -euo pipefail
           SWA_HOSTNAME=$(az staticwebapp show \
-            --name "$SWA_NAME" \
+            --name "fastestfinger-dev-swa" \
             --resource-group "${{ secrets.AZURE_RG }}" \
             --query defaultHostname -o tsv)
           echo "swaHostname=$SWA_HOSTNAME" >> "$GITHUB_OUTPUT"
 
-          az staticwebapp appsettings set \
-            --name "$SWA_NAME" \
-            --setting-names \
-              COSMOS_ENDPOINT="${{ steps.deploy-bicep.outputs.cosmosEndpoint }}" \
-              AzureSignalRConnectionString="${{ steps.deploy-bicep.outputs.signalrConn }}" \
-              AZURE_CLIENT_ID="${{ secrets.AZURE_CLIENT_ID }}" \
-              AZURE_CLIENT_SECRET="${{ secrets.AZURE_CLIENT_SECRET }}" \
-              AZURE_TENANT_ID="${{ secrets.AZURE_TENANT_ID }}" \
-            > /dev/null
-
-          echo "✅ SWA configured — $SWA_HOSTNAME"
-        continue-on-error: true
-
   # ===========================================================================
-  # Job 2 — Build, Test & Deploy Application
+  # Job 2 — Build & Deploy API (Function App)
   # ===========================================================================
-  build-and-deploy:
-    name: 🚀 Build, Test & Deploy
+  deploy-api:
+    name: 🔧 Build & Deploy API
     runs-on: ubuntu-latest
     needs: infrastructure
 
@@ -108,13 +107,104 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: |
-            src/frontend/package-lock.json
-            src/api/package-lock.json
+          cache-dependency-path: src/api/package-lock.json
 
-      # --- Frontend ---
+      - name: Install API dependencies
+        run: npm ci --no-audit --no-fund
+        working-directory: src/api
+
+      - name: Build API
+        run: npm run build
+        working-directory: src/api
+
+      - name: Prune dev dependencies
+        run: npm prune --omit=dev
+        working-directory: src/api
+
+      - name: Test API
+        run: npm test --if-present
+        working-directory: src/api
+        continue-on-error: true
+
+      - name: Azure Login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Package API for deployment
+        run: |
+          set -euo pipefail
+          cd src/api
+          zip -qr ../../deploy.zip host.json package.json package-lock.json dist node_modules
+          cd ../..
+          ls -lh deploy.zip
+
+      - name: Deploy to Flex Consumption Function App (OneDeploy)
+        run: |
+          set -euo pipefail
+          FUNC_NAME="${{ needs.infrastructure.outputs.functionAppName }}"
+
+          # Flex Consumption uses OneDeploy at /api/publish. The Azure/functions-action
+          # v1 goes through Kudu zipdeploy which has a validation bug on Flex where it
+          # falsely flags WEBSITE_RUN_FROM_PACKAGE as present. OneDeploy avoids this.
+          TOKEN=$(az account get-access-token --resource https://management.azure.com --query accessToken -o tsv)
+
+          echo "Uploading deploy.zip to https://${FUNC_NAME}.scm.azurewebsites.net/api/publish"
+          DEP_ID=$(curl -sS -X POST \
+            -H "Authorization: Bearer $TOKEN" \
+            -H "Content-Type: application/zip" \
+            --data-binary @deploy.zip \
+            --max-time 600 \
+            "https://${FUNC_NAME}.scm.azurewebsites.net/api/publish?RemoteBuild=false&Deployer=github-actions" \
+            | tr -d '"')
+
+          echo "Deployment id: $DEP_ID"
+
+          # Poll for completion.
+          for i in $(seq 1 60); do
+            RESP=$(curl -sS -H "Authorization: Bearer $TOKEN" \
+              "https://${FUNC_NAME}.scm.azurewebsites.net/api/deployments/${DEP_ID}")
+            STATUS=$(echo "$RESP" | jq -r '.status')
+            COMPLETE=$(echo "$RESP" | jq -r '.complete')
+            STATUS_TEXT=$(echo "$RESP" | jq -r '.status_text')
+            echo "[$i] status=$STATUS complete=$COMPLETE — $STATUS_TEXT"
+            if [ "$COMPLETE" = "true" ]; then
+              if [ "$STATUS" = "4" ]; then
+                echo "✅ OneDeploy succeeded"
+                exit 0
+              fi
+              echo "❌ OneDeploy failed: $STATUS_TEXT"
+              exit 1
+            fi
+            sleep 5
+          done
+
+          echo "❌ Timed out waiting for OneDeploy completion"
+          exit 1
+
+  # ===========================================================================
+  # Job 3 — Build Frontend + Deploy to SWA + Link Function App backend
+  # ===========================================================================
+  deploy-frontend:
+    name: 🚀 Build & Deploy Frontend
+    runs-on: ubuntu-latest
+    needs: [infrastructure, deploy-api]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: src/frontend/package-lock.json
+
       - name: Install frontend dependencies
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
         working-directory: src/frontend
 
       - name: Build frontend
@@ -126,21 +216,8 @@ jobs:
         working-directory: src/frontend
         continue-on-error: true
 
-      # --- Backend (API) ---
-      - name: Install API dependencies
-        run: npm install --no-audit --no-fund
-        working-directory: src/api
-
-      - name: Build API
-        run: npm run build
-        working-directory: src/api
-
-      - name: Test API
-        run: npm test --if-present
-        working-directory: src/api
-        continue-on-error: true
-
-      # --- Deploy to Azure Static Web Apps ---
+      # NB: no `api_location` — API is deployed to the standalone Function App
+      #     in the previous job and attached to SWA via the linked backend below.
       - name: Deploy to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1
         with:
@@ -148,5 +225,76 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: upload
           app_location: src/frontend
-          api_location: src/api
           output_location: dist
+          skip_api_build: true
+
+      - name: Azure Login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Link Function App as SWA backend
+        run: |
+          set -euo pipefail
+          SWA_NAME="fastestfinger-dev-swa"
+          FUNC_ID="${{ needs.infrastructure.outputs.functionAppResourceId }}"
+
+          EXISTING=$(az staticwebapp backends show \
+            --name "$SWA_NAME" \
+            --resource-group "${{ secrets.AZURE_RG }}" \
+            --query "[?backendResourceId=='$FUNC_ID'] | length(@)" -o tsv 2>/dev/null || echo 0)
+
+          if [ "$EXISTING" != "0" ] && [ -n "$EXISTING" ]; then
+            echo "✅ Function App already linked as SWA backend"
+          else
+            # Unlink any previously-linked backend (best-effort).
+            az staticwebapp backends unlink \
+              --name "$SWA_NAME" \
+              --resource-group "${{ secrets.AZURE_RG }}" \
+              || true
+
+            az staticwebapp backends link \
+              --name "$SWA_NAME" \
+              --resource-group "${{ secrets.AZURE_RG }}" \
+              --backend-resource-id "$FUNC_ID" \
+              --backend-region "westeurope"
+
+            echo "✅ Function App linked as SWA backend"
+          fi
+
+  # ===========================================================================
+  # Job 4 — Smoke test the deployed /api/health endpoint
+  # ===========================================================================
+  smoke-test:
+    name: ✅ Smoke Test
+    runs-on: ubuntu-latest
+    needs: [infrastructure, deploy-frontend]
+
+    steps:
+      - name: Wait for backend propagation (RBAC + PE DNS)
+        run: sleep 60
+
+      - name: Check /api/health
+        run: |
+          set -euo pipefail
+          SWA_HOST="${{ needs.infrastructure.outputs.swaHostname }}"
+          URL="https://$SWA_HOST/api/health"
+
+          echo "Probing $URL"
+          for i in 1 2 3 4 5; do
+            RESP=$(curl -s -w "\nHTTP_STATUS:%{http_code}" "$URL" || true)
+            STATUS=$(echo "$RESP" | grep -oE 'HTTP_STATUS:[0-9]+' | cut -d: -f2)
+            BODY=$(echo "$RESP" | sed '$d')
+            echo "Attempt $i → $STATUS"
+            echo "$BODY"
+            if [ "$STATUS" = "200" ]; then
+              echo "✅ Health check passed"
+              exit 0
+            fi
+            sleep 20
+          done
+
+          echo "❌ Health check failed after retries"
+          exit 1

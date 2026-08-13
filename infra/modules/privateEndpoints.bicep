@@ -19,6 +19,9 @@ param cosmosDbAccountId string
 @description('Resource ID of the SignalR service')
 param signalRId string
 
+@description('Resource ID of the storage account (for Flex Consumption deployment container)')
+param storageAccountId string
+
 // =============================================================================
 // Cosmos DB Private Endpoint
 // =============================================================================
@@ -151,3 +154,72 @@ resource signalRDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneG
 
 @description('Name of the SignalR private endpoint (needed for networkACL reference)')
 output signalRPrivateEndpointName string = signalRPrivateEndpoint.name
+
+// =============================================================================
+// Storage Account (Blob) Private Endpoint
+// Required for Flex Consumption: the SCM plane runs inside the Function App's
+// delegated subnet and must reach the deployment blob container. When the
+// storage account has publicNetworkAccess=Disabled (enforced by MCAPS policy),
+// a private endpoint on the "blob" sub-resource is the only reachable path.
+// =============================================================================
+
+var storagePrivateEndpointName = '${appName}-${environmentName}-storage-pe'
+
+resource storagePrivateEndpoint 'Microsoft.Network/privateEndpoints@2024-01-01' = {
+  name: storagePrivateEndpointName
+  location: location
+  properties: {
+    subnet: {
+      id: privateEndpointSubnetId
+    }
+    privateLinkServiceConnections: [
+      {
+        name: '${storagePrivateEndpointName}-conn'
+        properties: {
+          privateLinkServiceId: storageAccountId
+          groupIds: ['blob']
+        }
+      }
+    ]
+  }
+  tags: {
+    environment: environmentName
+    app: appName
+  }
+}
+
+resource storageBlobDnsZone 'Microsoft.Network/privateDnsZones@2024-06-01' = {
+  name: 'privatelink.blob.${environment().suffixes.storage}'
+  location: 'global'
+  tags: {
+    environment: environmentName
+    app: appName
+  }
+}
+
+resource storageBlobDnsZoneVnetLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2024-06-01' = {
+  parent: storageBlobDnsZone
+  name: '${appName}-${environmentName}-storage-vnet-link'
+  location: 'global'
+  properties: {
+    virtualNetwork: {
+      id: vnetId
+    }
+    registrationEnabled: false
+  }
+}
+
+resource storageBlobDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2024-01-01' = {
+  parent: storagePrivateEndpoint
+  name: 'storage-dns-group'
+  properties: {
+    privateDnsZoneConfigs: [
+      {
+        name: 'storage-blob-dns-config'
+        properties: {
+          privateDnsZoneId: storageBlobDnsZone.id
+        }
+      }
+    ]
+  }
+}
