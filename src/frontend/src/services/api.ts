@@ -143,12 +143,26 @@ async function withRetry<T>(fn: () => Promise<T>, retries = 2, delayMs = 800): P
   throw lastErr;
 }
 
+/** Optional API base URL (e.g. direct Function App URL). Empty by default (relative /api/*). */
+const API_BASE = (import.meta.env.VITE_API_BASE_URL ?? "").replace(/\/$/, "");
+
+/** Prepend API_BASE when set and the target is a relative /api path. */
+export function apiUrl(path: string): string {
+  if (!API_BASE) return path;
+  if (!path.startsWith("/")) return path;
+  return API_BASE + path;
+}
+
 /** Instrumented fetch — logs timing and status for every API call */
 async function instrumentedFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
-  const endpoint = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+  let target: RequestInfo | URL = input;
+  if (typeof input === "string" && input.startsWith("/")) {
+    target = apiUrl(input);
+  }
+  const endpoint = typeof target === "string" ? target : target instanceof URL ? target.href : target.url;
   const start = performance.now();
   try {
-    const response = await fetch(input, init);
+    const response = await fetch(target, init);
     logApiCall(endpoint, performance.now() - start, response.ok, response.status);
     return response;
   } catch (err) {

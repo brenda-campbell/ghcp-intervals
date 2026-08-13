@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import * as signalR from "@microsoft/signalr";
+import { apiUrl } from "@/services/api";
 import type { LeaderboardEntry } from "@/services/api";
 
 export type ConnectionState =
@@ -82,7 +83,7 @@ export function useSignalR(): UseSignalRReturn {
     if (connectionRef.current) return;
 
     const conn = new signalR.HubConnectionBuilder()
-      .withUrl("/api", {
+      .withUrl(apiUrl("/api"), {
         // Azure SignalR serverless mode — negotiate at /api/negotiate
       })
       .withAutomaticReconnect([0, 2000, 5000, 10000, 30000])

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useSignalRContext } from "@/contexts/SignalRContext";
 import type { ConnectionState } from "@/hooks/useSignalR";
+import { apiUrl } from "@/services/api";
 import { logError, logEvent } from "@/services/logger";
 import { cn } from "@/lib/utils";
 
@@ -28,7 +29,7 @@ export function ConnectionStatus() {
     const checkHealth = async () => {
       setApiHealth((prev) => (prev === "disconnected" ? "disconnected" : "checking"));
       try {
-        const res = await fetch("/api/health", { signal: AbortSignal.timeout(5000) });
+        const res = await fetch(apiUrl("/api/health"), { signal: AbortSignal.timeout(5000) });
         if (!cancelled) {
           if (res.ok) {
             setApiHealth((prev) => {
@@ -68,7 +69,7 @@ export function ConnectionStatus() {
     const pollMs = apiHealth === "disconnected" ? 5000 : 30000;
     const checkHealth = async () => {
       try {
-        const res = await fetch("/api/health", { signal: AbortSignal.timeout(5000) });
+        const res = await fetch(apiUrl("/api/health"), { signal: AbortSignal.timeout(5000) });
         setApiHealth(res.ok ? "connected" : "disconnected");
       } catch {
         setApiHealth("disconnected");
